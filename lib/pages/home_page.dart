@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:capstone_project/pages/tutorial_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,7 +18,7 @@ class HomePageState extends State<HomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,  
           children: <Widget>[
             const Text(
               'Home page',
@@ -29,31 +30,112 @@ class HomePageState extends State<HomePage> {
                 ElevatedButton(
                   child: const Text("Password"),
                   onPressed: () {
-                    // Add your onPressed logic here
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Password"),
+                          content: const Text("Test."),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("Close"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 ),
                 ElevatedButton(
                   child: const Text("Friends"),
+                  
                   onPressed: () {
-                    // Add your onPressed logic here
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Friends"),
+                          content: const Text("Test."),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("Close"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 ),
                 ElevatedButton(
                   child: const Text("Tagging"),
                   onPressed: () {
-                    // Add your onPressed logic here
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Tagging"),
+                          content: const Text("Test."),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("Close"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 ),
                 ElevatedButton(
                   child: const Text("Audience"),
                   onPressed: () {
-                    // Add your onPressed logic here
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Audience"),
+                          content: const Text("Test."),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("Close"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 ),
                 ElevatedButton(
                   child: const Text("Content"),
                   onPressed: () {
-                    // Add your onPressed logic here
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Content"),
+                          content: const Text("Test."),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text("Close"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 ),
               ],
@@ -61,7 +143,12 @@ class HomePageState extends State<HomePage> {
             ElevatedButton(
               child: const Text("Tutorial"),
               onPressed: () {
-                // Add your onPressed logic here
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TutorialPage(),
+                  ),
+                );
               },
             ),
           ],
