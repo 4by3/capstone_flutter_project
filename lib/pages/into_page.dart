@@ -21,7 +21,7 @@ class IntroPageState extends State<IntroPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'Test',
+              'Lorem impsum',
             ),
             ElevatedButton(
               child: const Text("Start"),
