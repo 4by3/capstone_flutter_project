@@ -21,8 +21,13 @@ class Quiz1PageState extends State<Quiz1Page> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'Lorem impsum',
+            const SizedBox(height: 20),
+            const Align(
+              alignment: Alignment.center,
+              child: Text(
+              'You see an advertisement on Facebook that promises a free gift if you click the link. \rWhat should you do?',
+              textAlign: TextAlign.center,
+              ),
             ),
             Image.asset(
               'assets/images/test.png',

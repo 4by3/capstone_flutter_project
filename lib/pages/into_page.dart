@@ -20,8 +20,13 @@ class IntroPageState extends State<IntroPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'Lorem impsum',
+            const SizedBox(height: 20),
+            const Align(
+              alignment: Alignment.center,
+              child: Text(
+              'This application will familiarize Facebook users with privacy settings. \rFacebook users can learn about these settings through audio-visual tutorials and test their knowledge with quizzes. \rThe goal of this application is to raise awareness about privacy among Facebook users.',
+              textAlign: TextAlign.center,
+              ),
             ),
             ElevatedButton(
               child: const Text("Start"),

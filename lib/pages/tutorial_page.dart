@@ -46,8 +46,13 @@ class TutorialPageState extends State<TutorialPage> {
                     child: VideoPlayer(_controller),
                   )
                 : Container(),
-            const Text(
-              'Lorem impsum',
+            const SizedBox(height: 20),
+            const Align(
+              alignment: Alignment.center,
+              child: Text(
+              'After Watching the video, please click on the “Quiz” button. \rYou will be given a scenario. \rWhat would be you choice if you were to update such a status?',
+              textAlign: TextAlign.center,
+              ),
             ),
             ElevatedButton(
               child: const Text("Quiz"),
