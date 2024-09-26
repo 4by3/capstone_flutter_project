@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:capstone_project/pages/feedback1.dart';
+import 'package:capstone_project/pages/feedback2.dart';
 
 class Quiz1Page extends StatefulWidget {
   const Quiz1Page({super.key});
@@ -25,8 +27,8 @@ class Quiz1PageState extends State<Quiz1Page> {
             const Align(
               alignment: Alignment.center,
               child: Text(
-              'You see an advertisement on Facebook that promises a free gift if you click the link. \rWhat should you do?',
-              textAlign: TextAlign.center,
+                'You see an advertisement on Facebook that promises a free gift if you click the link. \rWhat should you do?',
+                textAlign: TextAlign.center,
               ),
             ),
             Image.asset(
@@ -81,7 +83,38 @@ class Quiz1PageState extends State<Quiz1Page> {
             ElevatedButton(
               child: const Text("Feedback"),
               onPressed: () {
-                // go to feedback
+                // if no selection
+                if (_selectedOption == 0) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("Error"),
+                        content: const Text("Please select an option before proceeding"),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text("OK"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  // correct answer
+                } else if (_selectedOption == 2 || _selectedOption == 4) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Feedback1Page()),
+                  );
+                  // wrong answer
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Feedback2Page()),
+                  );
+                }
               },
             ),
             ElevatedButton(
@@ -96,3 +129,4 @@ class Quiz1PageState extends State<Quiz1Page> {
     );
   }
 }
+
