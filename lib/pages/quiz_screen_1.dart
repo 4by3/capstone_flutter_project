@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'result_screen_1a.dart';
 import 'result_screen_1b.dart';
+import 'menu.dart';
 
 class QuizScreen1 extends StatelessWidget {
   const QuizScreen1({super.key});
@@ -10,8 +11,19 @@ class QuizScreen1 extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Quiz 1'),
-        backgroundColor: Colors.white,
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              color: const Color.fromARGB(255, 238, 179, 69),
+            );
+          },
+        ),
       ),
+      drawer: Menu(),
       backgroundColor: const Color(0xFFE9CFA7),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
