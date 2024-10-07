@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:capstone_project/pages/quiz1_page.dart';
+import 'package:capstone_project/pages/unused/quiz1_page.dart';
 import 'package:video_player/video_player.dart';
 
 class TutorialPage extends StatefulWidget {

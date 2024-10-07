@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:capstone_project/pages/feedback1.dart';
-import 'package:capstone_project/pages/feedback2.dart';
+import 'package:capstone_project/pages/unused/feedback1.dart';
+import 'package:capstone_project/pages/unused/feedback2.dart';
 
 class Quiz1Page extends StatefulWidget {
   const Quiz1Page({super.key});
