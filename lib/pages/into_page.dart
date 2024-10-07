@@ -1,35 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:capstone_project/pages/home_page.dart';
+import 'Menu.dart'; 
+import 'home_page.dart';
 
-class IntroPage extends StatefulWidget {
+class IntroPage extends StatelessWidget {
   const IntroPage({super.key});
 
-  @override
-  IntroPageState createState() => IntroPageState();
-}
-
-class IntroPageState extends State<IntroPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Intro"),
+        title: const Text('Privacy Awareness'),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              color: const Color.fromARGB(255, 238, 179, 69),
+            );
+          },
+        ),
       ),
-      body: Center(
+      drawer: Menu(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const SizedBox(height: 20),
-            const Align(
-              alignment: Alignment.center,
-              child: Text(
-              'This application will familiarize Facebook users with privacy settings. \rFacebook users can learn about these settings through audio-visual tutorials and test their knowledge with quizzes. \rThe goal of this application is to raise awareness about privacy among Facebook users.',
-              textAlign: TextAlign.center,
-              ),
+          children: [
+            Image.asset(
+              'assets/images/logo.png', 
+              width: 250,
+              height: 250,
+             
             ),
+            const SizedBox(height: 20),
+            const Text(
+              "This application will familiarize Facebook users with privacy settings.",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "The goal of this application is to raise awareness about privacy among Facebook users through quizzes and videos.",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 30),
             ElevatedButton(
-              child: const Text("Start"),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -38,6 +56,11 @@ class IntroPageState extends State<IntroPage> {
                   ),
                 );
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 238, 179, 69),
+                foregroundColor: Colors.black,
+              ),
+              child: const Text('Get Started'),
             ),
           ],
         ),

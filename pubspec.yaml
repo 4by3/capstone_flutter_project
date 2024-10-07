@@ -64,6 +64,8 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/test.png # added test.png image to assets 19/09/2024
+    - assets/images/pa.png
+    - assets/images/logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
