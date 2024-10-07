@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:capstone_project/pages/tutorial_page.dart';
+import 'menu.dart';
+import 'quiz_screen_1.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -8,9 +9,19 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Interactive Quizzes and Learning Videos"),
-        backgroundColor: Colors.purple[200],
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              color: const Color.fromARGB(255, 238, 179, 69),
+            );
+          },
+        ),
       ),
+      drawer: Menu(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -28,11 +39,14 @@ class HomePage extends StatelessWidget {
                 children: [
                   HomePageCard(
                     title: 'The Privacy Game',
-                    // Update the icon and color for "The Privacy Game"
-                    icon: Icons.privacy_tip_outlined, // Changed icon
-                    color: Colors.amber[200]!, // Cream-yellow color
-                    onTap: () =>
-                        _showDialog(context, 'The Privacy Game', 'Test'),
+                    icon: Icons.privacy_tip_outlined,
+                    color: Colors.amber[200]!,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QuizScreen1(),
+                      ),
+                    ),
                   ),
                   HomePageCard(
                     title: 'Secure Passwords',
