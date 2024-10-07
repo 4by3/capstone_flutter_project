@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart';
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
@@ -25,9 +26,14 @@ class Menu extends StatelessWidget {
               Icons.quiz,
               color: Color.fromARGB(255, 238, 179, 69),
             ),
-            title: const Text('Interactive Quiz'),
+            title: const Text('Home'),
             onTap: () {
-              
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomePage(),
+                ),
+              );
             },
           ),
           ListTile(
@@ -36,9 +42,7 @@ class Menu extends StatelessWidget {
               color: Color.fromARGB(255, 238, 179, 69),
             ),
             title: const Text('Help & FAQs'),
-            onTap: () {
-            
-            },
+            onTap: () {},
           ),
           ListTile(
             leading: const Icon(
@@ -46,9 +50,7 @@ class Menu extends StatelessWidget {
               color: Color.fromARGB(255, 238, 179, 69),
             ),
             title: const Text('Social\'s & Share'),
-            onTap: () {
-              
-            },
+            onTap: () {},
           ),
         ],
       ),
