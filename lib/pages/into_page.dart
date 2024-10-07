@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'Menu.dart'; 
 import 'home_page.dart';
 
 class IntroPage extends StatelessWidget {
@@ -8,21 +7,6 @@ class IntroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Privacy Awareness'),
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              color: const Color.fromARGB(255, 238, 179, 69),
-            );
-          },
-        ),
-      ),
-      drawer: Menu(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
