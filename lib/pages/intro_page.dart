@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 
 class IntroPage extends StatelessWidget {
   const IntroPage({super.key});
+
+// flag that makes next app open go to home page. This should activate on final page of quiz but here temporarily
+  Future<void> _flagHomePage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('goIntroPage', false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,10 +20,9 @@ class IntroPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/logo.png', 
+              'assets/images/logo.png',
               width: 250,
               height: 250,
-             
             ),
             const SizedBox(height: 20),
             const Text(
@@ -32,11 +38,13 @@ class IntroPage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                // saves the home page
+                await _flagHomePage();
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => HomePage(),
+                    builder: (context) => const HomePage(),
                   ),
                 );
               },
