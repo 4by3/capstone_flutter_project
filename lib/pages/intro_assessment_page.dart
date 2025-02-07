@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'intro_completion_page.dart';
 import '../models/question.dart';
+import '../data/intro_data.dart';
+import 'intro_page.dart';
 
-class QuizPage extends StatefulWidget {
-  final String feature;
+class IntroAssessmentQuizPage extends StatefulWidget {
+  final String intro;
   final List<Question> questions;
 
-  const QuizPage({super.key, required this.feature, required this.questions});
+  const IntroAssessmentQuizPage({super.key, required this.intro, required this.questions});
 
   @override
-  State<QuizPage> createState() => _QuizPageState();
+  State<IntroAssessmentQuizPage> createState() => _IntroAssessmentQuizPageState();
 }
 
-class _QuizPageState extends State<QuizPage> {
+class _IntroAssessmentQuizPageState extends State<IntroAssessmentQuizPage> {
   int currentQuestionIndex = 0;
   List<int?> selectedAnswers = []; // list to store answers for each question (nullable integers)
   List<int> questionScores = []; // list to store individual question scores
   int totalScore = 0;
+  List<int> scores = [];
 
   // method for next button
   void checkAnswer() {
@@ -31,29 +34,17 @@ class _QuizPageState extends State<QuizPage> {
     questionScores[currentQuestionIndex] = questionScore;
 
     // update total score by adding the current question score
-    totalScore += questionScore;
+    scores.add(questionScore);
 
     setState(() {
       if (currentQuestionIndex < widget.questions.length - 1) { // if it isn't the last question
         currentQuestionIndex++;
       } else {
-        Future.delayed(Duration.zero, () { // temporary alert dialog. Will later add result page
-          showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-              title: const Text('Quiz Complete!'),
-              content: Text('Your score: $totalScore'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
-                    );
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
+        Future.delayed(Duration.zero, () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => IntroCompletionPage(),
             ),
           );
         });
@@ -83,13 +74,13 @@ class _QuizPageState extends State<QuizPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.feature} - Question ${currentQuestionIndex + 1}'),
+        title: Text('${widget.intro} - Question ${currentQuestionIndex + 1}'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
+              MaterialPageRoute(builder: (context) => const IntroPage()),
             );
           },
         ),

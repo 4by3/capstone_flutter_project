@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
-import 'intro_preference_quiz_page.dart';
-import '../data/intro_data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'home_page.dart';
 
-class IntroPage extends StatelessWidget {
-  const IntroPage({super.key});
+class IntroCompletionPage extends StatelessWidget {
+  const IntroCompletionPage({super.key});
+
+// flag that makes next app open go to home page. This should activate on final page of quiz but here temporarily
+  Future<void> _flagHomePage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('goIntroCompletionPage', false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,26 +26,25 @@ class IntroPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             const Text(
-              "This application will familiarize Facebook users with privacy settings.",
+              "Insert feedback here.",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 20),
             const Text(
-              "The goal of this application is to raise awareness about privacy among Facebook users through quizzes and videos.",
+              "Insert feedback here.",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                // saves the home page
+                await _flagHomePage();
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => IntroPreferenceQuiz(
-                      intro: 'Preferences',
-                      questions: intros['Preferences']!,
-                    ),
+                    builder: (context) => const HomePage(),
                   ),
                 );
               },

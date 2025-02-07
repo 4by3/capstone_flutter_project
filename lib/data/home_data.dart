@@ -1,6 +1,6 @@
 import '../models/question.dart';
 
-const Map<String, List<Question>> subjects = {
+const Map<String, List<Question>> features = {
   'Block, Restrict, and Report Usage': [
     Question(
       question: 'A user you don’t know has sent you multiple inappropriate messages and it’s making you uncomfortable.\nDo you:',

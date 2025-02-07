@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
 import '../models/question.dart';
+import '../data/intro_data.dart';
+import 'intro_assessment_page.dart';
+import 'intro_page.dart';
 
-class QuizPage extends StatefulWidget {
-  final String feature;
+class IntroPreferenceQuiz extends StatefulWidget {
+  final String intro;
   final List<Question> questions;
 
-  const QuizPage({super.key, required this.feature, required this.questions});
+  const IntroPreferenceQuiz(
+      {super.key, required this.intro, required this.questions});
 
   @override
-  State<QuizPage> createState() => _QuizPageState();
+  State<IntroPreferenceQuiz> createState() => _IntroPreferenceQuizState();
 }
 
-class _QuizPageState extends State<QuizPage> {
+class _IntroPreferenceQuizState extends State<IntroPreferenceQuiz> {
   int currentQuestionIndex = 0;
-  List<int?> selectedAnswers = []; // list to store answers for each question (nullable integers)
+  List<int?> selectedAnswers =
+      []; // list to store answers for each question (nullable integers)
   List<int> questionScores = []; // list to store individual question scores
   int totalScore = 0;
+  List<int> scores = [];
 
   // method for next button
   void checkAnswer() {
@@ -27,33 +32,28 @@ class _QuizPageState extends State<QuizPage> {
       questionScore++;
     }
 
-    // update the individual question score
-    questionScores[currentQuestionIndex] = questionScore;
+    // Ensure questionScores has enough elements
+    if (questionScores.length <= currentQuestionIndex) {
+      questionScores.add(questionScore);
+    } else {
+      questionScores[currentQuestionIndex] = questionScore;
+    }
 
-    // update total score by adding the current question score
-    totalScore += questionScore;
+    // Update total score
+    scores.add(questionScore);
 
     setState(() {
-      if (currentQuestionIndex < widget.questions.length - 1) { // if it isn't the last question
+      if (currentQuestionIndex < widget.questions.length - 1) {
         currentQuestionIndex++;
       } else {
-        Future.delayed(Duration.zero, () { // temporary alert dialog. Will later add result page
-          showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-              title: const Text('Quiz Complete!'),
-              content: Text('Your score: $totalScore'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
-                    );
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
+        Future.delayed(Duration.zero, () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => IntroAssessmentQuizPage(
+                intro: 'Assessment',
+                questions: intros['Assessment']!,
+              ),
             ),
           );
         });
@@ -63,11 +63,13 @@ class _QuizPageState extends State<QuizPage> {
 
   // method for back button
   void goBackOneQuestion() {
-    final correctAnswers = widget.questions[currentQuestionIndex - 1].correctness;
+    final correctAnswers =
+        widget.questions[currentQuestionIndex - 1].correctness;
     if (currentQuestionIndex > 0) {
       setState(() {
         currentQuestionIndex--;
-        totalScore -= correctAnswers[selectedAnswers[currentQuestionIndex] ?? 0]; // deletes previous answer from total score
+        totalScore -= correctAnswers[selectedAnswers[currentQuestionIndex] ??
+            0]; // deletes previous answer from total score
       });
     }
   }
@@ -83,13 +85,13 @@ class _QuizPageState extends State<QuizPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.feature} - Question ${currentQuestionIndex + 1}'),
+        title: Text('${widget.intro} - Question ${currentQuestionIndex + 1}'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
+              MaterialPageRoute(builder: (context) => const IntroPage()),
             );
           },
         ),
@@ -110,7 +112,8 @@ class _QuizPageState extends State<QuizPage> {
               groupValue: selectedAnswers[currentQuestionIndex],
               onChanged: (int? value) {
                 setState(() {
-                  selectedAnswers[currentQuestionIndex] = value; // stores the selected answer
+                  selectedAnswers[currentQuestionIndex] =
+                      value; // stores the selected answer
                 });
               },
             );
@@ -119,7 +122,8 @@ class _QuizPageState extends State<QuizPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ElevatedButton(
-                onPressed: currentQuestionIndex == 0 // if first question, disable back button
+                onPressed: currentQuestionIndex ==
+                        0 // if first question, disable back button
                     ? null
                     : goBackOneQuestion,
                 child: const Text('Back'),
@@ -127,7 +131,7 @@ class _QuizPageState extends State<QuizPage> {
               ElevatedButton(
                 onPressed: selectedAnswers[currentQuestionIndex] == null
                     ? null
-                    : checkAnswer, 
+                    : checkAnswer,
                 child: const Text('Next'),
               ),
             ],

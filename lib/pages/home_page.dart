@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'intro_page.dart';
 import 'quiz_page.dart';
-import '../data/home_features_data.dart';
+import '../data/home_data.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -18,20 +18,20 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Choose a Subject'),
+        title: const Text('Choose a Feature'),
         automaticallyImplyLeading: false,
       ),
       body: ListView(
-        children: subjects.keys.map((subject) {
+        children: features.keys.map((feature) {
           return ListTile(
-            title: Text(subject),
+            title: Text(feature),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => QuizPage(
-                    subject: subject,
-                    questions: subjects[subject]!,
+                    feature: feature,
+                    questions: features[feature]!,
                   ),
                 ),
               );
