@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'intro_preference_quiz_page.dart';
-import '../data/intro_data.dart';
+import 'intro_quiz_page.dart';
 
 class IntroPage extends StatelessWidget {
   const IntroPage({super.key});
@@ -36,15 +35,12 @@ class IntroPage extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => IntroPreferenceQuiz(
-                      intro: 'Preferences',
-                      questions: intros['Preferences']!,
-                    ),
+                    builder: (context) => const IntroQuizPage(),
                   ),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 238, 179, 69),
+                backgroundColor: Colors.deepPurpleAccent,
                 foregroundColor: Colors.black,
               ),
               child: const Text('Get Started'),
