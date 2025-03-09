@@ -34,57 +34,57 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> {
     0: [
       // Block, Restrict, Report Usage Question
       {
-        'question': 'What actions can you take when you want to block someone?',
+        'question': "A user you don't know has sen you multiple inappropriate messages and it's making you uncomfortable. \n Do you: ",
         'options': [
-          'A) Report their profile',
-          'B) Restrict their access',
-          'C) Both A and B',
-          'D) None of the above'
+          'A) Ignore the message',
+          'B) Block the user so they cannot contact you again',
+          'C) Respond to the message and ask them to stop',
+          'D) Report the user for inappropriate behaviour'
         ],
-        'answer': 'C) Both A and B'
+        'answer': 'B) Block the user so they cannot contact you again'
       },
       {
-        'question': 'How can you report inappropriate content on Facebook?',
+        'question': 'You find a Facebook profile using your name and photos to impersonate you and send messages to people. \n Do you: ',
         'options': [
-          'A) By clicking the three dots on the post',
-          'B) By unfriending the user',
-          'C) By liking the post',
-          'D) By sharing the post'
+          'A) Ignore it assuming it will go away',
+          'B) Send a message to the profile asking them to stop the impersonation',
+          'C) Report the profile to Facebook for impersonation',
+          'D) Post about it publicly to let the others know'
         ],
-        'answer': 'A) By clicking the three dots on the post'
+        'answer': 'C) Report the profile to Facebook for impersonation'
       },
       {
         'question':
-            'What is the difference between blocking and restricting on Facebook?',
+            'A group of users leaves hurtful comments on your recent post, criticizing your opinions and spreading misinformation about you. \n Do you: ',
         'options': [
-          'A) Blocking prevents the user from seeing your profile, restricting limits their interaction',
-          'B) Blocking restricts only posts',
-          'C) Restricting blocks everything',
-          'D) There is no difference'
+          'A) Delete your post and stay quiet',
+          'B) Block the users posting hurtful comments',
+          'C) Report the comments to Facebook for violating community guidelines',
+          'D) Respond to the comments to defend yourself'
         ],
         'answer':
-            'A) Blocking prevents the user from seeing your profile, restricting limits their interaction'
+            'C) Report the comments to Facebook for violating community guidelines'
       },
       {
-        'question': 'What can you report on Facebook?',
+        'question': "A friend keeps posting comments on your personal photos that makes you uncomfortable, but you don't want to unfriend them because they are part of your social circle. \n Do you: ",
         'options': [
-          'A) A post',
-          'B) A comment',
-          'C) A profile',
-          'D) All of the above'
+          'A) Restrict the friend so they can only see your public posts',
+          'B) Remove them from your friend list',
+          'C) Ask them privately to stop commenting on your photos',
+          'D) Block the friend immediately'
         ],
-        'answer': 'D) All of the above'
+        'answer': 'A) Restrict the friend so they can only see your public posts'
       },
       {
         'question':
-            'What should you consider before reporting something on Facebook?',
+            'You frequently receive friend request from strangers who immediately send spam messages or inappropriate content. \n Do you:',
         'options': [
-          'A) Whether it violates Facebook\'s community standards',
-          'B) Whether it involves someone you know personally',
-          'C) Whether it is offensive',
-          'D) All of the above'
+          'A) Accept the request and ignore the messages',
+          'B) Block the user immediately after receiving the requests',
+          'C) Report the accounts for spamming',
+          'D) Restrict your friend request setting to \'Friends of Friends\' to reduce unwanted requests'
         ],
-        'answer': 'A) Whether it violates Facebook\'s community standards'
+        'answer': 'D) Restrict your friend request setting to \'Friends of Friends\' to reduce unwanted requests'
       },
     ],
     1: [
@@ -144,162 +144,162 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> {
     2: [
       // Audience Setting for Posts Question
       {
-        'question': 'What does the audience setting for posts control?',
+        'question': 'You post a photo from a family gathering on your profile. A colleague comments on the post, mentioning details about your workplace. \n How should you handle the audience settings for this post?',
         'options': [
-          'A) Who can see your posts',
-          'B) Who can comment on your posts',
-          'C) Who can like your posts',
-          'D) None of the above'
+          'A) Leave it public to let everyone enjoy the post',
+          'B) Change the audience to \'Friends Only\'',
+          'C) Use the custom audience option to exclude colleagues',
+          'D) Delete the comment to avoid workplace-related exposure'
         ],
-        'answer': 'A) Who can see your posts'
+        'answer': 'C) Use the custom audience option to exclude colleagues'
       },
       {
-        'question': 'When should you review your post\'s audience settings?',
+        'question': 'You discover an old post from two years ago that is still set to \'Public\' The post includes a photo of your vacation with the location details. \n What is the best course of action?',
         'options': [
-          'A) Before posting',
-          'B) After posting',
-          'C) Never',
-          'D) Only for photos'
+          'A) Leave it public as it\'s an old post ',
+          'B) Use the \'Limit Past Posts\' feature to change the audience to \'Friends Only\'',
+          'C) Delete the post to eliminate any potential privacy risks',
+          'D) Edit the post to remove location details while keeping it public'
         ],
-        'answer': 'A) Before posting'
+        'answer': 'B) Use the \'Limit Past Posts\' feature to change the audience to \'Friends Only\''
       },
       {
-        'question': 'What is the most private audience setting for a post?',
+        'question': 'You share advice in a public professional group. Later, you noticed some group members visiting your profile and sending connection requests. \n How can you prevent this exposure?',
         'options': [
-          'A) Friends',
-          'B) Only Me',
-          'C) Public',
-          'D) Friends of Friends'
+          'A) Leave the group to avoid further interactions',
+          'B) Change your future post audience to  \'Friends\' or \'Only Me\'',
+          'C) Ignore the requests and continue posting in the group',
+          'D) Set profile details visible to \'Friends Only\' or \'Custom Audience\''
         ],
-        'answer': 'B) Only Me'
+        'answer': 'D) Set profile details visible to \'Friends Only\' or \'Custom Audience\''
       },
       {
-        'question': 'Can you change a post\'s audience setting after posting?',
+        'question': 'You announce your new job on your profile. You notice that acquaintances you don\'t interact with are congratulating you. \n What is the best way to control the audience for such updates?',
         'options': [
-          'A) Yes, anytime',
-          'B) No, never',
-          'C) Only within 24 hours',
-          'D) Only for photos'
+          'A) Keep the post public to let everyone celebrate with you',
+          'B) Adjust the audience to include only close friends and family',
+          'C) Use \'Custom Audience\' to exclude people you rarely interact with',
+          'D) Delete the post to avoid unwanted attention'
         ],
-        'answer': 'A) Yes, anytime'
+        'answer': 'C) Use \'Custom Audience\' to exclude people you rarely interact with'
       },
       {
-        'question': 'What happens when you set a post to "Friends except..."?',
+        'question': 'You create a post inviting friends to your birthday party. Later, you realize it\'s visible to your entire friend list, including colleagues and acquaintances. \n How can you fix the audience settings?',
         'options': [
-          'A) Selected friends won\'t see the post',
-          'B) Only selected friends see the post',
-          'C) Everyone sees the post',
-          'D) No one sees the post'
+          'A) Let it remain as it is; it\'s just a birthday invitation',
+          'B) Change the audience to include only specific people invited to the party',
+          'C) Delete the post and send individual invitations instead',
+          'D) Edit the post and add a note clarifying it\'s for specific people'
         ],
-        'answer': 'A) Selected friends won\'t see the post'
+        'answer': 'B) Change the audience to include only specific people invited to the party'
       },
     ],
     3: [
       // Interaction on Others' Posts Question
       {
         'question':
-            'What is a key aspect of interacting with posts on Facebook?',
+            'You comment on a public post shared by a news page. The post sparks a debate, and your comment receives several replies from strangers. Some of them visit your profile, and one even sends you a friend request. \n What action should you take to protect your privacy?',
         'options': [
-          'A) Liking',
-          'B) Commenting',
-          'C) Sharing',
-          'D) All of the above'
+          'A) Reply to all the comments to clarify your point',
+          'B) Adjust your privacy settings to limit profile visibility to \'Friends Only\'',
+          'C) Ignore the situation and keep engaging with strangers on the post',
+          'D) Block anyone who interacts with your comment'
         ],
-        'answer': 'D) All of the above'
+        'answer': 'B) Adjust your privacy settings to limit profile visibility to \'Friends Only\''
       },
       {
-        'question': 'What should you consider before commenting on a post?',
+        'question': 'You share a public post from a community page, and someone from that page comments on your post. They mentioned they liked your content and suggest checking out their profile. \n How can you minimize exposure to stranger?',
         'options': [
-          'A) The post\'s privacy settings',
-          'B) Your audience',
-          'C) The content appropriateness',
-          'D) All of the above'
+          'A) Delete the shared post',
+          'B) Check the privacy settings of your shared content and restrict it to \'Friends\'',
+          'C) Ignore the comment and continue sharing public posts',
+          'D) Engage with the stranger to learn more about them'
         ],
-        'answer': 'D) All of the above'
+        'answer': 'B) Check the privacy settings of your shared content and restrict it to \'Friends\''
       },
       {
-        'question': 'How can you ensure respectful interaction on posts?',
+        'question': 'You like a photo shared publicly by a stranger in a travel group. Shortly after, you receive a direct message from them asking about your interest in travelling. \n WHat would be the safest response?',
         'options': [
-          'A) Read before commenting',
-          'B) Be polite and considerate',
-          'C) Avoid offensive language',
-          'D) All of the above'
+          'A)  Review your group activity and limit your profile information visibility in your groups',
+          'B) Respond politely and share your travel experiences',
+          'C) Unfollow the group to avoid further interaction',
+          'D) Ignore the message and continue liking similar posts'
         ],
-        'answer': 'D) All of the above'
+        'answer': 'A)  Review your group activity and limit your profile information visibility in your groups'
       },
       {
         'question':
-            'What should you do if you see harmful content in comments?',
+            'You are tagged by a friend in a public group post. The post is a funny meme, but it attracts comments and reactions from strangers/ \n What steps should you take?',
         'options': [
-          'A) Ignore it',
-          'B) Report it',
-          'C) Engage with it',
-          'D) Share it'
+          'A) Leave the tag as it is; it\'s harmless',
+          'B) Engage with the comments to maintain a fun discussion',
+          'C) Adjust your tagging settings to require approval for future tags',
+          'D) Remove the tag and ask your friend to seek permission before tagging'
         ],
-        'answer': 'B) Report it'
+        'answer': 'D) Remove the tag and ask your friend to seek permission before tagging'
       },
       {
-        'question': 'How can you control who interacts with your posts?',
+        'question': 'You post a question in a public hobby group. A stranger replies with an answer but also starts following your profile. \n What should you do to protect your privacy?',
         'options': [
-          'A) Audience settings',
-          'B) Comment controls',
-          'C) Blocking users',
-          'D) All of the above'
+          'A) Thank the stranger and accept the follower',
+          'B) Message the stranger to confirm their intention',
+          'C) Review your profile visibility settings and restrict it to \'Friends Only\'',
+          'D) Remove the post to stop further exposure'
         ],
-        'answer': 'D) All of the above'
+        'answer': 'C) Review your profile visibility settings and restrict it to \'Friends Only\''
       },
     ],
     4: [
       // Tag and Review Settings Question
       {
-        'question': 'What is the purpose of tag review settings?',
+        'question': 'You go to a very fun party, and your friend posts you in a picture without asking you if it is all right. The post comes up as public which means most of your Facebook friends can see the picture. \n What do you do to keep your privacy but still feel okay with what happened? ',
         'options': [
-          'A) Control who can tag you',
-          'B) Review tags before they appear',
-          'C) Manage timeline posts',
-          'D) All of the above'
+          'A) Ignore the posting completely; it\'s just a tag, and no harm caused',
+          'B) Politely tell your friend to remove the tag or bring down the photo completely',
+          'C) Under the \'Review Tags\' feature on Facebook you can determine whether the tag will show up on your profile' ,
+          'D) Edit the tagged posts audience to one that only shows the post to specific people'
         ],
-        'answer': 'D) All of the above'
+        'answer': 'C) Under the \'Review Tags\' feature on Facebook you can determine whether the tag will show up on your profile'
       },
       {
-        'question': 'How do you enable tag review?',
+        'question': 'Facebook also has a feature known as \'Review Tags\'. This setting provides the user with even further control based on the different content that has been placed on their profiles. Whic of the following statements best describes what the \'Review Tags\' feature does for you?',
         'options': [
-          'A) Privacy Settings',
-          'B) Timeline Settings',
-          'C) Profile Settings',
-          'D) Account Settings'
+          'A) Automatically delete all tags from your photos and post without notifying the person who tagged you',
+          'B) Approve and reject tags added by others before they are displayed on your profile or timeline',
+          'C) Send a notification to anyone who tags you, reminding them to seek you',
+          'D) Permanently block tagging on your profile to avoid such situations in the future'
         ],
-        'answer': 'A) Privacy Settings'
+        'answer': 'B) Approve and reject tags added by others before they are displayed on your profile or timeline'
       },
       {
-        'question': 'What happens when someone tags you with tag review on?',
+        'question': 'Suppose a friend has tagged you in a group photo taken at some event. The friend created the posting with the audience setting of \'Friends\'. According to Facebook audience settings, who would have access to this tagged posting?',
         'options': [
-          'A) Tag appears immediately',
-          'B) You must approve the tag',
-          'C) Tag is automatically rejected',
-          'D) Tag is hidden'
+          'A) Your tagged post is only accessible by you Facebook friends regardless of the settings set by your friend',
+          'B) It\'s on your friend\'s profile; only their Facebook friends can view it',
+          'C) Due to the tag, anyone on Facebook will be able to see the post, regardless of whether they\'re in your friend\'s network of connections',
+          'D) Your friends, your friends\'s friends, and any others that your friend defines when setting the custom audience for it will be able to see the post'
         ],
-        'answer': 'B) You must approve the tag'
+        'answer': 'D) Your friends, your friends\'s friends, and any others that your friend defines when setting the custom audience for it will be able to see the post'
       },
       {
-        'question': 'Who can see posts you\'re tagged in?',
+        'question': 'You get tagged in a post that contains any kind of sensitive personal information, which is likely to include your location or an embarrassing photo. You don\'t want this being widely visbile or hurting anyone. What can you do to protect yourself from such situation?',
         'options': [
-          'A) Everyone',
-          'B) Only you',
-          'C) Depends on the post\'s privacy settings',
-          'D) Your friends only'
+          'A) Untag yourself from the photo or posting with the untagging option on the post itself',
+          'B) Report the post on Facebook and identify the violation of Community Guidelines or Terms of Service',
+          'C) Change your privacy settings to tagged content only showing to a limited audience',
+          'D) Take all the above measure for complete protection of your privacy'
         ],
-        'answer': 'C) Depends on the post\'s privacy settings'
+        'answer': 'D) Take all the above measure for complete protection of your privacy'
       },
       {
-        'question': 'How can you remove a tag from a post?',
+        'question': 'If you wish to stay updated and get notified every time anyone tags you in any post or photo, then to turn this on and monitor your tags, what would you do?',
         'options': [
-          'A) Report the post',
-          'B) Delete the post',
-          'C) Remove tag through options',
-          'D) Block the person'
+          'A) You enable the notifications of tagging in the privacy and notification settings of your account',
+          'B) Click directly under the post your\'re tagged in and enable \'Turn on notification\'',
+          'C) Undergo the settings on your account using Facebook\'s \'Privacy Checkup\' tool; including tagging notifications and approvals',
+          'D) There is no setting for notifications of tags since all users receive them by default from Facebook'
         ],
-        'answer': 'C) Remove tag through options'
+        'answer': 'A) You enable the notifications of tagging in the privacy and notification settings of your account'
       },
     ],
   };
