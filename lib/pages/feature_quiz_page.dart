@@ -90,55 +90,54 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> {
     1: [
       // Facebook Groups Question
       {
-        'question': 'What is the main purpose of Facebook groups?',
+        'question': 'Who can see the posts in a private Facebook group?',
         'options': [
-          'A) To share photos',
-          'B) To organize events',
-          'C) To connect people with shared interests',
-          'D) To advertise products'
+          'A) Only group members',
+          'B) Anyone on Facebook',
+          'C) Only the group admin',
+          'D) Friends of group members'
         ],
-        'answer': 'C) To connect people with shared interests'
+        'answer': 'A) Only group members'
       },
       {
-        'question':
-            'What type of Facebook group is best for a local community?',
+        'question': 'What happens when you switch a Facebook group from private to public?',
         'options': [
-          'A) Public group',
-          'B) Closed group',
-          'C) Secret group',
-          'D) None of the above'
+          'A) Only new posts become public',
+          'B) All past and future posts become visible to everyone',
+          'C) Only admins can see old posts, but new posts are public',
+          'D) Facebook does not allow switching a group from private to public'
         ],
-        'answer': 'B) Closed group'
+        'answer': 'B) All past and future posts become visible to everyone'
       },
       {
-        'question': 'How do you ensure safety in a Facebook group as an admin?',
+        'question': 'If you leave a Facebook group, what happens to the posts you shared in the group?',
         'options': [
-          'A) Screen member requests',
-          'B) Set clear group rules',
-          'C) Monitor post content',
-          'D) All of the above'
+          'A) They get automatically deleted',
+          'B) They remain in the group unless you delete them manually',
+          'C) Only admins can see them',
+          'D) They disappear after 30 days'
         ],
-        'answer': 'D) All of the above'
+        'answer': 'B) They remain in the group unless you delete them manually'
       },
       {
-        'question': 'What features are available to group administrators?',
+        'question': 'Who can approve new members in a Facebook group?',
         'options': [
-          'A) Post approval',
-          'B) Member management',
-          'C) Content moderation',
-          'D) All of the above'
+          'A) Only the group admin',
+          'B) Group admins and moderators',
+          'C) Any group member',
+          'D) Only Facebook itself'
         ],
-        'answer': 'D) All of the above'
+        'answer': 'B) Group admins and moderators'
       },
       {
-        'question': 'How do you participate effectively in a Facebook group?',
+        'question': 'What can group admins do to enhance privacy in a Facebook group?',
         'options': [
-          'A) Read group rules first',
-          'B) Engage respectfully with others',
-          'C) Share relevant content',
-          'D) All of the above'
+          'A) Turn off post approvals for all members',
+          'B) Make all group posts visible to non-members',
+          'C) Allow anyone to join',
+          'D) Set the group to private and restrict who can join'
         ],
-        'answer': 'D) All of the above'
+        'answer': 'D) Set the group to private and restrict who can join'
       },
     ],
     2: [
