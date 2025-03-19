@@ -11,35 +11,95 @@ class FeatureQuizPage extends StatefulWidget {
   _FeatureQuizPageState createState() => _FeatureQuizPageState();
 }
 
-class _FeatureQuizPageState extends State<FeatureQuizPage> {
+class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderStateMixin {
   int currentQuestionIndex = 0;
   int score = 0;
   Map<int, String> selectedAnswers = {};
   late ConfettiController _confettiController;
+  late AnimationController _questionController;
+  late Animation<Offset> _questionSlideAnimation;
+  late List<AnimationController> _answerControllers;
+  late List<Animation<Offset>> _answerSlideAnimations;
 
   @override
   void initState() {
     super.initState();
     _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+
+    // Question animation
+    _questionController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _questionSlideAnimation = Tween<Offset>(
+      begin: const Offset(1.0, 0.0), // Slide in from the right
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _questionController, curve: Curves.easeInOut));
+
+    // Initialize answer animations with increasing durations
+    _answerControllers = List.generate(
+      3, // Assuming max 3 options; adjust if needed
+      (index) => AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 700 + (index * 200)), // 700ms, 900ms, 1100ms
+      ),
+    );
+    _answerSlideAnimations = _answerControllers.map((controller) {
+      return Tween<Offset>(
+        begin: const Offset(1.0, 0.0), // Slide in from the right
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
+    }).toList();
+
+    // Start animations for the first question
+    _startAnimations();
   }
 
   @override
   void dispose() {
     _confettiController.dispose();
+    _questionController.dispose();
+    for (var controller in _answerControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
-  String getFeatureName() {
-    switch (widget.featureIndex) {
-      case 0: return 'Block, Restrict, Report Usage';
-      case 1: return 'Facebook Groups';
-      case 2: return 'Audience Setting for Posts';
-      case 3: return 'Interaction on Others\' Posts';
-      case 4: return 'Tag Review and Settings';
-      default: return 'Unknown Feature';
+  // Trigger animations when question changes
+  void _startAnimations() {
+    _questionController.reset();
+    _questionController.forward();
+    for (var controller in _answerControllers) {
+      controller.reset();
+      controller.forward();
     }
   }
 
+  // Handle back button press and return score
+  Future<bool> _onWillPop() async {
+    Navigator.pop(context, score);
+    return true;
+  }
+
+  // Get feature name based on index
+  String getFeatureName() {
+    switch (widget.featureIndex) {
+      case 0:
+        return 'Block, Restrict, Report Usage';
+      case 1:
+        return 'Facebook Groups';
+      case 2:
+        return 'Audience Setting for Posts';
+      case 3:
+        return 'Interaction on Others\' Posts';
+      case 4:
+        return 'Tag Review and Settings';
+      default:
+        return 'Unknown Feature';
+    }
+  }
+
+  // Submit answer and show feedback dialog
   void _submitAnswer() {
     final questions = featureQuestions[widget.featureIndex]!;
     final currentQuestion = questions[currentQuestionIndex];
@@ -47,7 +107,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> {
 
     if (isCorrect) {
       setState(() => score++);
-      _confettiController.play(); // Trigger confetti for correct answers
+      _confettiController.play();
     }
 
     showDialog(
@@ -89,8 +149,10 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> {
               children: [
                 const SizedBox(height: 10),
                 Text(
-                  isCorrect 
-                      ? 'You nailed it! On to the next one?'
+                  isCorrect
+                      ? (currentQuestionIndex == questions.length - 1
+                          ? 'Congratulations on finishing!'
+                          : 'You nailed it! On to the next one?')
                       : 'Feedback: ${currentQuestion['feedback']}',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
@@ -110,8 +172,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> {
                     elevation: 5,
                   ),
                   child: Text(
-                    isCorrect && currentQuestionIndex == questions.length - 1 
-                        ? 'Finish' 
+                    isCorrect && currentQuestionIndex == questions.length - 1
+                        ? 'Finish'
                         : 'Next',
                     style: const TextStyle(fontSize: 20, color: Colors.white),
                   ),
@@ -119,7 +181,10 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> {
                     Navigator.pop(context);
                     if (isCorrect) {
                       if (currentQuestionIndex < questions.length - 1) {
-                        setState(() => currentQuestionIndex++);
+                        setState(() {
+                          currentQuestionIndex++;
+                          _startAnimations(); // Trigger animations for next question
+                        });
                       } else {
                         _finishQuiz();
                       }
@@ -147,6 +212,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> {
     );
   }
 
+  // Show final score and return to home
   void _finishQuiz() {
     showDialog(
       context: context,
@@ -188,8 +254,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> {
             ),
             const SizedBox(height: 20),
             Text(
-              score == 5 
-                  ? 'You\'re a privacy expert!' 
+              score == 5
+                  ? 'You\'re a privacy expert!'
                   : 'Nice work! Try again to improve?',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 20, color: Colors.black87),
@@ -226,210 +292,241 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> {
     final questions = featureQuestions[widget.featureIndex] ?? [];
     final question = questions[currentQuestionIndex];
     final totalQuestions = questions.length;
+    const double questionContainerHeight = 300;
+    final double questionNumberFontSize = questionContainerHeight * 0.08;
+    final double questionTextFontSize = questionContainerHeight * 0.073;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          getFeatureName(),
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            getFeatureName(),
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
+          backgroundColor: Colors.deepPurple,
+          elevation: 0,
+          centerTitle: true,
         ),
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: Container(
-        color: Colors.grey[50],
-        child: Column(
-          children: [
-            // Progress Bar
-            Container(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: Container(
+          color: Colors.grey[50],
+          child: Column(
+            children: [
+              // Progress bar
+              Container(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Question ${currentQuestionIndex + 1}/$totalQuestions',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.deepPurple,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          'Score: $score',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.deepPurple,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    LinearProgressIndicator(
+                      value: (currentQuestionIndex + 1) / totalQuestions,
+                      backgroundColor: Colors.grey[300],
+                      valueColor: const AlwaysStoppedAnimation(Colors.deepPurple),
+                      minHeight: 10,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Question container with slide animation
+              SlideTransition(
+                position: _questionSlideAnimation,
+                child: Container(
+                  height: questionContainerHeight,
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
                     children: [
-                      Text(
-                        'Question ${currentQuestionIndex + 1}/$totalQuestions',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.deepPurple,
-                          fontWeight: FontWeight.w600,
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        child: Text(
+                          'Q${currentQuestionIndex + 1}',
+                          style: TextStyle(
+                            fontSize: questionNumberFontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
                         ),
                       ),
-                      Text(
-                        'Score: $score',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.deepPurple,
-                          fontWeight: FontWeight.w600,
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 40),
+                          child: SingleChildScrollView(
+                            child: Text(
+                              question['question'],
+                              style: TextStyle(
+                                fontSize: questionTextFontSize,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  LinearProgressIndicator(
-                    value: (currentQuestionIndex + 1) / totalQuestions,
-                    backgroundColor: Colors.grey[300],
-                    valueColor: const AlwaysStoppedAnimation(Colors.deepPurple),
-                    minHeight: 10,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ],
+                ),
               ),
-            ),
-            
-            // Question Container with Fixed Height
-            Container(
-              height: 220,
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 2,
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
+
+              // Answers section with slide animations
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: Column(
+                    children: question['options'].asMap().entries.map<Widget>((entry) {
+                      final index = entry.key;
+                      final option = entry.value;
+                      final isSelected = selectedAnswers[currentQuestionIndex] == option;
+
+                      // Use the last animation if index exceeds available animations
+                      final animationIndex = index < _answerSlideAnimations.length
+                          ? index
+                          : _answerSlideAnimations.length - 1;
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: SlideTransition(
+                          position: _answerSlideAnimations[animationIndex],
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() => selectedAnswers[currentQuestionIndex] = option);
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? Colors.deepPurple.withOpacity(0.15)
+                                    : Colors.white,
+                                border: Border.all(
+                                  color: isSelected ? Colors.deepPurple : Colors.grey[400]!,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    spreadRadius: 1,
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Radio<String>(
+                                    value: option,
+                                    groupValue: selectedAnswers[currentQuestionIndex],
+                                    onChanged: (value) {
+                                      setState(() => selectedAnswers[currentQuestionIndex] = value!);
+                                    },
+                                    activeColor: Colors.deepPurple,
+                                    materialTapTargetSize: MaterialTapTargetSize.padded,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      option,
+                                      style: const TextStyle(fontSize: 20),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
-                ],
+                ),
               ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+
+              // Navigation buttons
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
                   children: [
-                    Text(
-                      'Q${currentQuestionIndex + 1}',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
+                    if (currentQuestionIndex > 0)
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            side: const BorderSide(color: Colors.deepPurple, width: 2),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              currentQuestionIndex--;
+                              _startAnimations(); // Trigger animations for previous question
+                            });
+                          },
+                          child: const Text(
+                            'Previous',
+                            style: TextStyle(fontSize: 20, color: Colors.deepPurple),
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      question['question'],
-                      style: const TextStyle(
-                        fontSize: 22,
-                        height: 1.3,
+                    if (currentQuestionIndex > 0) const SizedBox(width: 20),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple,
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          elevation: selectedAnswers[currentQuestionIndex] != null ? 5 : 0,
+                        ),
+                        onPressed: selectedAnswers[currentQuestionIndex] != null
+                            ? _submitAnswer
+                            : null,
+                        child: const Text(
+                          'Submit',
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-
-            // Answers Section
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Column(
-                  children: question['options'].map<Widget>((option) {
-                    final isSelected = selectedAnswers[currentQuestionIndex] == option;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() => selectedAnswers[currentQuestionIndex] = option);
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                          decoration: BoxDecoration(
-                            color: isSelected 
-                                ? Colors.deepPurple.withOpacity(0.15) 
-                                : Colors.white,
-                            border: Border.all(
-                              color: isSelected ? Colors.deepPurple : Colors.grey[400]!,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 1,
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Radio<String>(
-                                value: option,
-                                groupValue: selectedAnswers[currentQuestionIndex],
-                                onChanged: (value) {
-                                  setState(() => selectedAnswers[currentQuestionIndex] = value!);
-                                },
-                                activeColor: Colors.deepPurple,
-                                materialTapTargetSize: MaterialTapTargetSize.padded,
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  option,
-                                  style: const TextStyle(fontSize: 20),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-
-            // Navigation Buttons
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  if (currentQuestionIndex > 0)
-                    Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          side: const BorderSide(color: Colors.deepPurple, width: 2),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                        ),
-                        onPressed: () => setState(() => currentQuestionIndex--),
-                        child: const Text(
-                          'Previous',
-                          style: TextStyle(fontSize: 20, color: Colors.deepPurple),
-                        ),
-                      ),
-                    ),
-                  if (currentQuestionIndex > 0) const SizedBox(width: 20),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                        elevation: selectedAnswers[currentQuestionIndex] != null ? 5 : 0,
-                      ),
-                      onPressed: selectedAnswers[currentQuestionIndex] != null 
-                          ? _submitAnswer 
-                          : null,
-                      child: const Text(
-                        'Submit',
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
