@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'feature_quiz_page.dart';
+import '../widgets/video_popup.dart'; // Import VideoPopup from the widgets folder
+import 'feature_quiz_page.dart'; // Import your FeatureQuizPage
 
 class HomePage extends StatefulWidget {
   final Map<String, int>? initialFeatureScores;
@@ -16,12 +17,38 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    // Add a 'video' field to each feature with the placeholder video URL
     features = [
-      {'name': 'Block, Restrict, Report Usage', 'score': 0, 'started': 0},
-      {'name': 'Facebook Groups', 'score': 0, 'started': 0},
-      {'name': 'Audience Setting for Posts', 'score': 0, 'started': 0},
-      {'name': 'Interaction on Others\' Posts', 'score': 0, 'started': 0},
-      {'name': 'Tag Review and Settings', 'score': 0, 'started': 0}
+      {
+        'name': 'Block, Restrict, Report Usage',
+        'score': 0,
+        'started': 0,
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+      },
+      {
+        'name': 'Facebook Groups',
+        'score': 0,
+        'started': 0,
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+      },
+      {
+        'name': 'Audience Setting for Posts',
+        'score': 0,
+        'started': 0,
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+      },
+      {
+        'name': 'Interaction on Others\' Posts',
+        'score': 0,
+        'started': 0,
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+      },
+      {
+        'name': 'Tag Review and Settings',
+        'score': 0,
+        'started': 0,
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+      },
     ];
 
     if (widget.initialFeatureScores != null) {
@@ -89,6 +116,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _showVideoPopup(BuildContext context, String videoUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return VideoPopup(videoUrl: videoUrl); // Use the VideoPopup widget
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,6 +132,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text(
           'Home Page',
           style: TextStyle(
+            color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 24,
             letterSpacing: 1.2,
@@ -213,16 +250,22 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.transparent,
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            leading: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: completionColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Icon(
-                                isCompleted ? Icons.check_circle : Icons.play_circle_fill,
-                                color: completionColor,
-                                size: 30,
+                            leading: GestureDetector(
+                              onTap: () {
+                                // Use the feature's unique video URL
+                                _showVideoPopup(context, features[index]['video']);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: completionColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  isCompleted ? Icons.check_circle : Icons.play_circle_fill,
+                                  color: completionColor,
+                                  size: 30,
+                                ),
                               ),
                             ),
                             title: Text(
