@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   video_player: ^2.9.1 # added video_player dependecy for videos 19/09/2024
   shared_preferences: ^2.2.0
+  confetti: ^0.7.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -67,6 +68,8 @@ flutter:
     - assets/images/test.png # added test.png image to assets 19/09/2024
     - assets/images/pa.png
     - assets/images/logo.png
+    - assets/images/happy_bee.png
+    - assets/images/sad_bee.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
