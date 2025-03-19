@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
         'name': 'Tag Review and Settings',
         'score': 0,
         'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+        'video': 'https://ia902908.us.archive.org/12/items/invideo-ai-1080-facebook-tag-review-control-your-profil-2025-03-19/invideo-ai-1080%20Facebook%20Tag%20Review_%20Control%20Your%20Profil%202025-03-19.mp4',
       },
     ];
 
