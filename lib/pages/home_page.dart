@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'feature_quiz_page.dart';
 
-///Homepage - shows they user's progress across different Facebook privacy features
-///Allows users to take feature specific quizzes and the features are sorted based on completion, status, and scores.
-
 class HomePage extends StatefulWidget {
-  ///Initial scores for features which will be populated from an introductory quiz.
-  ///Keys are feature names and values are scores from 0-5
   final Map<String, int>? initialFeatureScores;
 
   const HomePage({super.key, this.initialFeatureScores});
@@ -16,18 +11,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  ///List of features with their completion scores
-  ///each feature is represented as a map with "name" and "score" keys
-  ///score ranges from:
-  ///-0 : Not started
-  ///- 1-4: In progress
-  ///- 5: Completed
   late List<Map<String, dynamic>> features;
 
   @override
   void initState() {
     super.initState();
-    //Initialise features with default scores
     features = [
       {'name': 'Block, Restrict, Report Usage', 'score': 0, 'started': 0},
       {'name': 'Facebook Groups', 'score': 0, 'started': 0},
@@ -36,7 +24,6 @@ class _HomePageState extends State<HomePage> {
       {'name': 'Tag Review and Settings', 'score': 0, 'started': 0}
     ];
 
-    // Initialize scores from intro quiz if available
     if (widget.initialFeatureScores != null) {
       for (var feature in features) {
         feature['score'] = widget.initialFeatureScores![feature['name']] ?? 0;
@@ -45,25 +32,22 @@ class _HomePageState extends State<HomePage> {
 
     _sortFeatures();
   }
-  ///Sorts by lowest score first
-void _sortFeatures() {
-  setState(() {
-    features.sort((a, b) => a['score'].compareTo(b['score']));
-  });
-}
-  ///navigates to the quiz page for specific feature and updates its score when the quiz is completed.
-  ///[index] is the current position of the feature in the sorted list
-  ///uses a mapping to  maintain consistent feature indices regardless of the list order
+
+  void _sortFeatures() {
+    setState(() {
+      features.sort((a, b) => a['score'].compareTo(b['score']));
+    });
+  }
+
   void _goToFeatureQuiz(int index) async {
     final featureName = features[index]['name'];
-    //Map to maintain consistent feature indices despite list reordering
     final originalIndex = {
       'Block, Restrict, Report Usage': 0,
       'Facebook Groups': 1,
       'Audience Setting for Posts': 2,
       'Interaction on Others\' Posts': 3,
       'Tag Review and Settings': 4,
-    }[featureName] ?? 0; // Default to 0 if not found
+    }[featureName] ?? 0;
 
     final score = await Navigator.push(
       context,
@@ -77,14 +61,10 @@ void _sortFeatures() {
     }
     features[index]['started'] = 1;
     setState(() {
-        _sortFeatures();
-      });
+      _sortFeatures();
+    });
   }
-  ///Builds a statistic widget for the progress overview card
-  ///label - describers the statistic category
-  ///value - is the numerical value to display
-  ///icon - is the icon representing the category
-  ///color - determines the icon and value color
+
   Widget _buildProgressStat(String label, String value, IconData icon, Color color) {
     return Column(
       children: [
@@ -124,18 +104,11 @@ void _sortFeatures() {
         backgroundColor: Colors.deepPurpleAccent,
         elevation: 0,
       ),
-      //main container with gradient background
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.deepPurpleAccent, Colors.pinkAccent.withOpacity(0.8)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        // Changed from gradient to solid light purple
+        color: Colors.purple[100], // Light purple background
         child: Column(
           children: [
-            // Progress Overview Card showing completion statistic
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container(
@@ -162,7 +135,6 @@ void _sortFeatures() {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    //Statistic row showing completed, in progress, and not started counts
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -174,7 +146,7 @@ void _sortFeatures() {
                         ),
                         _buildProgressStat(
                           'In Progress',
-                          features.where((f) => f['started'] == 1).length.toString(),
+                          features.where((f) => f['started'] == 1 && f['score'] < 5).length.toString(),
                           Icons.trending_up,
                           Colors.orange,
                         ),
@@ -190,8 +162,6 @@ void _sortFeatures() {
                 ),
               ),
             ),
-            // Feature List
-            //Scrollable list of feature cards/
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -199,19 +169,19 @@ void _sortFeatures() {
                 itemBuilder: (context, index) {
                   bool isCompleted = features[index]['score'] == 5;
                   bool hasStarted = features[index]['started'] == 1;
-                  Color titleTextColor = Colors.grey; // Default color
+                  Color titleTextColor = Colors.grey;
                   if (hasStarted) {
-                    if(isCompleted){
+                    if (isCompleted) {
                       titleTextColor = Colors.green;
-                    }else{
+                    } else {
                       titleTextColor = Colors.orange;
                     }
                   }
                   Color completionColor = Colors.deepPurpleAccent;
                   if (hasStarted) {
-                    if(isCompleted){
+                    if (isCompleted) {
                       completionColor = Colors.green;
-                    }else{
+                    } else {
                       completionColor = Colors.orange;
                     }
                   }
@@ -219,16 +189,12 @@ void _sortFeatures() {
                     padding: const EdgeInsets.only(bottom: 12.0),
                     child: GestureDetector(
                       onTap: () {
-                        /*if (!isCompleted) {
-                          _goToFeatureQuiz(index);
-                        }*/
                         _goToFeatureQuiz(index);
                       },
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                         decoration: BoxDecoration(
-                          //different styling for completed vs uncompleted features
                           color: isCompleted
                               ? Colors.grey[100]
                               : Colors.white.withOpacity(0.9),
@@ -243,7 +209,6 @@ void _sortFeatures() {
                             ),
                           ],
                         ),
-                        //Feature card with progress indicator and score
                         child: Material(
                           color: Colors.transparent,
                           child: ListTile(
@@ -272,14 +237,17 @@ void _sortFeatures() {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 8),
-                                LinearProgressIndicator(
-                                  value: features[index]['score'] / 5,
-                                  backgroundColor: Colors.grey[200],
-                                  valueColor: AlwaysStoppedAnimation(
-                                    isCompleted ? Colors.green : Colors.deepPurpleAccent,
+                                if (features[index]['score'] == 5 || features[index]['started'] == 1) ...[
+                                  LinearProgressIndicator(
+                                    value: features[index]['score'] / 5,
+                                    backgroundColor: Colors.grey[200],
+                                    valueColor: AlwaysStoppedAnimation(
+                                      // Changed to orange for in-progress (score 1-4)
+                                      isCompleted ? Colors.green : Colors.orange,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 4),
+                                  const SizedBox(height: 4),
+                                ],
                                 if (features[index]['score'] < 2) 
                                   const Text(
                                     "Recommended",
@@ -292,7 +260,6 @@ void _sortFeatures() {
                               color: isCompleted ? Colors.grey : Colors.deepPurpleAccent,
                             ),
                           ),
-
                         ),
                       ),
                     ),
