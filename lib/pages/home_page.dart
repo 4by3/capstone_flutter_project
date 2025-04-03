@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import '../widgets/video_popup.dart'; // Import VideoPopup from the widgets folder
-import 'feature_quiz_page.dart'; // Import your FeatureQuizPage
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:confetti/confetti.dart'; 
+import '../widgets/video_popup.dart';
+import 'feature_quiz_page.dart';
+import 'intro_page.dart';
 
 class HomePage extends StatefulWidget {
   final Map<String, int>? initialFeatureScores;
@@ -11,62 +14,85 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late List<Map<String, dynamic>> features;
+  late ConfettiController _confettiController;
+  final List<AnimationController> _scaleControllers = [];
 
   @override
   void initState() {
     super.initState();
-    // Add a 'video' field to each feature with the placeholder video URL
-    features = [
-      {
-        'name': 'Block, Restrict, Report Usage',
-        'score': 0,
-        'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-      },
-      {
-        'name': 'Facebook Groups',
-        'score': 0,
-        'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-      },
-      {
-        'name': 'Audience Setting for Posts',
-        'score': 0,
-        'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-      },
-      {
-        'name': 'Interaction on Others\' Posts',
-        'score': 0,
-        'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-      },
-      {
-        'name': 'Tag Review and Settings',
-        'score': 0,
-        'started': 0,
-        'video': 'https://ia902908.us.archive.org/12/items/invideo-ai-1080-facebook-tag-review-control-your-profil-2025-03-19/invideo-ai-1080%20Facebook%20Tag%20Review_%20Control%20Your%20Profil%202025-03-19.mp4',
-      },
-    ];
-
-    if (widget.initialFeatureScores != null) {
-      for (var feature in features) {
-        feature['score'] = widget.initialFeatureScores![feature['name']] ?? 0;
-      }
-    }
-
-    _sortFeatures();
+    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+    _loadFeatureScores();
   }
 
-  void _sortFeatures() {
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    for (var controller in _scaleControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _loadFeatureScores() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    features = [
+      {'name': 'Block, Restrict, Report Usage', 'score': 0, 'started': 0, 'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'},
+      {'name': 'Facebook Groups', 'score': 0, 'started': 0, 'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'},
+      {'name': 'Audience Setting for Posts', 'score': 0, 'started': 0, 'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'},
+      {'name': 'Interaction on Others\' Posts', 'score': 0, 'started': 0, 'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'},
+      {'name': 'Tag Review and Settings', 'score': 0, 'started': 0, 'video': 'https://ia902908.us.archive.org/12/items/invideo-ai-1080-facebook-tag-review-control-your-profil-2025-03-19/invideo-ai-1080%20Facebook%20Tag%20Review_%20Control%20Your%20Profil%202025-03-19.mp4'},
+    ];
+
+    for (var feature in features) {
+      String featureName = feature['name'];
+      feature['score'] = prefs.getInt('${featureName}_score') ?? 0;
+      feature['started'] = prefs.getInt('${featureName}_started') ?? 0;
+    }
+
+    // Initialize scale controllers for each feature
+    _scaleControllers.clear();
+    for (int i = 0; i < features.length; i++) {
+      _scaleControllers.add(AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 200),
+        lowerBound: 0.95,
+        upperBound: 1.0,
+      ));
+    }
+
     setState(() {
-      features.sort((a, b) => a['score'].compareTo(b['score']));
+      _sortFeatures();
+      if (features.every((f) => f['score'] == 5)) {
+        _confettiController.play();
+      }
     });
   }
 
+  Future<void> _saveFeatureScores() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (var feature in features) {
+      await prefs.setInt('${feature['name']}_score', feature['score']);
+      await prefs.setInt('${feature['name']}_started', feature['started']);
+    }
+  }
+
+  void _updateFeatureScore(int index, int score) {
+    setState(() {
+      features[index]['score'] = score;
+      features[index]['started'] = 1;
+      _sortFeatures();
+      if (features.every((f) => f['score'] == 5)) {
+        _confettiController.play();
+      }
+    });
+    _saveFeatureScores();
+  }
+
   void _goToFeatureQuiz(int index) async {
+    _scaleControllers[index].forward().then((_) => _scaleControllers[index].reverse());
     final featureName = features[index]['name'];
     final originalIndex = {
       'Block, Restrict, Report Usage': 0,
@@ -84,35 +110,74 @@ class _HomePageState extends State<HomePage> {
     );
 
     if (score != null) {
-      features[index]['score'] = score;
+      _updateFeatureScore(index, score);
     }
-    features[index]['started'] = 1;
-    setState(() {
-      _sortFeatures();
-    });
+  }
+
+  void _sortFeatures() {
+    features.sort((a, b) => a['score'].compareTo(b['score']));
+  }
+
+  Future<void> _resetQuiz() async {
+    bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Reset Progress?'),
+        content: const Text('Are you sure you want to reset all your progress? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel', style: TextStyle(color: Colors.blueAccent)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Reset', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      await prefs.setBool('goIntroPage', true);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const IntroPage()),
+      );
+    }
   }
 
   Widget _buildProgressStat(String label, String value, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: color,
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 500),
+      transitionBuilder: (child, animation) => ScaleTransition(
+        scale: animation,
+        child: child,
+      ),
+      child: Column(
+        key: ValueKey(value),
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -120,7 +185,7 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return VideoPopup(videoUrl: videoUrl); // Use the VideoPopup widget
+        return VideoPopup(videoUrl: videoUrl);
       },
     );
   }
@@ -128,190 +193,208 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Home Page',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-            letterSpacing: 1.2,
-          ),
-        ),
-        backgroundColor: Colors.deepPurpleAccent,
-        elevation: 0,
-      ),
-      body: Container(
-        // Changed from gradient to solid light purple
-        color: Colors.purple[100], // Light purple background
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 15,
-                      spreadRadius: 5,
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Your Progress',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildProgressStat(
-                          'Completed',
-                          features.where((f) => f['score'] == 5).length.toString(),
-                          Icons.check_circle,
-                          Colors.green,
-                        ),
-                        _buildProgressStat(
-                          'In Progress',
-                          features.where((f) => f['started'] == 1 && f['score'] < 5).length.toString(),
-                          Icons.trending_up,
-                          Colors.orange,
-                        ),
-                        _buildProgressStat(
-                          'Not Started',
-                          features.where((f) => f['started'] == 0).length.toString(),
-                          Icons.schedule,
-                          Colors.grey,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.blue[50]!, Colors.blue[100]!],
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: features.length,
-                itemBuilder: (context, index) {
-                  bool isCompleted = features[index]['score'] == 5;
-                  bool hasStarted = features[index]['started'] == 1;
-                  Color titleTextColor = Colors.grey;
-                  if (hasStarted) {
-                    if (isCompleted) {
-                      titleTextColor = Colors.green;
-                    } else {
-                      titleTextColor = Colors.orange;
-                    }
-                  }
-                  Color completionColor = Colors.deepPurpleAccent;
-                  if (hasStarted) {
-                    if (isCompleted) {
-                      completionColor = Colors.green;
-                    } else {
-                      completionColor = Colors.orange;
-                    }
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        _goToFeatureQuiz(index);
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        decoration: BoxDecoration(
-                          color: isCompleted
-                              ? Colors.grey[100]
-                              : Colors.white.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: isCompleted
-                                  ? Colors.black12
-                                  : Colors.deepPurpleAccent.withOpacity(0.3),
-                              offset: const Offset(0, 4),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            leading: GestureDetector(
-                              onTap: () {
-                                // Use the feature's unique video URL
-                                _showVideoPopup(context, features[index]['video']);
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: completionColor.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Icon(
-                                  isCompleted ? Icons.check_circle : Icons.play_circle_fill,
-                                  color: completionColor,
-                                  size: 30,
-                                ),
-                              ),
-                            ),
-                            title: Text(
-                              features[index]['name'],
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: titleTextColor,
-                              ),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 8),
-                                if (features[index]['score'] == 5 || features[index]['started'] == 1) ...[
-                                  LinearProgressIndicator(
-                                    value: features[index]['score'] / 5,
-                                    backgroundColor: Colors.grey[200],
-                                    valueColor: AlwaysStoppedAnimation(
-                                      // Changed to orange for in-progress (score 1-4)
-                                      isCompleted ? Colors.green : Colors.orange,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                ],
-                                if (features[index]['score'] < 2) 
-                                  const Text(
-                                    "Recommended",
-                                    style: TextStyle(color: Colors.blue, fontSize: 12, fontWeight: FontWeight.bold),
-                                  ),
-                              ],
-                            ),
-                            trailing: Icon(
-                              Icons.chevron_right,
-                              color: isCompleted ? Colors.grey : Colors.deepPurpleAccent,
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    child: const Text(
+                      'Your Privacy Journey',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
+                      ),
+                    ),
+                  ),
+                  // Progress Section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blue.withOpacity(0.1),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          const Text(
+                            'Progress Overview',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueAccent,
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildProgressStat(
+                                'Completed',
+                                features.where((f) => f['score'] == 5).length.toString(),
+                                Icons.check_circle,
+                                Colors.green,
+                              ),
+                              _buildProgressStat(
+                                'In Progress',
+                                features.where((f) => f['started'] == 1 && f['score'] < 5).length.toString(),
+                                Icons.trending_up,
+                                Colors.orange,
+                              ),
+                              _buildProgressStat(
+                                'Not Started',
+                                features.where((f) => f['started'] == 0).length.toString(),
+                                Icons.schedule,
+                                Colors.grey,
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  );
-                },
+                  ),
+                  // Features List
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: features.length,
+                      itemBuilder: (context, index) {
+                        bool isCompleted = features[index]['score'] == 5;
+                        bool hasStarted = features[index]['started'] == 1;
+                        Color titleTextColor = Colors.grey[700]!;
+                        if (hasStarted) {
+                          titleTextColor = isCompleted ? Colors.green : Colors.orange;
+                        }
+                        Color completionColor = Colors.blueAccent;
+                        if (hasStarted) {
+                          completionColor = isCompleted ? Colors.green : Colors.orange;
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: ScaleTransition(
+                            scale: _scaleControllers[index].drive(
+                              Tween(begin: 1.0, end: 0.95),
+                            ),
+                            child: GestureDetector(
+                              onTap: () => _goToFeatureQuiz(index),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.blue.withOpacity(isCompleted ? 0.05 : 0.1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  leading: GestureDetector(
+                                    onTap: () => _showVideoPopup(context, features[index]['video']),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: completionColor.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Icon(
+                                        isCompleted ? Icons.check_circle : Icons.play_circle_fill,
+                                        color: completionColor,
+                                        size: 30,
+                                      ),
+                                    ),
+                                  ),
+                                  title: Text(
+                                    features[index]['name'],
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: titleTextColor,
+                                    ),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 8),
+                                      if (hasStarted || isCompleted) ...[
+                                        LinearProgressIndicator(
+                                          value: features[index]['score'] / 5,
+                                          backgroundColor: Colors.grey[200],
+                                          valueColor: AlwaysStoppedAnimation(
+                                            isCompleted ? Colors.green : Colors.orange,
+                                          ),
+                                          minHeight: 6,
+                                          borderRadius: BorderRadius.circular(3),
+                                        ),
+                                        const SizedBox(height: 4),
+                                      ],
+                                      if (features[index]['score'] < 2)
+                                        const Text(
+                                          "Recommended",
+                                          style: TextStyle(
+                                            color: Colors.blueAccent,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  trailing: Icon(
+                                    Icons.chevron_right,
+                                    color: isCompleted ? Colors.grey : Colors.blueAccent,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              shouldLoop: false,
+              colors: const [Colors.green, Colors.blue, Colors.yellow, Colors.pink],
+              numberOfParticles: 20,
+              gravity: 0.2,
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _resetQuiz,
+        backgroundColor: Colors.blueAccent,
+        tooltip: 'Reset Quiz',
+        child: const Icon(Icons.refresh, color: Colors.white),
       ),
     );
   }

@@ -72,6 +72,8 @@ class _VideoPopupState extends State<VideoPopup> {
                             _controller.seekTo(Duration(seconds: value.toInt()));
                           });
                         },
+                        activeColor: Colors.blue,
+                        inactiveColor: Colors.blue.withOpacity(0.3),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -94,7 +96,9 @@ class _VideoPopupState extends State<VideoPopup> {
                       ),
                     ],
                   )
-                : const CircularProgressIndicator(),
+                : const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
             const SizedBox(height: 20),
           ],
         ),
