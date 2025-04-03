@@ -157,9 +157,9 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                         secondChild: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius: const BorderRadius.only(
+                            borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(16),
                               bottomRight: Radius.circular(16),
                             ),
@@ -205,9 +205,9 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                       ),
                       elevation: 8,
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Text(
                           "Start Learning",
                           style: TextStyle(
