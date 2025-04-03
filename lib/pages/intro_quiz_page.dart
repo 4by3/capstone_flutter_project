@@ -14,39 +14,42 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
   int currentQuestionIndex = 0;
   Map<int, String> selectedAnswers = {};
   late AnimationController _questionController;
-  late Animation<Offset> _questionSlideAnimation;
+  late Animation<double> _questionFadeAnimation;
+  late Animation<double> _questionScaleAnimation;
   late List<AnimationController> _answerControllers;
-  late List<Animation<Offset>> _answerSlideAnimations;
+  late List<Animation<double>> _answerFadeAnimations;
 
   @override
   void initState() {
     super.initState();
-    // Question animation
+    
     _questionController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
-    _questionSlideAnimation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _questionController, curve: Curves.easeInOut));
+    
+    _questionFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _questionController, curve: Curves.easeIn),
+    );
+    
+    _questionScaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
+      CurvedAnimation(parent: _questionController, curve: Curves.easeOutBack),
+    );
 
-    // Initialize answer animations with increasing durations
     _answerControllers = List.generate(
-      3, 
+      3,
       (index) => AnimationController(
         vsync: this,
-        duration: Duration(milliseconds: 700 + (index * 200)),
+        duration: Duration(milliseconds: 400 + (index * 150)),
       ),
     );
-    _answerSlideAnimations = _answerControllers.map((controller) {
-      return Tween<Offset>(
-        begin: const Offset(1.0, 0.0),
-        end: Offset.zero,
-      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
+    
+    _answerFadeAnimations = _answerControllers.map((controller) {
+      return Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: controller, curve: Curves.easeInOut),
+      );
     }).toList();
 
-    // Start animations for the first question
     _startAnimations();
   }
 
@@ -59,7 +62,6 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
     super.dispose();
   }
 
-  // Trigger animations when question changes
   void _startAnimations() {
     _questionController.reset();
     _questionController.forward();
@@ -112,7 +114,7 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
     if (currentQuestionIndex < introQuestions.length - 1) {
       setState(() {
         currentQuestionIndex++;
-        _startAnimations(); // Trigger slide animations for question and answers
+        _startAnimations();
       });
     } else {
       _submitQuiz();
@@ -123,7 +125,7 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
     if (currentQuestionIndex > 0) {
       setState(() {
         currentQuestionIndex--;
-        _startAnimations(); // Trigger slide animations for question and answers
+        _startAnimations();
       });
     }
   }
@@ -140,9 +142,11 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please answer all questions before submitting.'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: const Text('Please answer all questions to continue'),
+          backgroundColor: Colors.red[700],
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
@@ -155,137 +159,123 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
     final options = question['options'] as List<String>;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Intro Quiz',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.blue[50]!, Colors.blue[100]!],
           ),
         ),
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: Container(
-        color: Colors.grey[50],
-        child: Column(
-          children: [
-            // Progress Bar
-            Container(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Question ${currentQuestionIndex + 1}/$totalQuestions',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.deepPurple,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  LinearProgressIndicator(
-                    value: (currentQuestionIndex + 1) / totalQuestions,
-                    backgroundColor: Colors.grey[300],
-                    valueColor: const AlwaysStoppedAnimation(Colors.deepPurple),
-                    minHeight: 10,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ],
-              ),
-            ),
-
-            // Question Container with Slide Animation
-            SlideTransition(
-              position: _questionSlideAnimation,
-              child: Container(
-                height: 220,
-                margin: const EdgeInsets.symmetric(horizontal: 20),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Progress and Header
+              Container(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Question ${currentQuestionIndex + 1}/$totalQuestions',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueAccent,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    LinearProgressIndicator(
+                      value: (currentQuestionIndex + 1) / totalQuestions,
+                      backgroundColor: Colors.blue[100],
+                      valueColor: const AlwaysStoppedAnimation(Colors.blueAccent),
+                      minHeight: 8,
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ],
                 ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Q${currentQuestionIndex + 1}',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+              ),
+
+              // Question Card
+              FadeTransition(
+                opacity: _questionFadeAnimation,
+                child: ScaleTransition(
+                  scale: _questionScaleAnimation,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(30), 
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue.withOpacity(0.1),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        question['question'] as String,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          height: 1.3,
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Q${currentQuestionIndex + 1}',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueAccent,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        Text(
+                          question['question'] as String,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            height: 1.4,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // Answers Section with Slide Animations
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Column(
-                  children: options.asMap().entries.map<Widget>((entry) {
-                    final index = entry.key;
-                    final option = entry.value;
+              // Answers Section
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(20),
+                  itemCount: options.length,
+                  itemBuilder: (context, index) {
+                    final option = options[index];
                     final isSelected = selectedAnswers[currentQuestionIndex] == option;
+                    final animationIndex = index < _answerFadeAnimations.length ? index : _answerFadeAnimations.length - 1;
 
-                    // Ensure we don't access beyond _answerSlideAnimations length
-                    final animationIndex = index < _answerSlideAnimations.length ? index : _answerSlideAnimations.length - 1;
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: SlideTransition(
-                        position: _answerSlideAnimations[animationIndex],
+                    return FadeTransition(
+                      opacity: _answerFadeAnimations[animationIndex],
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
                         child: GestureDetector(
                           onTap: () {
                             setState(() => selectedAnswers[currentQuestionIndex] = option);
                           },
                           child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                            padding: const EdgeInsets.all(20), 
                             decoration: BoxDecoration(
-                              color: isSelected
-                                  ? Colors.deepPurple.withOpacity(0.15)
-                                  : Colors.white,
+                              color: isSelected ? Colors.blue[50] : Colors.white,
+                              borderRadius: BorderRadius.circular(15),
                               border: Border.all(
-                                color: isSelected ? Colors.deepPurple : Colors.grey[400]!,
+                                color: isSelected ? Colors.blueAccent : Colors.grey[300]!,
                                 width: 2,
                               ),
-                              borderRadius: BorderRadius.circular(15),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.grey.withOpacity(0.1),
-                                  spreadRadius: 1,
-                                  blurRadius: 4,
+                                  color: Colors.blue.withOpacity(0.1),
+                                  blurRadius: 6,
                                   offset: const Offset(0, 2),
                                 ),
                               ],
@@ -298,69 +288,95 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                                   onChanged: (value) {
                                     setState(() => selectedAnswers[currentQuestionIndex] = value!);
                                   },
-                                  activeColor: Colors.deepPurple,
-                                  materialTapTargetSize: MaterialTapTargetSize.padded,
+                                  activeColor: Colors.blueAccent,
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
                                     option,
-                                    style: const TextStyle(fontSize: 20),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: isSelected ? Colors.blueAccent : Colors.black87,
+                                    ),
                                   ),
                                 ),
+                                if (isSelected)
+                                  const Icon(
+                                    Icons.check_circle,
+                                    color: Colors.blueAccent,
+                                    size: 24,
+                                  ),
                               ],
                             ),
                           ),
                         ),
                       ),
                     );
-                  }).toList(),
+                  },
                 ),
               ),
-            ),
 
-            // Navigation Buttons
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  if (currentQuestionIndex > 0)
+              // Navigation Buttons
+              Padding(
+                padding: const EdgeInsets.all(20), 
+                child: Row(
+                  children: [
+                    if (currentQuestionIndex > 0)
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _previousQuestion,
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 22),
+                            side: const BorderSide(color: Colors.blueAccent, width: 2),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: const Text(
+                            'Previous',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (currentQuestionIndex > 0) const SizedBox(width: 16),
                     Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          side: const BorderSide(color: Colors.deepPurple, width: 2),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      child: ElevatedButton(
+                        onPressed: selectedAnswers[currentQuestionIndex] != null
+                            ? _nextQuestion
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent,
+                          padding: const EdgeInsets.symmetric(vertical: 22),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 5,
                         ),
-                        onPressed: _previousQuestion,
-                        child: const Text(
-                          'Previous',
-                          style: TextStyle(fontSize: 20, color: Colors.deepPurple),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              currentQuestionIndex == totalQuestions - 1 ? 'Submit' : 'Next',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            if (currentQuestionIndex != totalQuestions - 1)
+                              const Padding(
+                                padding: EdgeInsets.only(left: 8),
+                                child: Icon(Icons.arrow_forward, color: Colors.white),
+                              ),
+                          ],
                         ),
                       ),
                     ),
-                  if (currentQuestionIndex > 0) const SizedBox(width: 20),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                        elevation: selectedAnswers[currentQuestionIndex] != null ? 5 : 0,
-                      ),
-                      onPressed: selectedAnswers[currentQuestionIndex] != null
-                          ? _nextQuestion
-                          : null,
-                      child: Text(
-                        currentQuestionIndex == totalQuestions - 1 ? 'Submit' : 'Next',
-                        style: const TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
