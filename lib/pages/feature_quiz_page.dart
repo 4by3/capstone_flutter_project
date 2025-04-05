@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
-import '../data/features_quiz_data.dart';
+import '../data/hardFeatures_quiz_data.dart';
 
 class FeatureQuizPage extends StatefulWidget {
   final int featureIndex;
@@ -90,7 +90,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
   }
 
   void _submitAnswer() {
-    final questions = featureQuestions[widget.featureIndex]!;
+    final questions = hardFeatureQuestions[widget.featureIndex]!;
     final currentQuestion = questions[currentQuestionIndex];
     final isCorrect = selectedAnswers[currentQuestionIndex] == currentQuestion['answer'];
 
@@ -221,7 +221,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '$score/${featureQuestions[widget.featureIndex]!.length}',
+              '$score/${hardFeatureQuestions[widget.featureIndex]!.length}',
               style: const TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
@@ -262,7 +262,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final questions = featureQuestions[widget.featureIndex] ?? [];
+    final questions = hardFeatureQuestions[widget.featureIndex] ?? [];
     final question = questions[currentQuestionIndex];
     final totalQuestions = questions.length;
 

@@ -1,6 +1,6 @@
-  ///comprehensice question bank for all features
+  ///comprehensice question bank for hard features
   ///organized by feature index containing questions, options and correct answers
-  final Map<int, List<Map<String, dynamic>>> featureQuestions = {
+  final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
     0: [
       /// Block, Restrict, Report Usage Question
       {
