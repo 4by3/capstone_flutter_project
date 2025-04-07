@@ -81,11 +81,11 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
     };
 
     const featureMapping = [
+      'Block, Restrict, Report Usage',
       'Facebook Groups',
       'Audience Setting for Posts',
-      'Block, Restrict, Report Usage',
+      'Interaction on Others\' Posts', 
       'Tag Review and Settings',
-      'Block, Restrict, Report Usage',
     ];
 
     for (var i = 0; i < introQuestions.length; i++) {
@@ -170,7 +170,6 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
         child: SafeArea(
           child: Column(
             children: [
-              // Progress and Header
               Container(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -199,15 +198,13 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                   ],
                 ),
               ),
-
-              // Question Card
               FadeTransition(
                 opacity: _questionFadeAnimation,
                 child: ScaleTransition(
                   scale: _questionScaleAnimation,
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 16),
-                    padding: const EdgeInsets.all(30), 
+                    padding: const EdgeInsets.all(30),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
@@ -244,8 +241,6 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                   ),
                 ),
               ),
-
-              // Answers Section
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(20),
@@ -264,7 +259,7 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                             setState(() => selectedAnswers[currentQuestionIndex] = option);
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(20), 
+                            padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
                               color: isSelected ? Colors.blue[50] : Colors.white,
                               borderRadius: BorderRadius.circular(15),
@@ -315,10 +310,8 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                   },
                 ),
               ),
-
-              // Navigation Buttons
               Padding(
-                padding: const EdgeInsets.all(20), 
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
                     if (currentQuestionIndex > 0)

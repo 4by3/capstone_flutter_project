@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:confetti/confetti.dart'; 
+import 'package:confetti/confetti.dart';
 import '../widgets/video_popup.dart';
 import 'feature_quiz_page.dart';
 import 'intro_page.dart';
@@ -46,10 +46,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       {'name': 'Tag Review and Settings', 'score': 0, 'started': 0, 'video': 'https://ia902908.us.archive.org/12/items/invideo-ai-1080-facebook-tag-review-control-your-profil-2025-03-19/invideo-ai-1080%20Facebook%20Tag%20Review_%20Control%20Your%20Profil%202025-03-19.mp4'},
     ];
 
-    for (var feature in features) {
-      String featureName = feature['name'];
-      feature['score'] = prefs.getInt('${featureName}_score') ?? 0;
-      feature['started'] = prefs.getInt('${featureName}_started') ?? 0;
+    // Apply initialFeatureScores if provided (e.g., from IntroQuizPage)
+    if (widget.initialFeatureScores != null) {
+      for (var feature in features) {
+        String featureName = feature['name'];
+        feature['score'] = widget.initialFeatureScores![featureName] ?? 0;
+        // Do NOT mark as started here; leave it as 0 unless explicitly started via feature quiz
+      }
+      // Save the initial scores to SharedPreferences
+      await _saveFeatureScores();
+    } else {
+      // Load from SharedPreferences if no initial scores are provided
+      for (var feature in features) {
+        String featureName = feature['name'];
+        feature['score'] = prefs.getInt('${featureName}_score') ?? 0;
+        feature['started'] = prefs.getInt('${featureName}_started') ?? 0;
+      }
     }
 
     // Initialize scale controllers for each feature
@@ -82,7 +94,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void _updateFeatureScore(int index, int score) {
     setState(() {
       features[index]['score'] = score;
-      features[index]['started'] = 1;
+      features[index]['started'] = 1; // Mark as started only when updated via feature quiz
       _sortFeatures();
       if (features.every((f) => f['score'] == 5)) {
         _confettiController.play();
@@ -217,7 +229,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  // Progress Section
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Container(
@@ -271,7 +282,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  // Features List
                   Expanded(
                     child: ListView.builder(
                       padding: const EdgeInsets.all(16),
