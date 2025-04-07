@@ -1,37 +1,52 @@
 final List<Map<String, dynamic>> introQuestions = [
   {
-    'question': 'What is the most important thing to look out for before joining a Facebook group?',
+    'question': 'How do you respond to unwanted interactions from strangers on Facebook?',
     'options': [
-      'Familiarity of group members',
-      'Frequency of uninteresting and spammy posts',
-      'Privacy settings, whether it is open or closed group',
-      'Group size'
+      'I ignore them completely',
+      'I restrict their ability to contact me',
+      'I use block or report tools when needed',
+      'I don’t know what options are available'
     ],
-    'answers': [1, 1, 4, 2],
+    'answers': [1, 2, 3, 0]
   },
   {
-    'question': 'Which privacy setting do you use the most for posts on your timeline?',
-    'options': ['Friends', 'Friends of Friends', 'Public', 'Only Me'],
-    'answers': [3, 2, 1, 4],
-  },
-  {
-    'question': 'What is your understanding of Facebook\'s privacy settings?',
+    'question': 'How do you evaluate a Facebook group before joining?',
     'options': [
-      'I understand them well',
-      'Somewhat',
-      'I rarely adjust them',
-      'I don\'t know about them'
+      'I check the group’s privacy level and rules',
+      'I see if it’s active and matches my interests',
+      'I join based on a friend’s recommendation',
+      'I don’t think much about it, I just join'
     ],
-    'answers': [4, 3, 2, 1],
+    'answers': [3, 2, 1, 0]
   },
   {
-    'question': 'How often do you review your Facebook account\'s privacy settings?',
-    'options': ['Regularly', 'Occasionally', 'Rarely', 'Never'],
-    'answers': [4, 3, 2, 1], 
+    'question': 'How do you decide who can see your Facebook posts?',
+    'options': [
+      'I set a custom audience for sensitive posts',
+      'I stick to “Friends” for most posts',
+      'I leave it as “Public” for simplicity',
+      'I don’t adjust it, I use the default setting'
+    ],
+    'answers': [3, 2, 0, 1]
   },
   {
-    'question': 'How confident are you in managing your Facebook privacy settings?',
-    'options': ['Very Confident', 'Somewhat Confident', 'Not Confident', 'Not Sure'],
-    'answers': [4, 3, 2, 1], 
+    'question': 'How cautious are you when engaging with posts from people you don’t know well?',
+    'options': [
+      'I often like or comment without much thought',
+      'I engage if it’s public and seems safe',
+      'I rarely interact unless I trust the person',
+      'I avoid it entirely to protect my privacy'
+    ],
+    'answers': [0, 1, 2, 3]
+  },
+  {
+    'question': 'How do you handle tags from others on your Facebook timeline?',
+    'options': [
+      'I don’t manage tags, they show up as is',
+      'I remove tags if I don’t like them',
+      'I review tags occasionally but not always',
+      'I enable tag review so I approve them first'
+    ],
+    'answers': [0, 2, 1, 3]
   },
 ];
