@@ -22,6 +22,9 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
   late List<AnimationController> _answerControllers;
   late List<Animation<double>> _answerFadeAnimations;
 
+  final Color textColor = const Color.fromARGB(255, 24, 53, 98);
+  final Color answerColor = const Color.fromARGB(255, 18, 40, 74);
+
   @override
   void initState() {
     super.initState();
@@ -80,12 +83,18 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
 
   String getFeatureName() {
     switch (widget.featureIndex) {
-      case 0: return 'Block, Restrict, Report Usage';
-      case 1: return 'Facebook Groups';
-      case 2: return 'Audience Setting for Posts';
-      case 3: return 'Interaction on Others\' Posts';
-      case 4: return 'Tag Review and Settings';
-      default: return 'Unknown Feature';
+      case 0:
+        return 'Block, Restrict, Report Usage';
+      case 1:
+        return 'Facebook Groups';
+      case 2:
+        return 'Audience Setting for Posts';
+      case 3:
+        return 'Interaction on Others\' Posts';
+      case 4:
+        return 'Tag Review and Settings';
+      default:
+        return 'Unknown Feature';
     }
   }
 
@@ -139,7 +148,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                           : 'You nailed it! On to the next one?')
                       : 'Feedback: ${currentQuestion['feedback']}',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 20, color: Colors.black87),
+                  style: TextStyle(fontSize: 20, color: textColor),
                 ),
               ],
             ),
@@ -147,7 +156,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isCorrect ? Colors.green : Colors.redAccent,
+                    backgroundColor: textColor,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 5,
@@ -203,14 +212,14 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
           children: [
             Icon(
               score == 5 ? Icons.celebration : Icons.check,
-              color: score == 5 ? Colors.amber : Colors.blueAccent,
+              color: score == 5 ? Colors.amber : textColor,
               size: 80,
             ),
             const SizedBox(height: 20),
             Text(
               score == 5 ? 'Perfect Score!' : 'Well Done!',
-              style: const TextStyle(
-                color: Colors.blueAccent,
+              style: TextStyle(
+                color: textColor,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -222,17 +231,17 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
           children: [
             Text(
               '$score/${hardFeatureQuestions[widget.featureIndex]!.length}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
-                color: Colors.blueAccent,
+                color: textColor,
               ),
             ),
             const SizedBox(height: 20),
             Text(
               score == 5 ? 'You\'re a privacy expert!' : 'Nice work! Try again to improve?',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20, color: Colors.black87),
+              style: TextStyle(fontSize: 20, color: textColor),
             ),
           ],
         ),
@@ -240,7 +249,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
           Center(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
+                backgroundColor: textColor,
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 elevation: 5,
@@ -278,7 +287,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
               color: Colors.white,
             ),
           ),
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: textColor,
           elevation: 0,
           centerTitle: true,
           leading: IconButton(
@@ -306,18 +315,18 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                       children: [
                         Text(
                           'Question ${currentQuestionIndex + 1}/$totalQuestions',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
+                            color: textColor,
                           ),
                         ),
                         Text(
                           'Score: $score',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
+                            color: textColor,
                           ),
                         ),
                       ],
@@ -326,7 +335,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                     LinearProgressIndicator(
                       value: (currentQuestionIndex + 1) / totalQuestions,
                       backgroundColor: Colors.blue[100],
-                      valueColor: const AlwaysStoppedAnimation(Colors.blueAccent),
+                      valueColor: AlwaysStoppedAnimation(textColor),
                       minHeight: 8,
                       borderRadius: BorderRadius.circular(4),
                     ),
@@ -347,7 +356,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.black.withOpacity(0.1),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -358,19 +367,19 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                       children: [
                         Text(
                           'Q${currentQuestionIndex + 1}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
+                            color: textColor,
                           ),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           question['question'],
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 22,
                             height: 1.4,
-                            color: Colors.black87,
+                            color: textColor,
                           ),
                         ),
                       ],
@@ -400,15 +409,11 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                           child: Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: isSelected ? Colors.blue[50] : Colors.white,
+                              color: isSelected ? answerColor.withOpacity(0.9) : answerColor,
                               borderRadius: BorderRadius.circular(15),
-                              border: Border.all(
-                                color: isSelected ? Colors.blueAccent : Colors.grey[300]!,
-                                width: 2,
-                              ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.blue.withOpacity(0.1),
+                                  color: Colors.black.withOpacity(0.1),
                                   blurRadius: 6,
                                   offset: const Offset(0, 2),
                                 ),
@@ -422,22 +427,22 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                                   onChanged: (value) {
                                     setState(() => selectedAnswers[currentQuestionIndex] = value!);
                                   },
-                                  activeColor: Colors.blueAccent,
+                                  activeColor: Colors.white,
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
                                     option,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 18,
-                                      color: isSelected ? Colors.blueAccent : Colors.black87,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
                                 if (isSelected)
                                   const Icon(
                                     Icons.check_circle,
-                                    color: Colors.blueAccent,
+                                    color: Colors.white,
                                     size: 24,
                                   ),
                               ],
@@ -466,14 +471,14 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                           },
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 22),
-                            side: const BorderSide(color: Colors.blueAccent, width: 2),
+                            side: BorderSide(color: textColor, width: 2),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Previous',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.blueAccent,
+                              color: textColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -484,7 +489,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                       child: ElevatedButton(
                         onPressed: selectedAnswers[currentQuestionIndex] != null ? _submitAnswer : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
+                          backgroundColor: textColor,
                           padding: const EdgeInsets.symmetric(vertical: 22),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           elevation: 5,

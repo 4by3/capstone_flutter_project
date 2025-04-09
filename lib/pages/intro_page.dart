@@ -76,12 +76,20 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 24),
                         const Text(
-                          "Master Your Facebook Privacy",
+                          "Welcome,",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
+                            fontSize: 18,
+                            color: Color.fromARGB(255, 24, 53, 98),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        const Text(
+                          "When it's about Privacy,\nAwareness Matters!",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 38,
+                            color: Color.fromARGB(255, 24, 53, 98),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -90,7 +98,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18,
-                            color: Colors.blueGrey,
+                            color: Color.fromARGB(255, 24, 53, 98),
                           ),
                         ),
                       ],
@@ -121,8 +129,8 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Colors.blue[200]!, Colors.blue[300]!],
+                            gradient: const LinearGradient(
+                              colors: [Color.fromARGB(255, 109, 141, 188), Color.fromARGB(255, 24, 53, 98)],
                             ),
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -165,11 +173,11 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                             ),
                           ),
                           child: const Text(
-                            "Empowering Facebook users with knowledge to protect their privacy through engaging educational content.",
+                            "Master setting up privacy, learn the Facebook features, and become a valuable member of the digital society.",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.blueGrey,
+                              color: Color.fromARGB(255, 24, 53, 98),
                             ),
                           ),
                         ),
@@ -196,12 +204,12 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 48,
-                        vertical: 20,
+                        horizontal: 78,
+                        vertical: 30,
                       ),
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: const Color.fromARGB(255, 24, 53, 98),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(40),
                       ),
                       elevation: 8,
                     ),

@@ -19,6 +19,9 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
   late List<AnimationController> _answerControllers;
   late List<Animation<double>> _answerFadeAnimations;
 
+  final Color textColor = const Color.fromARGB(255, 24, 53, 98);
+  final Color answerColor = const Color.fromARGB(255, 18, 40, 74);
+
   @override
   void initState() {
     super.initState();
@@ -168,21 +171,33 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
           ),
         ),
         child: SafeArea(
+          top: false, // Disables top padding from SafeArea
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(20),
+              // Logo icon at the top left
+              Padding(
+                padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 200,
+                  height: 100,
+                ),
+              ),
+              // Progress bar and question number
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           'Question ${currentQuestionIndex + 1}/$totalQuestions',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
+                            color: textColor,
                           ),
                         ),
                       ],
@@ -191,118 +206,129 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                     LinearProgressIndicator(
                       value: (currentQuestionIndex + 1) / totalQuestions,
                       backgroundColor: Colors.blue[100],
-                      valueColor: const AlwaysStoppedAnimation(Colors.blueAccent),
+                      valueColor: AlwaysStoppedAnimation(textColor),
                       minHeight: 8,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ],
                 ),
               ),
-              FadeTransition(
-                opacity: _questionFadeAnimation,
-                child: ScaleTransition(
-                  scale: _questionScaleAnimation,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    padding: const EdgeInsets.all(30),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.1),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Q${currentQuestionIndex + 1}',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          question['question'] as String,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            height: 1.4,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              // Dynamically centered content
               Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(20),
-                  itemCount: options.length,
-                  itemBuilder: (context, index) {
-                    final option = options[index];
-                    final isSelected = selectedAnswers[currentQuestionIndex] == option;
-                    final animationIndex = index < _answerFadeAnimations.length ? index : _answerFadeAnimations.length - 1;
-
-                    return FadeTransition(
-                      opacity: _answerFadeAnimations[animationIndex],
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() => selectedAnswers[currentQuestionIndex] = option);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: isSelected ? Colors.blue[50] : Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(
-                                color: isSelected ? Colors.blueAccent : Colors.grey[300]!,
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.blue.withOpacity(0.1),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                Radio<String>(
-                                  value: option,
-                                  groupValue: selectedAnswers[currentQuestionIndex],
-                                  onChanged: (value) {
-                                    setState(() => selectedAnswers[currentQuestionIndex] = value!);
-                                  },
-                                  activeColor: Colors.blueAccent,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    option,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: isSelected ? Colors.blueAccent : Colors.black87,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              FadeTransition(
+                                opacity: _questionFadeAnimation,
+                                child: ScaleTransition(
+                                  scale: _questionScaleAnimation,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Q${currentQuestionIndex + 1}',
+                                          style: TextStyle(
+                                            fontSize: 32,
+                                            fontWeight: FontWeight.bold,
+                                            color: textColor,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          question['question'] as String,
+                                          style: TextStyle(
+                                            fontSize: 32,
+                                            fontWeight: FontWeight.w600,
+                                            height: 1.4,
+                                            color: textColor,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                                if (isSelected)
-                                  const Icon(
-                                    Icons.check_circle,
-                                    color: Colors.blueAccent,
-                                    size: 24,
-                                  ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                                child: Column(
+                                  children: List.generate(options.length, (index) {
+                                    final option = options[index];
+                                    final isSelected = selectedAnswers[currentQuestionIndex] == option;
+                                    final animationIndex = index < _answerFadeAnimations.length ? index : _answerFadeAnimations.length - 1;
+
+                                    return FadeTransition(
+                                      opacity: _answerFadeAnimations[animationIndex],
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(bottom: 12),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() => selectedAnswers[currentQuestionIndex] = option);
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.all(20),
+                                            decoration: BoxDecoration(
+                                              color: isSelected ? answerColor.withOpacity(0.9) : answerColor,
+                                              borderRadius: BorderRadius.circular(15),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(0.1),
+                                                  blurRadius: 6,
+                                                  offset: const Offset(0, 2),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Radio<String>(
+                                                  value: option,
+                                                  groupValue: selectedAnswers[currentQuestionIndex],
+                                                  onChanged: (value) {
+                                                    setState(() => selectedAnswers[currentQuestionIndex] = value!);
+                                                  },
+                                                  activeColor: Colors.white,
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Expanded(
+                                                  child: Text(
+                                                    option,
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                                if (isSelected)
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(left: 12),
+                                                    child: Icon(
+                                                      Icons.check_circle,
+                                                      color: Colors.white,
+                                                      size: 24,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -310,9 +336,11 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                   },
                 ),
               ),
+              // Navigation buttons at the bottom
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (currentQuestionIndex > 0)
                       Expanded(
@@ -320,14 +348,14 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                           onPressed: _previousQuestion,
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 22),
-                            side: const BorderSide(color: Colors.blueAccent, width: 2),
+                            side: BorderSide(color: textColor, width: 2),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Previous',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.blueAccent,
+                              color: textColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -340,7 +368,7 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                             ? _nextQuestion
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
+                          backgroundColor: textColor,
                           padding: const EdgeInsets.symmetric(vertical: 22),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           elevation: 5,
