@@ -148,204 +148,215 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
   2: [
     // Audience Setting for Posts Question
     {
+      //level 1: shared secrets
       'question':
-          'You post a photo from a family gathering on your profile. A colleague comments on the post, mentioning details about your workplace. \n How should you handle the audience settings for this post?',
+          'You’ve just landed an exciting new job! You want to post the news on Facebook—but only your professional network should see it. You don’t want your family or some close friends to know just yet. Time to use your privacy powers.  \n You share a post with a few contacts using Custom. One shares it—who can see it now? ',
       'options': [
-        'A) Leave it public to let everyone enjoy the post',
-        'B) Change the audience to \'Friends Only\'',
-        'C) Use the custom audience option to exclude colleagues',
-        'D) Delete the comment to avoid workplace-related exposure'
+        'A) Only your contacts ',
+        'B) The sharer\’s followers',
+        'C) Mutual friends',
+        'D)  No one'
       ],
-      'answer': 'C) Use the custom audience option to exclude colleagues',
-      'feedback': 'test1'
+      'answer': 'B) The sharer\’s followers',
+      'feedback':
+          'tShared posts follow their settings—more people might see itest1'
     },
     {
+      //cluster 1: Privacy control & selective sharing
+      //level 2 -hode from a few
       'question':
-          'You discover an old post from two years ago that is still set to \'Public\' The post includes a photo of your vacation with the location details. \n What is the best course of action?',
+          'Which setting lets you post something but hide it from specific friends?',
       'options': [
-        'A) Leave it public as it\'s an old post ',
-        'B) Use the \'Limit Past Posts\' feature to change the audience to \'Friends Only\'',
-        'C) Delete the post to eliminate any potential privacy risks',
-        'D) Edit the post to remove location details while keeping it public'
+        'A) Public',
+        'B) Friends',
+        'C) Friends Except…',
+        'D) Only Me '
       ],
-      'answer':
-          'B) Use the \'Limit Past Posts\' feature to change the audience to \'Friends Only\'',
+      'answer': 'C) Friends Except…',
       'feedback': 'test2'
     },
     {
-      'question':
-          'You share advice in a public professional group. Later, you noticed some group members visiting your profile and sending connection requests. \n How can you prevent this exposure?',
+      //level 3- full control
+      'question': 'What does Custom let you do?',
       'options': [
-        'A) Leave the group to avoid further interactions',
-        'B) Change your future post audience to  \'Friends\' or \'Only Me\'',
-        'C) Ignore the requests and continue posting in the group',
-        'D) Set profile details visible to \'Friends Only\' or \'Custom Audience\''
+        'A) All friends',
+        'B) Block all',
+        'C) Pick who sees',
+        'D) Auto-delete'
       ],
-      'answer':
-          'D) Set profile details visible to \'Friends Only\' or \'Custom Audience\'',
-      'feedback': 'test3'
+      'answer': 'C) Pick who sees',
+      'feedback':
+          'Friends Except…\' hides from some. \'Custom\' lets you choose exactly who sees it.'
     },
     {
+      //cluster 2: changing privacy & post visibility
+      //level 2 - changing your mind
       'question':
-          'You announce your new job on your profile. You notice that acquaintances you don\'t interact with are congratulating you. \n What is the best way to control the audience for such updates?',
+          'You change a post from Public to Friends. Who loses access? ',
       'options': [
-        'A) Keep the post public to let everyone celebrate with you',
-        'B) Adjust the audience to include only close friends and family',
-        'C) Use \'Custom Audience\' to exclude people you rarely interact with',
-        'D) Delete the post to avoid unwanted attention'
+        'A) No one ',
+        'B) Only new viewers',
+        'C) Non-friends',
+        'D) Everyone'
       ],
-      'answer':
-          'C) Use \'Custom Audience\' to exclude people you rarely interact with',
+      'answer': 'C) Non-friends',
       'feedback': 'test4'
     },
     {
+      //level 3- tags and shares
       'question':
-          'You create a post inviting friends to your birthday party. Later, you realize it\'s visible to your entire friend list, including colleagues and acquaintances. \n How can you fix the audience settings?',
+          'A user sets a post to Friends, but a tagged friend shares it publicly. Who can see the post? ',
       'options': [
-        'A) Let it remain as it is; it\'s just a birthday invitation',
-        'B) Change the audience to include only specific people invited to the party',
-        'C) Delete the post and send individual invitations instead',
-        'D) Edit the post and add a note clarifying it\'s for specific people'
+        'A)  Only the tagged friend',
+        'B)  Only mutual friends',
+        'C)  Everyone',
+        'D)  No one '
       ],
-      'answer':
-          'B) Change the audience to include only specific people invited to the party',
-      'feedback': 'test5'
+      'answer': 'B)  Only mutual friends',
+      'feedback':
+          'Changing to Friends hides the post from non-friends—even if it\’s shared publicly'
     },
   ],
   3: [
     // Interaction on Others' Posts Question
     {
+      //level 1 - comment under review
       'question':
-          'You comment on a public post shared by a news page. The post sparks a debate, and your comment receives several replies from strangers. Some of them visit your profile, and one even sends you a friend request. \n What action should you take to protect your privacy?',
+          'Mark comments on a public post made by a friend. Later, the friend turns on “Review Comments”, which means all comments need approval before appearing. What happens to Mark\’s comment? \n What happens to Mark\’s comment after the setting is on?  ',
       'options': [
-        'A) Reply to all the comments to clarify your point',
-        'B) Adjust your privacy settings to limit profile visibility to \'Friends Only\'',
-        'C) Ignore the situation and keep engaging with strangers on the post',
-        'D) Block anyone who interacts with your comment'
+        'A) Auto visible',
+        'B) Hidden until approved',
+        'C) Gone',
+        'D) Mutual only'
       ],
-      'answer':
-          'B) Adjust your privacy settings to limit profile visibility to \'Friends Only\'',
-      'feedback': 'test1'
+      'answer': 'B) Hidden until approved',
+      'feedback':
+          'With comment review on, all comments need approval—including Mark\'s.'
     },
     {
+      //cluster 1: privacy control & engagement
+      //level 2 - Who Sees the Like?
       'question':
-          'You share a public post from a community page, and someone from that page comments on your post. They mentioned they liked your content and suggest checking out their profile. \n How can you minimize exposure to stranger?',
+          'If a user reacts to a post shared with a limited audience, who can see that reaction? ',
       'options': [
-        'A) Delete the shared post',
-        'B) Check the privacy settings of your shared content and restrict it to \'Friends\'',
-        'C) Ignore the comment and continue sharing public posts',
-        'D) Engage with the stranger to learn more about them'
+        'A) Everyone',
+        'B) Selected friends',
+        'C) Only mutual friends',
+        'D) The user\’s entire friend list'
       ],
-      'answer':
-          'B) Check the privacy settings of your shared content and restrict it to \'Friends\'',
+      'answer': 'B) Selected friends',
       'feedback': 'test2'
     },
     {
-      'question':
-          'You like a photo shared publicly by a stranger in a travel group. Shortly after, you receive a direct message from them asking about your interest in travelling. \n WHat would be the safest response?',
+      //level 3 - hidden chain reaction
+      'question': 'What happens to a reply if the original comment is hidden? ',
       'options': [
-        'A)  Review your group activity and limit your profile information visibility in your groups',
-        'B) Respond politely and share your travel experiences',
-        'C) Unfollow the group to avoid further interaction',
-        'D) Ignore the message and continue liking similar posts'
+        'A) Reply disappears',
+        'B) Reply stays ',
+        'C) Becomes a new post',
+        'D) Only hidden from commenter'
       ],
-      'answer':
-          'A)  Review your group activity and limit your profile information visibility in your groups',
-      'feedback': 'test3'
+      'answer': 'A)  Reply disappears',
+      'feedback':
+          'Likes and replies follow the post\’s privacy. Hidden posts hide all interactions.'
     },
     {
+      //cluster 2 - changing post & comment privacy
+      //level 2 - post locked down
       'question':
-          'You are tagged by a friend in a public group post. The post is a funny meme, but it attracts comments and reactions from strangers/ \n What steps should you take?',
+          'A user changes a post from "Friends Only" to "Only Me." What happens to a friend\'s comment?',
       'options': [
-        'A) Leave the tag as it is; it\'s harmless',
-        'B) Engage with the comments to maintain a fun discussion',
-        'C) Adjust your tagging settings to require approval for future tags',
-        'D) Remove the tag and ask your friend to seek permission before tagging'
+        'A) Still visible to commenter',
+        'B) Deleted',
+        'C) Only poster sees it',
+        'D) Moved to archive'
       ],
-      'answer':
-          'D) Remove the tag and ask your friend to seek permission before tagging',
+      'answer': 'C) Only poster sees it',
       'feedback': 'test4'
     },
     {
+      //level 3 - going public
       'question':
-          'You post a question in a public hobby group. A stranger replies with an answer but also starts following your profile. \n What should you do to protect your privacy?',
+          'A user comments on a Friends Only post. The post is now made Public. Who can see the comment?',
       'options': [
-        'A) Thank the stranger and accept the follower',
-        'B) Message the stranger to confirm their intention',
-        'C) Review your profile visibility settings and restrict it to \'Friends Only\'',
-        'D) Remove the post to stop further exposure'
+        'A) Everyone',
+        'B) No one ',
+        'C) Only to mutual friends',
+        'D) Only with approval'
       ],
-      'answer':
-          'C) Review your profile visibility settings and restrict it to \'Friends Only\'',
-      'feedback': 'test5'
+      'answer': 'A) Everyone',
+      'feedback':
+          'Change visibility, and comments follow. \'Only Me\' hides all, Public shows all.'
     },
   ],
   4: [
     // Tag and Review Settings Question
     {
       'question':
-          'You go to a very fun party, and your friend posts you in a picture without asking you if it is all right. The post comes up as public which means most of your Facebook friends can see the picture. \n What do you do to keep your privacy but still feel okay with what happened? ',
+          'Sophie goes to a party, and a friend uploads a bunch of photos, tagging her in several of them. Luckily, Sophie has Tag Review turned on—so she can approve or decline tags before they appear on her profile. But Sophie doesn\’t check for hours. What happens in the meantime? \n Sophie has Tag Review on but doesn\’t check for hours. What happens to the tagged photos? ',
       'options': [
-        'A) Ignore the posting completely; it\'s just a tag, and no harm caused',
-        'B) Politely tell your friend to remove the tag or bring down the photo completely',
-        'C) Under the \'Review Tags\' feature on Facebook you can determine whether the tag will show up on your profile',
-        'D) Edit the tagged posts audience to one that only shows the post to specific people'
+        'A) Tags stay hidden',
+        'B) Tags auto-approve',
+        'C) Photos disappear',
+        'D) Friends can\’t see them'
       ],
-      'answer':
-          'C) Under the \'Review Tags\' feature on Facebook you can determine whether the tag will show up on your profile',
-      'feedback': 'test1'
+      'answer': 'A) Tags stay hidden',
+      'feedback':
+          'With Tag Review on, tags stay hidden until approved, even if delayed.'
     },
     {
-      'question':
-          'Facebook also has a feature known as \'Review Tags\'. This setting provides the user with even further control based on the different content that has been placed on their profiles. Whic of the following statements best describes what the \'Review Tags\' feature does for you?',
+      //cluster 1: tag approval & removal
+      //level 2 - no gatekeeper
+      'question': 'What happens if Tag Review is disabled?',
       'options': [
-        'A) Automatically delete all tags from your photos and post without notifying the person who tagged you',
-        'B) Approve and reject tags added by others before they are displayed on your profile or timeline',
-        'C) Send a notification to anyone who tags you, reminding them to seek you',
-        'D) Permanently block tagging on your profile to avoid such situations in the future'
+        'A) Tags appear instantly',
+        'B) Tags require approval',
+        'C) Tags are hidden by default',
+        'D) Tags disappear after 24 hours'
       ],
-      'answer':
-          'B) Approve and reject tags added by others before they are displayed on your profile or timeline',
+      'answer': 'A) Tags appear instantly',
       'feedback': 'test2'
     },
     {
+      //level 3 - remove the label
       'question':
-          'Suppose a friend has tagged you in a group photo taken at some event. The friend created the posting with the audience setting of \'Friends\'. According to Facebook audience settings, who would have access to this tagged posting?',
+          'If Sophie removes a tag from a post, who can still see the post?',
       'options': [
-        'A) Your tagged post is only accessible by you Facebook friends regardless of the settings set by your friend',
-        'B) It\'s on your friend\'s profile; only their Facebook friends can view it',
-        'C) Due to the tag, anyone on Facebook will be able to see the post, regardless of whether they\'re in your friend\'s network of connections',
-        'D) Your friends, your friends\'s friends, and any others that your friend defines when setting the custom audience for it will be able to see the post'
+        'A) Shared audience',
+        'B) Only Sophie',
+        'C) Tagged friends only',
+        'D) No one'
       ],
-      'answer':
-          'D) Your friends, your friends\'s friends, and any others that your friend defines when setting the custom audience for it will be able to see the post',
-      'feedback': 'test3'
+      'answer': 'A) Shared audience',
+      'feedback':
+          'Without Tag Review, tags go live. Removing a tag just unlinks you—it won\'t delete the post.'
     },
     {
-      'question':
-          'You get tagged in a post that contains any kind of sensitive personal information, which is likely to include your location or an embarrassing photo. You don\'t want this being widely visbile or hurting anyone. What can you do to protect yourself from such situation?',
+      //cluster 2: tag privacy & blocking
+      //level 2 - block & wipe
+      'question': 'What happens to tags when you block someone? ',
       'options': [
-        'A) Untag yourself from the photo or posting with the untagging option on the post itself',
-        'B) Report the post on Facebook and identify the violation of Community Guidelines or Terms of Service',
-        'C) Change your privacy settings to tagged content only showing to a limited audience',
-        'D) Take all the above measure for complete protection of your privacy'
+        'A) Tags are removed, post stays',
+        'B) Tags remain visible',
+        'C) Only mutual friends see them',
+        'D) The post is deleted'
       ],
-      'answer':
-          'D) Take all the above measure for complete protection of your privacy',
+      'answer': 'A) Tags are removed, post stays',
       'feedback': 'test4'
     },
     {
+      //level 3 - privacy change
       'question':
-          'If you wish to stay updated and get notified every time anyone tags you in any post or photo, then to turn this on and monitor your tags, what would you do?',
+          'If a post\’s privacy is changed after tagging, what happens to the tag?',
       'options': [
-        'A) You enable the notifications of tagging in the privacy and notification settings of your account',
-        'B) Click directly under the post your\'re tagged in and enable \'Turn on notification\'',
-        'C) Undergo the settings on your account using Facebook\'s \'Privacy Checkup\' tool; including tagging notifications and approvals',
-        'D) There is no setting for notifications of tags since all users receive them by default from Facebook'
+        'A) Follows new privacy settings',
+        'B) Stays as originally set',
+        'C) Becomes hidden',
+        'D) Tag is removed'
       ],
-      'answer':
-          'A) You enable the notifications of tagging in the privacy and notification settings of your account',
-      'feedback': 'test5'
+      'answer': 'A)  Follows new privacy settings',
+      'feedback':
+          'Blocking removes tags and interactions. Tags follow post privacy unless removed.'
     },
   ],
 };
