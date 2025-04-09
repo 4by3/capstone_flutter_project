@@ -33,6 +33,7 @@ dependencies:
   video_player: ^2.9.1 # added video_player dependecy for videos 19/09/2024
   shared_preferences: ^2.2.0
   confetti: ^0.7.0
+  google_fonts: ^6.2.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
