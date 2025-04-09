@@ -5,7 +5,7 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
     /// Block, Restrict, Report Usage Question
     {
       'question':
-          "You\’ve been using Facebook for several years and have accumulated large network. Recently, you have encountered some complex privacy challenges and need to manage interactions with various connections while maintaining a professional online presence. \n  When you restrict someone, which is FALSE?",
+          "You\’ve been using Facebook for several years and have accumulated large network. Recently, you have encountered some complex privacy challenges and need to manage interactions with various connections while maintaining a professional online presence. \nWhen you restrict someone, which is FALSE?",
       'options': [
         'A) They only see things you post publicly ',
         'B) They can still leave comments ',
