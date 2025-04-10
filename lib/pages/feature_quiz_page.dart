@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
+import '../data/easyFeatures_quiz_data.dart';
 import '../data/hardFeatures_quiz_data.dart';
 
 class FeatureQuizPage extends StatefulWidget {
   final int featureIndex;
+  final String mode;
 
-  const FeatureQuizPage({required this.featureIndex});
+  const FeatureQuizPage({
+    required this.featureIndex,
+    required this.mode,
+    super.key,
+  });
 
   @override
   _FeatureQuizPageState createState() => _FeatureQuizPageState();
 }
 
-class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderStateMixin {
+class _FeatureQuizPageState extends State<FeatureQuizPage>
+    with TickerProviderStateMixin {
   int currentQuestionIndex = 0;
   int score = 0;
   Map<int, String> selectedAnswers = {};
@@ -28,7 +35,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 2));
 
     _questionController = AnimationController(
       vsync: this,
@@ -99,9 +107,12 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
   }
 
   void _submitAnswer() {
-    final questions = hardFeatureQuestions[widget.featureIndex]!;
+    final questions = widget.mode == 'hard'
+        ? hardFeatureQuestions[widget.featureIndex]!
+        : easyFeatureQuestions[widget.featureIndex]!;
     final currentQuestion = questions[currentQuestionIndex];
-    final isCorrect = selectedAnswers[currentQuestionIndex] == currentQuestion['answer'];
+    final isCorrect =
+        selectedAnswers[currentQuestionIndex] == currentQuestion['answer'];
 
     if (isCorrect) {
       setState(() => score++);
@@ -114,14 +125,17 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
       builder: (BuildContext context) => Stack(
         children: [
           AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             backgroundColor: Colors.white.withOpacity(0.95),
             elevation: 10,
             contentPadding: const EdgeInsets.all(20),
             title: Column(
               children: [
                 Image.asset(
-                  isCorrect ? 'assets/images/happy_bee.png' : 'assets/images/sad_bee.png',
+                  isCorrect
+                      ? 'assets/images/happy_bee.png'
+                      : 'assets/images/sad_bee.png',
                   height: 120,
                   width: 120,
                 ),
@@ -157,12 +171,16 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: textColor,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     elevation: 5,
                   ),
                   child: Text(
-                    isCorrect && currentQuestionIndex == questions.length - 1 ? 'Finish' : 'Next',
+                    isCorrect && currentQuestionIndex == questions.length - 1
+                        ? 'Finish'
+                        : 'Next',
                     style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                   onPressed: () {
@@ -189,7 +207,12 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                 confettiController: _confettiController,
                 blastDirectionality: BlastDirectionality.explosive,
                 shouldLoop: false,
-                colors: const [Colors.green, Colors.yellow, Colors.blue, Colors.pink],
+                colors: const [
+                  Colors.green,
+                  Colors.yellow,
+                  Colors.blue,
+                  Colors.pink
+                ],
                 numberOfParticles: 20,
                 gravity: 0.2,
               ),
@@ -230,7 +253,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '$score/${hardFeatureQuestions[widget.featureIndex]!.length}',
+              '$score/${(widget.mode == 'hard' ? hardFeatureQuestions : easyFeatureQuestions)[widget.featureIndex]!.length}',
               style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
@@ -239,7 +262,9 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
             ),
             const SizedBox(height: 20),
             Text(
-              score == 5 ? 'You\'re a privacy expert!' : 'Nice work! Try again to improve?',
+              score == 5
+                  ? 'You\'re a privacy expert!'
+                  : 'Nice work! Try again to improve?',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20, color: textColor),
             ),
@@ -250,8 +275,10 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: textColor,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 elevation: 5,
               ),
               child: const Text(
@@ -271,7 +298,10 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final questions = hardFeatureQuestions[widget.featureIndex] ?? [];
+    final questions = widget.mode == 'hard'
+        ? hardFeatureQuestions[widget.featureIndex]!
+        : easyFeatureQuestions[widget.featureIndex]!;
+
     final question = questions[currentQuestionIndex];
     final totalQuestions = questions.length;
 
@@ -395,8 +425,11 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                   itemCount: question['options'].length,
                   itemBuilder: (context, index) {
                     final option = question['options'][index];
-                    final isSelected = selectedAnswers[currentQuestionIndex] == option;
-                    final animationIndex = index < _answerFadeAnimations.length ? index : _answerFadeAnimations.length - 1;
+                    final isSelected =
+                        selectedAnswers[currentQuestionIndex] == option;
+                    final animationIndex = index < _answerFadeAnimations.length
+                        ? index
+                        : _answerFadeAnimations.length - 1;
 
                     return FadeTransition(
                       opacity: _answerFadeAnimations[animationIndex],
@@ -404,12 +437,15 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                         padding: const EdgeInsets.only(bottom: 12),
                         child: GestureDetector(
                           onTap: () {
-                            setState(() => selectedAnswers[currentQuestionIndex] = option);
+                            setState(() =>
+                                selectedAnswers[currentQuestionIndex] = option);
                           },
                           child: Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: isSelected ? answerColor.withOpacity(0.9) : answerColor,
+                              color: isSelected
+                                  ? answerColor.withOpacity(0.9)
+                                  : answerColor,
                               borderRadius: BorderRadius.circular(15),
                               boxShadow: [
                                 BoxShadow(
@@ -423,9 +459,12 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                               children: [
                                 Radio<String>(
                                   value: option,
-                                  groupValue: selectedAnswers[currentQuestionIndex],
+                                  groupValue:
+                                      selectedAnswers[currentQuestionIndex],
                                   onChanged: (value) {
-                                    setState(() => selectedAnswers[currentQuestionIndex] = value!);
+                                    setState(() =>
+                                        selectedAnswers[currentQuestionIndex] =
+                                            value!);
                                   },
                                   activeColor: Colors.white,
                                 ),
@@ -472,7 +511,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 22),
                             side: BorderSide(color: textColor, width: 2),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                           ),
                           child: Text(
                             'Previous',
@@ -487,11 +527,14 @@ class _FeatureQuizPageState extends State<FeatureQuizPage> with TickerProviderSt
                     if (currentQuestionIndex > 0) const SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: selectedAnswers[currentQuestionIndex] != null ? _submitAnswer : null,
+                        onPressed: selectedAnswers[currentQuestionIndex] != null
+                            ? _submitAnswer
+                            : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: textColor,
                           padding: const EdgeInsets.symmetric(vertical: 22),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                           elevation: 5,
                         ),
                         child: const Text(

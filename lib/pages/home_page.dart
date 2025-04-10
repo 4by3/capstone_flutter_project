@@ -22,7 +22,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 2));
     _loadFeatureScores();
   }
 
@@ -37,21 +38,46 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _loadFeatureScores() async {
     final prefs = await SharedPreferences.getInstance();
+    String currentMode = prefs.getString('quizMode') ?? 'easy';
 
     features = [
-      {'name': 'Block, Restrict, Report Usage', 'score': 0, 'started': 0, 'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'},
-      {'name': 'Facebook Groups', 'score': 0, 'started': 0, 'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'},
-      {'name': 'Audience Setting for Posts', 'score': 0, 'started': 0, 'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'},
-      {'name': 'Interaction on Others\' Posts', 'score': 0, 'started': 0, 'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'},
-      {'name': 'Tag Review and Settings', 'score': 0, 'started': 0, 'video': 'https://ia902908.us.archive.org/12/items/invideo-ai-1080-facebook-tag-review-control-your-profil-2025-03-19/invideo-ai-1080%20Facebook%20Tag%20Review_%20Control%20Your%20Profil%202025-03-19.mp4'},
+      {
+        'name': 'Block, Restrict, Report Usage',
+        'score': 0,
+        'started': 0,
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'
+      },
+      {
+        'name': 'Facebook Groups',
+        'score': 0,
+        'started': 0,
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'
+      },
+      {
+        'name': 'Audience Setting for Posts',
+        'score': 0,
+        'started': 0,
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'
+      },
+      {
+        'name': 'Interaction on Others\' Posts',
+        'score': 0,
+        'started': 0,
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'
+      },
+      {
+        'name': 'Tag Review and Settings',
+        'score': 0,
+        'started': 0,
+        'video':
+            'https://ia902908.us.archive.org/12/items/invideo-ai-1080-facebook-tag-review-control-your-profil-2025-03-19/invideo-ai-1080%20Facebook%20Tag%20Review_%20Control%20Your%20Profil%202025-03-19.mp4'
+      },
     ];
 
-    // Apply initialFeatureScores if provided (e.g., from IntroQuizPage)
     if (widget.initialFeatureScores != null) {
       for (var feature in features) {
         String featureName = feature['name'];
         feature['score'] = widget.initialFeatureScores![featureName] ?? 0;
-        // Do NOT mark as started here; leave it as 0 unless explicitly started via feature quiz
       }
       // Save the initial scores to SharedPreferences
       await _saveFeatureScores();
@@ -59,8 +85,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       // Load from SharedPreferences if no initial scores are provided
       for (var feature in features) {
         String featureName = feature['name'];
-        feature['score'] = prefs.getInt('${featureName}_score') ?? 0;
-        feature['started'] = prefs.getInt('${featureName}_started') ?? 0;
+        if (currentMode == 'hard') {
+          // For hard mode, always use the hard mode scores
+          feature['score'] = prefs.getInt('${featureName}_hard_score') ?? 0;
+          feature['started'] = prefs.getInt('${featureName}_hard_started') ?? 0;
+        } else {
+          // For easy mode, use easy mode scores
+          feature['score'] = prefs.getInt('${featureName}_score') ?? 0;
+          feature['started'] = prefs.getInt('${featureName}_started') ?? 0;
+        }
       }
     }
 
@@ -85,16 +118,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _saveFeatureScores() async {
     final prefs = await SharedPreferences.getInstance();
+    String currentMode = prefs.getString('quizMode') ?? 'easy';
+
     for (var feature in features) {
-      await prefs.setInt('${feature['name']}_score', feature['score']);
-      await prefs.setInt('${feature['name']}_started', feature['started']);
+      if (currentMode == 'hard') {
+        await prefs.setInt('${feature['name']}_hard_score', feature['score']);
+        await prefs.setInt(
+            '${feature['name']}_hard_started', feature['started']);
+      } else {
+        await prefs.setInt('${feature['name']}_score', feature['score']);
+        await prefs.setInt('${feature['name']}_started', feature['started']);
+      }
     }
   }
 
   void _updateFeatureScore(int index, int score) {
     setState(() {
       features[index]['score'] = score;
-      features[index]['started'] = 1; // Mark as started only when updated via feature quiz
+      features[index]['started'] =
+          1; // Mark as started only when updated via feature quiz
       _sortFeatures();
       if (features.every((f) => f['score'] == 5)) {
         _confettiController.play();
@@ -104,25 +146,63 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _goToFeatureQuiz(int index) async {
-    _scaleControllers[index].forward().then((_) => _scaleControllers[index].reverse());
+    _scaleControllers[index]
+        .forward()
+        .then((_) => _scaleControllers[index].reverse());
+
+    final prefs = await SharedPreferences.getInstance();
+    String mode = prefs.getString('quizMode') ?? 'easy';
+
     final featureName = features[index]['name'];
     final originalIndex = {
-      'Block, Restrict, Report Usage': 0,
-      'Facebook Groups': 1,
-      'Audience Setting for Posts': 2,
-      'Interaction on Others\' Posts': 3,
-      'Tag Review and Settings': 4,
-    }[featureName] ?? 0;
+          'Block, Restrict, Report Usage': 0,
+          'Facebook Groups': 1,
+          'Audience Setting for Posts': 2,
+          'Interaction on Others\' Posts': 3,
+          'Tag Review and Settings': 4,
+        }[featureName] ??
+        0;
 
     final score = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FeatureQuizPage(featureIndex: originalIndex),
+        builder: (context) => FeatureQuizPage(
+          featureIndex: originalIndex,
+          mode: mode,
+        ),
       ),
     );
 
     if (score != null) {
       _updateFeatureScore(index, score);
+
+      // Check if all easy quizzes are completed with perfect scores
+      if (mode == 'easy' && features.every((f) => f['score'] == 5)) {
+        await prefs.setString('quizMode', 'hard');
+
+        // After switching to hard mode, reload feature scores to update UI
+        await _loadFeatureScores();
+
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text("🎉 Hard Mode Unlocked!"),
+            content: const Text(
+              "Great job! You've completed all the Easy quizzes.\n\nHard quizzes are now unlocked.",
+              style: TextStyle(fontSize: 16),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
 
@@ -136,11 +216,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Reset Progress?'),
-        content: const Text('Are you sure you want to reset all your progress? This action cannot be undone.'),
+        content: const Text(
+            'Are you sure you want to reset all your progress? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel', style: TextStyle(color: Colors.blueAccent)),
+            child: const Text('Cancel',
+                style: TextStyle(color: Colors.blueAccent)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -161,7 +243,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  Widget _buildProgressStat(String label, String value, IconData icon, Color color) {
+  Widget _buildProgressStat(
+      String label, String value, IconData icon, Color color) {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 500),
       transitionBuilder: (child, animation) => ScaleTransition(
@@ -220,13 +303,81 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(20),
-                    child: const Text(
-                      'Your Privacy Journey',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blueAccent,
-                      ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Your Privacy Journey',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueAccent,
+                          ),
+                        ),
+                        FutureBuilder<SharedPreferences>(
+                          future: SharedPreferences.getInstance(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              String mode =
+                                  snapshot.data!.getString('quizMode') ??
+                                      'easy';
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: mode == 'hard'
+                                          ? [
+                                              Colors.redAccent.withOpacity(0.7),
+                                              Colors.red.withOpacity(0.5)
+                                            ]
+                                          : [
+                                              Colors.blue.withOpacity(0.7),
+                                              Colors.blue.withOpacity(0.5)
+                                            ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: mode == 'hard'
+                                            ? Colors.red.withOpacity(0.2)
+                                            : Colors.blue.withOpacity(0.2),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        mode == 'hard'
+                                            ? Icons.shield_outlined
+                                            : Icons.verified_user,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        mode == 'hard'
+                                            ? 'Hard Mode'
+                                            : 'Easy Mode',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ],
                     ),
                   ),
                   Padding(
@@ -260,19 +411,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             children: [
                               _buildProgressStat(
                                 'Completed',
-                                features.where((f) => f['score'] == 5).length.toString(),
+                                features
+                                    .where((f) => f['score'] == 5)
+                                    .length
+                                    .toString(),
                                 Icons.check_circle,
                                 Colors.green,
                               ),
                               _buildProgressStat(
                                 'In Progress',
-                                features.where((f) => f['started'] == 1 && f['score'] < 5).length.toString(),
+                                features
+                                    .where((f) =>
+                                        f['started'] == 1 && f['score'] < 5)
+                                    .length
+                                    .toString(),
                                 Icons.trending_up,
                                 Colors.orange,
                               ),
                               _buildProgressStat(
                                 'Not Started',
-                                features.where((f) => f['started'] == 0).length.toString(),
+                                features
+                                    .where((f) => f['started'] == 0)
+                                    .length
+                                    .toString(),
                                 Icons.schedule,
                                 Colors.grey,
                               ),
@@ -291,11 +452,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         bool hasStarted = features[index]['started'] == 1;
                         Color titleTextColor = Colors.grey[700]!;
                         if (hasStarted) {
-                          titleTextColor = isCompleted ? Colors.green : Colors.orange;
+                          titleTextColor =
+                              isCompleted ? Colors.green : Colors.orange;
                         }
                         Color completionColor = Colors.blueAccent;
                         if (hasStarted) {
-                          completionColor = isCompleted ? Colors.green : Colors.orange;
+                          completionColor =
+                              isCompleted ? Colors.green : Colors.orange;
                         }
 
                         return Padding(
@@ -313,16 +476,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   borderRadius: BorderRadius.circular(15),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.blue.withOpacity(isCompleted ? 0.05 : 0.1),
+                                      color: Colors.blue.withOpacity(
+                                          isCompleted ? 0.05 : 0.1),
                                       blurRadius: 8,
                                       offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
                                 child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
                                   leading: GestureDetector(
-                                    onTap: () => _showVideoPopup(context, features[index]['video']),
+                                    onTap: () => _showVideoPopup(
+                                        context, features[index]['video']),
                                     child: Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
@@ -330,7 +496,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Icon(
-                                        isCompleted ? Icons.check_circle : Icons.play_circle_fill,
+                                        isCompleted
+                                            ? Icons.check_circle
+                                            : Icons.play_circle_fill,
                                         color: completionColor,
                                         size: 30,
                                       ),
@@ -345,7 +513,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const SizedBox(height: 8),
                                       if (hasStarted || isCompleted) ...[
@@ -353,10 +522,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           value: features[index]['score'] / 5,
                                           backgroundColor: Colors.grey[200],
                                           valueColor: AlwaysStoppedAnimation(
-                                            isCompleted ? Colors.green : Colors.orange,
+                                            isCompleted
+                                                ? Colors.green
+                                                : Colors.orange,
                                           ),
                                           minHeight: 6,
-                                          borderRadius: BorderRadius.circular(3),
+                                          borderRadius:
+                                              BorderRadius.circular(3),
                                         ),
                                         const SizedBox(height: 4),
                                       ],
@@ -373,7 +545,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   ),
                                   trailing: Icon(
                                     Icons.chevron_right,
-                                    color: isCompleted ? Colors.grey : Colors.blueAccent,
+                                    color: isCompleted
+                                        ? Colors.grey
+                                        : Colors.blueAccent,
                                   ),
                                 ),
                               ),
@@ -393,7 +567,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
               shouldLoop: false,
-              colors: const [Colors.green, Colors.blue, Colors.yellow, Colors.pink],
+              colors: const [
+                Colors.green,
+                Colors.blue,
+                Colors.yellow,
+                Colors.pink
+              ],
               numberOfParticles: 20,
               gravity: 0.2,
             ),

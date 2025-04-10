@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
+import 'intro_summary_page.dart';
+
 import '../data/intro_quiz_data.dart';
 
 class IntroQuizPage extends StatefulWidget {
@@ -10,7 +12,8 @@ class IntroQuizPage extends StatefulWidget {
   State<IntroQuizPage> createState() => _IntroQuizPageState();
 }
 
-class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateMixin {
+class _IntroQuizPageState extends State<IntroQuizPage>
+    with TickerProviderStateMixin {
   int currentQuestionIndex = 0;
   Map<int, String> selectedAnswers = {};
   late AnimationController _questionController;
@@ -25,16 +28,16 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
-    
+
     _questionController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    
+
     _questionFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _questionController, curve: Curves.easeIn),
     );
-    
+
     _questionScaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
       CurvedAnimation(parent: _questionController, curve: Curves.easeOutBack),
     );
@@ -46,7 +49,7 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
         duration: Duration(milliseconds: 400 + (index * 150)),
       ),
     );
-    
+
     _answerFadeAnimations = _answerControllers.map((controller) {
       return Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(parent: controller, curve: Curves.easeInOut),
@@ -87,7 +90,7 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
       'Block, Restrict, Report Usage',
       'Facebook Groups',
       'Audience Setting for Posts',
-      'Interaction on Others\' Posts', 
+      'Interaction on Others\' Posts',
       'Tag Review and Settings',
     ];
 
@@ -136,11 +139,16 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
   void _submitQuiz() async {
     if (selectedAnswers.length == introQuestions.length) {
       final featureScores = _calculateFeatureScores();
-      await _flagHomePage();
+      int totalScore = featureScores.values.reduce((a, b) => a + b);
+      String quizMode = totalScore >= 9 ? 'hard' : 'easy';
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => HomePage(initialFeatureScores: featureScores),
+          builder: (context) => IntroSummaryPage(
+            totalScore: totalScore,
+            quizMode: quizMode,
+          ),
         ),
       );
     } else {
@@ -149,7 +157,8 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
           content: const Text('Please answer all questions to continue'),
           backgroundColor: Colors.red[700],
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
@@ -173,7 +182,6 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
         child: SafeArea(
           child: Column(
             children: [
-              // Progress bar and question number at the top
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -202,9 +210,9 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                   ],
                 ),
               ),
-              // Spacer to push content down slightly
+
               const SizedBox(height: 40),
-              // Main content (question and answers)
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,12 +252,17 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                     const SizedBox(height: 20),
                     Expanded(
                       child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 20),
                         itemCount: options.length,
                         itemBuilder: (context, index) {
                           final option = options[index];
-                          final isSelected = selectedAnswers[currentQuestionIndex] == option;
-                          final animationIndex = index < _answerFadeAnimations.length ? index : _answerFadeAnimations.length - 1;
+                          final isSelected =
+                              selectedAnswers[currentQuestionIndex] == option;
+                          final animationIndex =
+                              index < _answerFadeAnimations.length
+                                  ? index
+                                  : _answerFadeAnimations.length - 1;
 
                           return FadeTransition(
                             opacity: _answerFadeAnimations[animationIndex],
@@ -257,12 +270,16 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                               padding: const EdgeInsets.only(bottom: 12),
                               child: GestureDetector(
                                 onTap: () {
-                                  setState(() => selectedAnswers[currentQuestionIndex] = option);
+                                  setState(() =>
+                                      selectedAnswers[currentQuestionIndex] =
+                                          option);
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.all(20),
                                   decoration: BoxDecoration(
-                                    color: isSelected ? answerColor.withOpacity(0.9) : answerColor,
+                                    color: isSelected
+                                        ? answerColor.withOpacity(0.9)
+                                        : answerColor,
                                     borderRadius: BorderRadius.circular(15),
                                     boxShadow: [
                                       BoxShadow(
@@ -276,9 +293,11 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                                     children: [
                                       Radio<String>(
                                         value: option,
-                                        groupValue: selectedAnswers[currentQuestionIndex],
+                                        groupValue: selectedAnswers[
+                                            currentQuestionIndex],
                                         onChanged: (value) {
-                                          setState(() => selectedAnswers[currentQuestionIndex] = value!);
+                                          setState(() => selectedAnswers[
+                                              currentQuestionIndex] = value!);
                                         },
                                         activeColor: Colors.white,
                                       ),
@@ -327,7 +346,8 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 22),
                             side: BorderSide(color: textColor, width: 2),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                           ),
                           child: Text(
                             'Previous',
@@ -348,14 +368,17 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                         style: ElevatedButton.styleFrom(
                           backgroundColor: textColor,
                           padding: const EdgeInsets.symmetric(vertical: 22),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                           elevation: 5,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              currentQuestionIndex == totalQuestions - 1 ? 'Submit' : 'Next',
+                              currentQuestionIndex == totalQuestions - 1
+                                  ? 'Submit'
+                                  : 'Next',
                               style: const TextStyle(
                                 fontSize: 18,
                                 color: Colors.white,
@@ -365,7 +388,8 @@ class _IntroQuizPageState extends State<IntroQuizPage> with TickerProviderStateM
                             if (currentQuestionIndex != totalQuestions - 1)
                               const Padding(
                                 padding: EdgeInsets.only(left: 8),
-                                child: Icon(Icons.arrow_forward, color: Colors.white),
+                                child: Icon(Icons.arrow_forward,
+                                    color: Colors.white),
                               ),
                           ],
                         ),
