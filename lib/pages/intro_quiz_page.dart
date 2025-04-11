@@ -210,13 +210,12 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                   ],
                 ),
               ),
-
               const SizedBox(height: 40),
-
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Question
                     FadeTransition(
                       opacity: _questionFadeAnimation,
                       child: ScaleTransition(
@@ -249,85 +248,89 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    // Answers
                     Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 20),
-                        itemCount: options.length,
-                        itemBuilder: (context, index) {
-                          final option = options[index];
-                          final isSelected =
-                              selectedAnswers[currentQuestionIndex] == option;
-                          final animationIndex =
-                              index < _answerFadeAnimations.length
-                                  ? index
-                                  : _answerFadeAnimations.length - 1;
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 20),
+                          itemCount: options.length,
+                          itemBuilder: (context, index) {
+                            final option = options[index];
+                            final isSelected =
+                                selectedAnswers[currentQuestionIndex] == option;
+                            final animationIndex =
+                                index < _answerFadeAnimations.length
+                                    ? index
+                                    : _answerFadeAnimations.length - 1;
 
-                          return FadeTransition(
-                            opacity: _answerFadeAnimations[animationIndex],
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() =>
-                                      selectedAnswers[currentQuestionIndex] =
-                                          option);
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(20),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? answerColor.withOpacity(0.9)
-                                        : answerColor,
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Radio<String>(
-                                        value: option,
-                                        groupValue: selectedAnswers[
-                                            currentQuestionIndex],
-                                        onChanged: (value) {
-                                          setState(() => selectedAnswers[
-                                              currentQuestionIndex] = value!);
-                                        },
-                                        activeColor: Colors.white,
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          option,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
+                            return FadeTransition(
+                              opacity: _answerFadeAnimations[animationIndex],
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() =>
+                                        selectedAnswers[currentQuestionIndex] =
+                                            option);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? answerColor.withOpacity(0.9)
+                                          : answerColor,
+                                      borderRadius: BorderRadius.circular(15),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Radio<String>(
+                                          value: option,
+                                          groupValue: selectedAnswers[
+                                              currentQuestionIndex],
+                                          onChanged: (value) {
+                                            setState(() => selectedAnswers[
+                                                currentQuestionIndex] = value!);
+                                          },
+                                          activeColor: Colors.white,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                            option,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      if (isSelected)
-                                        const Padding(
-                                          padding: EdgeInsets.only(left: 12),
-                                          child: Icon(
-                                            Icons.check_circle,
-                                            color: Colors.white,
-                                            size: 24,
+                                        if (isSelected)
+                                          const Padding(
+                                            padding: EdgeInsets.only(left: 12),
+                                            child: Icon(
+                                              Icons.check_circle,
+                                              color: Colors.white,
+                                              size: 24,
+                                            ),
                                           ),
-                                        ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ],
