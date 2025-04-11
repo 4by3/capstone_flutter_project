@@ -225,7 +225,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blueAccent,
+                        color: Color.fromARGB(255, 24, 53, 98),
                       ),
                     ),
                   ),
@@ -237,7 +237,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: Colors.blue.withOpacity(0.4),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -251,7 +251,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Colors.blueAccent,
+                              color: Color.fromARGB(255, 24, 53, 98),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -402,7 +402,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _resetQuiz,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color.fromARGB(255, 24, 53, 98),
         tooltip: 'Reset Quiz',
         child: const Icon(Icons.refresh, color: Colors.white),
       ),

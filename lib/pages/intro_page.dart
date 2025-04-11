@@ -114,8 +114,8 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                         const SizedBox(height: 54),
                         Image.asset(
                           'assets/images/logo.png',
-                          width: 600,
-                          height: 500,
+                          width: 400,
+                          height: 400,
                         ),
                       ],
                     ),
@@ -236,8 +236,8 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 118,
-                        vertical: 32,
+                        horizontal: 100,
+                        vertical: 22,
                       ),
                       backgroundColor: const Color.fromARGB(255, 24, 53, 98),
                       shape: RoundedRectangleBorder(
