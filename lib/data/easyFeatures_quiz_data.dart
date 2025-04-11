@@ -316,5 +316,19 @@ final Map<int, List<Map<String, dynamic>>> easyFeatureQuestions = {
       'feedback':
           'Tag review helps you control your Facebook presence by letting you decide which tagged post appear on your profile.  '
     },
+    {
+      'question':
+          'Can you still be tagged in a post if you have tag reivew turned on? ',
+      'options': [
+        'A) No all tags are blocked',
+        'B) Yes, but you can review it before it shows on your timeline  ',
+        'C) Only by close friends',
+        'D) Only in photos, not in text posts '
+      ],
+      'answer':
+          'B) Yes, but you can review it before it shows on your timeline  ',
+      'feedback':
+          'Tag review doesn\'t stops tag, it lets you decide wheter to show them on your timeline.'
+    },
   ],
 };
