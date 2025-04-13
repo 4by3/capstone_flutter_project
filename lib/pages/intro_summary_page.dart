@@ -90,7 +90,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 60),
                           Container(
                             width: 120,
                             height: 120,
