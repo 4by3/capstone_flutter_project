@@ -111,11 +111,11 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 54),
+                        const SizedBox(height: 84),
                         Image.asset(
                           'assets/images/logo.png',
-                          width: 400,
-                          height: 400,
+                          width: 320,
+                          height: 320,
                         ),
                       ],
                     ),
@@ -208,8 +208,10 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                 // ),
 
 
-                const SizedBox(height: 32),
+                const Spacer(),
 
+
+                
                 const Text(
                   "Learn privacy settings through interactive\nquizzes and videos!",
                   textAlign: TextAlign.center,
@@ -219,9 +221,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                   ),
                 ),
 
-                const SizedBox(height: 32),
-
-                const Spacer(),
+                const SizedBox(height: 42),
 
                 FadeTransition(
                   opacity: _fadeAnimation,
@@ -236,8 +236,8 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 100,
-                        vertical: 22,
+                        horizontal: 110,
+                        vertical: 27,
                       ),
                       backgroundColor: const Color.fromARGB(255, 24, 53, 98),
                       shape: RoundedRectangleBorder(
@@ -251,13 +251,11 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                         Text(
                           "Start Learning",
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: 36,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_forward, color: Colors.white),
                       ],
                     ),
                   ),
