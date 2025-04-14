@@ -18,6 +18,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late List<Map<String, dynamic>> features;
   late ConfettiController _confettiController;
   final List<AnimationController> _scaleControllers = [];
+  final ScrollController _scrollController = ScrollController();
+
+  // Define consistent colors
+  final Color primaryBlue = const Color.fromARGB(255, 24, 53, 98);
+  final Color primaryLightBlue = Color.fromARGB(255, 40, 65, 102);
+  final Color backgroundBlue = Color.fromARGB(255, 235, 245, 255);
+  final Color accentRed = Colors.redAccent;
 
   @override
   void initState() {
@@ -30,6 +37,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _confettiController.dispose();
+    _scrollController.dispose();
     for (var controller in _scaleControllers) {
       controller.dispose();
     }
@@ -45,32 +53,42 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         'name': 'Block, Restrict, Report Usage',
         'score': 0,
         'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+        'description':
+            'Learn how to manage unwanted interactions with blocking, restricting, and reporting tools.'
       },
       {
         'name': 'Facebook Groups',
         'score': 0,
         'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+        'description':
+            'Discover privacy controls for joining, participating in, and managing Facebook Groups.'
       },
       {
         'name': 'Audience Setting for Posts',
         'score': 0,
         'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+        'description':
+            'Control who sees your posts with audience selection tools.'
       },
       {
         'name': 'Interaction on Others\' Posts',
         'score': 0,
         'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'
+        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+        'description':
+            'Manage your visibility when interacting with content from other users.'
       },
       {
         'name': 'Tag Review and Settings',
         'score': 0,
         'started': 0,
         'video':
-            'https://ia902908.us.archive.org/12/items/invideo-ai-1080-facebook-tag-review-control-your-profil-2025-03-19/invideo-ai-1080%20Facebook%20Tag%20Review_%20Control%20Your%20Profil%202025-03-19.mp4'
+            'https://ia902908.us.archive.org/12/items/invideo-ai-1080-facebook-tag-review-control-your-profil-2025-03-19/invideo-ai-1080%20Facebook%20Tag%20Review_%20Control%20Your%20Profil%202025-03-19.mp4',
+        'description':
+            'Learn how to review and control when others tag you in posts or photos.'
       },
     ];
 
@@ -79,25 +97,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         String featureName = feature['name'];
         feature['score'] = widget.initialFeatureScores![featureName] ?? 0;
       }
-      // Save the initial scores to SharedPreferences
       await _saveFeatureScores();
     } else {
-      // Load from SharedPreferences if no initial scores are provided
       for (var feature in features) {
         String featureName = feature['name'];
         if (currentMode == 'hard') {
-          // For hard mode, always use the hard mode scores
           feature['score'] = prefs.getInt('${featureName}_hard_score') ?? 0;
           feature['started'] = prefs.getInt('${featureName}_hard_started') ?? 0;
         } else {
-          // For easy mode, use easy mode scores
           feature['score'] = prefs.getInt('${featureName}_score') ?? 0;
           feature['started'] = prefs.getInt('${featureName}_started') ?? 0;
         }
       }
     }
 
-    // Initialize scale controllers for each feature
     _scaleControllers.clear();
     for (int i = 0; i < features.length; i++) {
       _scaleControllers.add(AnimationController(
@@ -135,8 +148,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void _updateFeatureScore(int index, int score) {
     setState(() {
       features[index]['score'] = score;
-      features[index]['started'] =
-          1; // Mark as started only when updated via feature quiz
+      features[index]['started'] = 1;
       _sortFeatures();
       if (features.every((f) => f['score'] == 5)) {
         _confettiController.play();
@@ -176,11 +188,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (score != null) {
       _updateFeatureScore(index, score);
 
-      // Check if all easy quizzes are completed with perfect scores
       if (mode == 'easy' && features.every((f) => f['score'] == 5)) {
         await prefs.setString('quizMode', 'hard');
 
-        // After switching to hard mode, reload feature scores to update UI
         await _loadFeatureScores();
 
         showDialog(
@@ -209,8 +219,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Container(
                     width: 80,
                     height: 80,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
+                    decoration: BoxDecoration(
+                      color: accentRed,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -227,31 +237,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       color: Colors.red[100],
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    child: const Text(
+                    child: Text(
                       "HARD MODE",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                        color: accentRed,
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     "Hard Mode Unlocked!",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 24, 53, 98),
+                      color: primaryBlue,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     "Congratulations! You've completed all Easy quizzes with perfect scores. Challenge yourself with more advanced privacy questions.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
-                      color: Color.fromARGB(255, 40, 65, 102),
+                      color: primaryLightBlue,
                       height: 1.4,
                     ),
                   ),
@@ -265,19 +275,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           color: Colors.red[50],
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.star,
-                          color: Colors.red,
+                          color: accentRed,
                           size: 20,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           "Hard mode features more in-depth privacy scenarios and advanced options.",
                           style: TextStyle(
                             fontSize: 14,
-                            color: Color.fromARGB(255, 40, 65, 102),
+                            color: primaryLightBlue,
                             height: 1.4,
                           ),
                         ),
@@ -290,7 +300,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 24, 53, 98),
+                        backgroundColor: primaryBlue,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -325,7 +335,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Reset Progress?'),
+        title: Text('Reset Progress?',
+            style: TextStyle(color: primaryBlue, fontWeight: FontWeight.bold)),
         content: const Text(
             'Are you sure you want to reset all your progress? This action cannot be undone.'),
         actions: [
@@ -336,7 +347,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Reset', style: TextStyle(color: Colors.red)),
+            child: Text('Reset', style: TextStyle(color: accentRed)),
           ),
         ],
       ),
@@ -364,12 +375,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         key: ValueKey(value),
         children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 8),
+          Icon(icon, color: color, size: 36),
+          const SizedBox(height: 10),
           Text(
             value,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -377,8 +388,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -387,12 +399,77 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _showVideoPopup(BuildContext context, String videoUrl) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return VideoPopup(videoUrl: videoUrl);
+        return DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          builder: (_, scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 12, bottom: 16),
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  Expanded(
+                    child: VideoPopup(videoUrl: videoUrl),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       },
     );
+  }
+
+  Color _getCardBackgroundColor(int score, bool started) {
+    if (score == 5) {
+      return Colors.green.withOpacity(0.05);
+    } else if (started == 1) {
+      return Colors.orange.withOpacity(0.05);
+    } else {
+      return Colors.white;
+    }
+  }
+
+  LinearGradient _getCardBorderGradient(int score, bool started) {
+    if (score == 5) {
+      return LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Colors.green.shade300, Colors.green.shade500],
+      );
+    } else if (started == 1) {
+      return LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Colors.orange.shade300, Colors.orange.shade500],
+      );
+    } else {
+      return LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Colors.grey.shade200, Colors.grey.shade300],
+      );
+    }
   }
 
   @override
@@ -405,24 +482,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Colors.blue[50]!, Colors.blue[100]!],
+                colors: [backgroundBlue, Colors.blue[100]!],
               ),
             ),
             child: SafeArea(
-              child: Column(
+              child: ListView(
+                controller: _scrollController,
+                padding: const EdgeInsets.only(bottom: 80),
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.fromLTRB(20, 30, 20, 15),
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           'Your Privacy Journey',
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 30,
                             fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 40, 65, 102),
+                            color: primaryBlue,
                           ),
                         ),
+                        const SizedBox(height: 50),
                         FutureBuilder<SharedPreferences>(
                           future: SharedPreferences.getInstance(),
                           builder: (context, snapshot) {
@@ -430,57 +510,54 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               String mode =
                                   snapshot.data!.getString('quizMode') ??
                                       'easy';
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: mode == 'hard'
-                                          ? [
-                                              Colors.redAccent.withOpacity(0.7),
-                                              Colors.red.withOpacity(0.5)
-                                            ]
-                                          : [
-                                              Colors.blue.withOpacity(0.7),
-                                              Colors.blue.withOpacity(0.5)
-                                            ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: mode == 'hard'
-                                            ? Colors.red.withOpacity(0.2)
-                                            : Colors.blue.withOpacity(0.2),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: mode == 'hard'
+                                        ? [
+                                            accentRed.withOpacity(0.7),
+                                            Colors.red.withOpacity(0.5)
+                                          ]
+                                        : [
+                                            primaryBlue.withOpacity(0.7),
+                                            Colors.blue.withOpacity(0.5)
+                                          ],
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        mode == 'hard'
-                                            ? Icons.shield_outlined
-                                            : Icons.verified_user,
-                                        size: 16,
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: mode == 'hard'
+                                          ? Colors.red.withOpacity(0.3)
+                                          : Colors.blue.withOpacity(0.3),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      mode == 'hard'
+                                          ? Icons.shield_outlined
+                                          : Icons.verified_user,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      mode == 'hard'
+                                          ? 'Hard Mode'
+                                          : 'Easy Mode',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        mode == 'hard'
-                                            ? 'Hard Mode'
-                                            : 'Easy Mode',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               );
                             }
@@ -490,32 +567,34 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 5),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.blue.withOpacity(0.4),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
+                            color: primaryBlue.withOpacity(0.2),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                            spreadRadius: 2,
                           ),
                         ],
                       ),
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(24),
                       child: Column(
                         children: [
-                          const Text(
+                          Text(
                             'Progress Overview',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 40, 65, 102),
+                              color: primaryBlue,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 24),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -553,112 +632,264 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  Expanded(
+                  const SizedBox(height: 30),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ListView.builder(
-                      padding: const EdgeInsets.all(16),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: features.length,
                       itemBuilder: (context, index) {
                         bool isCompleted = features[index]['score'] == 5;
                         bool hasStarted = features[index]['started'] == 1;
-                        Color titleTextColor = Colors.grey[700]!;
+                        Color statusColor = Colors.grey;
                         if (hasStarted) {
-                          titleTextColor =
-                              isCompleted ? Colors.green : Colors.orange;
-                        }
-                        Color completionColor = Colors.blueAccent;
-                        if (hasStarted) {
-                          completionColor =
+                          statusColor =
                               isCompleted ? Colors.green : Colors.orange;
                         }
 
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.only(bottom: 20),
                           child: ScaleTransition(
                             scale: _scaleControllers[index].drive(
                               Tween(begin: 1.0, end: 0.95),
                             ),
                             child: GestureDetector(
                               onTap: () => _goToFeatureQuiz(index),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
+                              child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
+                                  color: _getCardBackgroundColor(
+                                      features[index]['score'],
+                                      features[index]['started'] == 1),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      _getCardBackgroundColor(
+                                          features[index]['score'],
+                                          features[index]['started'] == 1),
+                                      _getCardBackgroundColor(
+                                              features[index]['score'],
+                                              features[index]['started'] == 1)
+                                          .withOpacity(0.7),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    width: 2,
+                                    color: statusColor.withOpacity(0.5),
+                                  ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.blue.withOpacity(
-                                          isCompleted ? 0.05 : 0.1),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
+                                      color: statusColor.withOpacity(0.1),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
                                     ),
                                   ],
                                 ),
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 10),
-                                  leading: GestureDetector(
-                                    onTap: () => _showVideoPopup(
-                                        context, features[index]['video']),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          20, 20, 20, 12),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  statusColor.withOpacity(0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: Icon(
+                                              isCompleted
+                                                  ? Icons.check_circle
+                                                  : hasStarted
+                                                      ? Icons.trending_up
+                                                      : Icons.schedule,
+                                              color: statusColor,
+                                              size: 24,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 14),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  features[index]['name'],
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: primaryBlue,
+                                                  ),
+                                                ),
+                                                if (features[index]['score'] <
+                                                    2)
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 6),
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 4),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.blue
+                                                            .withOpacity(0.12),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                      ),
+                                                      child: const Text(
+                                                        "Recommended",
+                                                        style: TextStyle(
+                                                          color:
+                                                              Colors.blueAccent,
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          20, 0, 20, 16),
+                                      child: Text(
+                                        features[index]['description'],
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          height: 1.4,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
+                                    if (hasStarted || isCompleted)
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            20, 0, 20, 16),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  isCompleted
+                                                      ? 'Completed'
+                                                      : 'In Progress',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: statusColor,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${features[index]['score']}/5',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: statusColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 8),
+                                            LinearProgressIndicator(
+                                              value:
+                                                  features[index]['score'] / 5,
+                                              backgroundColor: Colors.grey[200],
+                                              valueColor:
+                                                  AlwaysStoppedAnimation(
+                                                      statusColor),
+                                              minHeight: 8,
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    Container(
                                       decoration: BoxDecoration(
-                                        color: completionColor.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(10),
+                                        color: backgroundBlue.withOpacity(0.5),
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(16),
+                                          bottomRight: Radius.circular(16),
+                                        ),
                                       ),
-                                      child: Icon(
-                                        isCompleted
-                                            ? Icons.check_circle
-                                            : Icons.play_circle_fill,
-                                        color: completionColor,
-                                        size: 30,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 14),
+                                      child: GestureDetector(
+                                        onTap: () => _showVideoPopup(
+                                            context, features[index]['video']),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 80,
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                color: Colors.black
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Center(
+                                                child: Icon(
+                                                  Icons.play_circle_fill,
+                                                  color: Colors.white,
+                                                  size: 30,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Video Tutorial',
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: primaryBlue,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'Learn how to use ${features[index]['name']}',
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      color: primaryLightBlue,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.chevron_right,
+                                              color: primaryBlue,
+                                              size: 24,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  title: Text(
-                                    features[index]['name'],
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: titleTextColor,
-                                    ),
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 8),
-                                      if (hasStarted || isCompleted) ...[
-                                        LinearProgressIndicator(
-                                          value: features[index]['score'] / 5,
-                                          backgroundColor: Colors.grey[200],
-                                          valueColor: AlwaysStoppedAnimation(
-                                            isCompleted
-                                                ? Colors.green
-                                                : Colors.orange,
-                                          ),
-                                          minHeight: 6,
-                                          borderRadius:
-                                              BorderRadius.circular(3),
-                                        ),
-                                        const SizedBox(height: 4),
-                                      ],
-                                      if (features[index]['score'] < 2)
-                                        const Text(
-                                          "Recommended",
-                                          style: TextStyle(
-                                            color: Colors.blueAccent,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                  trailing: Icon(
-                                    Icons.chevron_right,
-                                    color: isCompleted
-                                        ? Colors.grey
-                                        : Colors.blueAccent,
-                                  ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -681,19 +912,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Colors.green,
                 Colors.blue,
                 Colors.yellow,
-                Colors.pink
+                Colors.purple,
+                Colors.orange,
               ],
+              emissionFrequency: 0.05,
               numberOfParticles: 20,
-              gravity: 0.2,
+              maxBlastForce: 5,
+              minBlastForce: 2,
+              gravity: 0.1,
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: _resetQuiz,
+              backgroundColor: primaryBlue,
+              child: const Icon(Icons.refresh, color: Colors.white),
+              tooltip: 'Reset Progress',
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _resetQuiz,
-        backgroundColor: const Color.fromARGB(255, 24, 53, 98),
-        tooltip: 'Reset Quiz',
-        child: const Icon(Icons.refresh, color: Colors.white),
       ),
     );
   }
