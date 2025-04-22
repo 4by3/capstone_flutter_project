@@ -92,8 +92,8 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                         children: [
                           const SizedBox(height: 60),
                           Container(
-                            width: 120,
-                            height: 120,
+                            width: 100,
+                            height: 100,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
@@ -140,7 +140,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                   ? "Easy Mode Activated!"
                                   : "Hard Mode Activated!",
                               style: TextStyle(
-                                fontSize: 32,
+                                fontSize: 26,
                                 fontWeight: FontWeight.bold,
                                 color: textColor,
                               ),
@@ -148,7 +148,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                             ),
                           ),
 
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           Text(
                             "Score: ${widget.totalScore}/$totalPossibleScore",
                             style: TextStyle(
@@ -179,13 +179,13 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                   Text(
                                     "Based on your quiz results (${widget.totalScore}/$totalPossibleScore), we'll start with ${isEasy ? 'easy' : 'hard'}-friendly questions to help you build a strong foundation in Facebook privacy.",
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       color: textColor,
                                       height: 1.5,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
-                                  const SizedBox(height: 24),
+                                  const SizedBox(height: 20),
                                   Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -205,7 +205,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                         child: Text(
                                           "You'll learn step by step with helpful tutorial videos and interactive questions to check your understanding.",
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 14,
                                             color: textColor,
                                             height: 1.4,
                                           ),
@@ -246,7 +246,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                             ),
                           ),
                           //
-                          const SizedBox(height: 90),
+                          const SizedBox(height: 10),
                         ],
                       ),
                     ),

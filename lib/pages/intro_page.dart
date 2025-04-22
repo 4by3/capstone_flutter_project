@@ -86,7 +86,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                               TextSpan(
                                 text: "When it's about ",
                                 style: TextStyle(
-                                  fontSize: 44,
+                                  fontSize: 32,
                                   fontWeight: FontWeight.bold,
                                   color: Color.fromARGB(255, 24, 53, 98),
                                 ),
@@ -94,7 +94,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                               TextSpan(
                                 text: "Privacy, Awareness",
                                 style: TextStyle(
-                                  fontSize: 44,
+                                  fontSize: 32,
                                   fontWeight: FontWeight.bold,
                                   height: 1.3,
                                   color: Color(0xFF1877F2),
@@ -103,7 +103,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                               TextSpan(
                                 text: " Matters!",
                                 style: TextStyle(
-                                  fontSize: 44,
+                                  fontSize: 32,
                                   fontWeight: FontWeight.bold,
                                   color: Color.fromARGB(255, 24, 53, 98),
                                 ),
@@ -111,7 +111,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 84),
+                        const SizedBox(height: 64),
                         Image.asset(
                           'assets/images/logo.png',
                           width: 320,
@@ -207,10 +207,9 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                 // ),
                 // ),
 
-
                 const Spacer(),
 
-
+                
                 
                 const Text(
                   "Learn privacy settings through interactive\nquizzes and videos!",
@@ -236,7 +235,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 110,
+                        horizontal: 60,
                         vertical: 27,
                       ),
                       backgroundColor: const Color.fromARGB(255, 24, 53, 98),
@@ -250,6 +249,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                       children: [
                         Text(
                           "Start Learning",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 36,
                             color: Colors.white,

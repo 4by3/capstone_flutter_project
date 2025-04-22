@@ -538,7 +538,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                           // Answers
                           ConstrainedBox(
                             constraints: const BoxConstraints(
-                              maxHeight: 440,
+                              maxHeight: 370,
                             ),
                             child: ListView.builder(
                               shrinkWrap: true,
@@ -590,7 +590,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                         clickAnimationIndex]
                                                     .value,
                                             child: Container(
-                                              height: 88, // For two lines
+                                              height: 77, // For two lines
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 20,
@@ -657,7 +657,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                 },
                                 style: OutlinedButton.styleFrom(
                                   padding:
-                                      const EdgeInsets.symmetric(vertical: 26),
+                                      const EdgeInsets.symmetric(vertical: 20),
                                   side: BorderSide(color: textColor, width: 2),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12)),
@@ -685,7 +685,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: textColor,
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 26),
+                                    const EdgeInsets.symmetric(vertical: 20),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),

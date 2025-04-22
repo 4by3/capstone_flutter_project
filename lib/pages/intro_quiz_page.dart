@@ -287,7 +287,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                     // Answers
                     ConstrainedBox(
                       constraints: const BoxConstraints(
-                        maxHeight: 440, // For pushing the questions up
+                        maxHeight: 370, // For pushing the questions up
                       ),
                       child: ListView.builder(
                         shrinkWrap: true,
@@ -333,7 +333,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                               clickAnimationIndex]
                                           .value,
                                       child: Container(
-                                        height: 88, // For two lines
+                                        height: 77, // For two lines
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 20, vertical: 10),
                                         decoration: BoxDecoration(
@@ -390,7 +390,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                         child: OutlinedButton(
                           onPressed: _previousQuestion,
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 26),
+                            padding: const EdgeInsets.symmetric(vertical: 20),
                             side: BorderSide(color: textColor, width: 2),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
@@ -414,7 +414,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                             : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: textColor,
-                          padding: const EdgeInsets.symmetric(vertical: 26),
+                          padding: const EdgeInsets.symmetric(vertical: 20),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
