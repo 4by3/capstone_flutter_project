@@ -165,87 +165,80 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
       //level 1: shared secrets
       'scenarioNumber': 1,
       'scenario':
-          'You’ve just landed an exciting new job! You want to post the news on Facebook—but only your professional network should see it. You don’t want your family or some close friends to know just yet. Time to use your privacy powers.',
+          'You’re building your personal brand online and want to keep your Facebook presence both professional and private. With friends, coworkers, clients, and family all in one place, managing who sees what has become a must. You now use audience settings to carefully control your posts. ',
       'question':
-          'You share a post with a few contacts using Custom. One shares it—who can see it now?',
+          'You’re sharing a post related to your work or industry. What setting helps you share it with colleagues while hiding it from others? ',
       'options': [
-        'A) Only your contacts',
-        'B) The sharer’s followers',
-        'C) Mutual friends',
-        'D) No one'
-      ],
-      'answer': 'B) The sharer’s followers',
-      'feedback':
-          'Shared posts follow their settings—more people might see it.'
-    },
-    {
-      //cluster 1: Privacy control & selective sharing
-      //level 2 - hide from a few
-      'scenarioNumber': 1,
-      'scenario':
-          'You’ve just landed an exciting new job! You want to post the news on Facebook—but only your professional network should see it. You don’t want your family or some close friends to know just yet. Time to use your privacy powers.',
-      'question':
-          'Which setting lets you post something but hide it from specific friends?',
-      'options': [
-        'A) Public',
-        'B) Friends',
-        'C) Friends Except…',
+        'A) Friends',
+        'B) Friends Except… ',
+        'C) Public',
         'D) Only Me'
       ],
-      'answer': 'C) Friends Except…',
-      'feedback': 'This setting allows you to exclude specific friends from seeing your post.'
-    },
-    {
-      //level 3 - full control
-      'scenarioNumber': 1,
-      'scenario':
-          'You’ve just landed an exciting new job! You want to post the news on Facebook—but only your professional network should see it. You don’t want your family or some close friends to know just yet. Time to use your privacy powers.',
-      'question': 'What does Custom let you do?',
-      'options': [
-        'A) All friends',
-        'B) Block all',
-        'C) Pick who sees',
-        'D) Auto-delete'
-      ],
-      'answer': 'C) Pick who sees',
+      'answer': 'B) Friends Except…',
       'feedback':
-          'Friends Except… hides from some. Custom lets you choose exactly who sees it.'
+          '“Friends Except…” lets you hide your post from selected people without them knowing. '
     },
     {
-      //cluster 2: changing privacy & post visibility
-      //level 2 - changing your mind
+      'scenario':
+          '',
+      'question':
+          'You shared your job promotion using “Custom” to target a specific list. A tagged friend shares it. Who can now see the post?',
+      'options': [
+        'A) Everyone',
+        'B) Only the original custom audience',
+        'C) Only mutual friends',
+        'D) Everyone except those tagged'
+      ],
+      'answer': 'B) Only the original custom audience',
+      'feedback': 'Custom settings still control visibility, even when someone shares your post.'
+    },
+    {
+      //cluster 1; advanced privacy management
+      'scenario':
+          '',
+      'question': 'You want to hide a post from your boss and a few family members without unfriending them. What’s the best option? ',
+      'options': [
+        'A) Public',
+        'B) Hide from Timeline',
+        'C) Friends Except…',
+        'D) Close Friends'
+      ],
+      'answer': 'C) Friends Except…',
+      'feedback':
+          'Friends Except… allows you to silently exclude selected people from specific posts.'
+    },
+    {
       'scenario': '',
       'question':
-          'You change a post from Public to Friends. Who loses access?',
+          ' You change a post’s audience from Public to Friends. Who can no longer see it? ',
       'options': [
-        'A) No one',
-        'B) Only new viewers',
+        'A) Everyone',
+        'B) Your boss',
         'C) Non-friends',
-        'D) Everyone'
+        'D) Tagged friends'
       ],
       'answer': 'C) Non-friends',
-      'feedback': 'Non-friends lose access when you change the post to Friends.'
+      'feedback': 'Changing from Public to Friends removes the post from public view instantly.'
     },
     {
-      //level 3 - tags and shares
+      //cluster 2: post control and security
       'scenario': '',
       'question':
-          'A user sets a post to Friends, but a tagged friend shares it publicly. Who can see the post?',
+          'A stranger screenshot your public post and shares it out of context. How can you prevent this in the future?',
       'options': [
-        'A) Only the tagged friend',
-        'B) Only mutual friends',
-        'C) Everyone',
-        'D) No one'
+        'A) Make future posts Friends Only or Custom ',
+        'B) Report the screenshot',
+        'C) Delete your Facebook account',
+        'D) Ask them to take it down nicely'
       ],
-      'answer': 'B) Only mutual friends',
+      'answer': 'A) Make future posts Friends Only or Custom',
       'feedback':
-          'Changing to Friends hides the post from non-friends—even if it’s shared publicly.'
+          'Limiting your audience to trusted groups reduces the chances of content misuse. '
     },
   ],
   3: [
     // Interaction on Others' Posts Question
     {
-      //level 1 - comment under review
       'scenarioNumber': 1,
       'scenario':
           'Mark comments on a public post made by a friend. Later, the friend turns on “Review Comments”, which means all comments need approval before appearing.',
@@ -262,7 +255,6 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
     },
     {
       //cluster 1: privacy control & engagement
-      //level 2 - Who Sees the Like?
       'scenario': '',
       'question':
           'If a user reacts to a post shared with a limited audience, who can see that reaction?',
@@ -273,42 +265,39 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
         'D) The user’s entire friend list'
       ],
       'answer': 'B) Selected friends',
-      'feedback': 'Reactions follow the post’s privacy settings.'
+      'feedback': 'Reactions follow post privacy. If the post is limited, only selected friends can see your interaction.'
     },
     {
-      //level 3 - hidden chain reaction
       'scenario': '',
       'question': 'What happens to a reply if the original comment is hidden?',
       'options': [
-        'A) Reply disappears',
+        'A) Becomes a new post',
         'B) Reply stays',
-        'C) Becomes a new post',
+        'C) Reply disappears',
         'D) Only hidden from commenter'
       ],
-      'answer': 'A) Reply disappears',
+      'answer': 'C) Reply disappears',
       'feedback':
           'Likes and replies follow the post’s privacy. Hidden posts hide all interactions.'
     },
     {
       //cluster 2 - changing post & comment privacy
-      //level 2 - post locked down
       'scenario': '',
       'question':
           'A user changes a post from "Friends Only" to "Only Me." What happens to a friend’s comment?',
       'options': [
         'A) Still visible to commenter',
         'B) Deleted',
-        'C) Only poster sees it',
-        'D) Moved to archive'
+        'C) Moved to archive',
+        'D) Only the person who shared the post can see it'
       ],
-      'answer': 'C) Only poster sees it',
-      'feedback': 'Only the poster can see comments when the post is set to "Only Me."'
+      'answer': 'D) Only the person who shared the post can see it',
+      'feedback': 'When changed to “Only Me,” even comments from others are hidden from everyone else.'
     },
     {
-      //level 3 - going public
       'scenario': '',
       'question':
-          'A user comments on a Friends Only post. The post is now made Public. Who can see the comment?',
+          'A user comments on a "Friends Only post". The post is now made Public. Who can see the comment?',
       'options': [
         'A) Everyone',
         'B) No one',
@@ -317,7 +306,7 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
       ],
       'answer': 'A) Everyone',
       'feedback':
-          'Change visibility, and comments follow. "Only Me" hides all, Public shows all.'
+          'When a post becomes Public, comments also become visible to everyone.'
     },
   ],
   4: [
@@ -325,7 +314,7 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
     {
       'scenarioNumber': 1,
       'scenario':
-          'Sophie goes to a party, and a friend uploads a bunch of photos, tagging her in several of them. Luckily, Sophie has Tag Review turned on—so she can approve or decline tags before they appear on her profile. But Sophie doesn’t check for hours.',
+          'Sophie goes to a party, and a friend uploads a bunch of photos, tagging her in several of them. Luckily, Sophie has Tag Review turned on—so she can approve or decline tags before they appear on her profile. But Sophie doesn\’t check for hours.',
       'question': 'What happens to the tagged photos?',
       'options': [
         'A) Tags stay hidden',
@@ -335,29 +324,25 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
       ],
       'answer': 'A) Tags stay hidden',
       'feedback':
-          'With Tag Review on, tags stay hidden until approved, even if delayed.'
+          'With Tag Review on, tags stay hidden until approved—even if there\'s a delay. '
     },
     {
       //cluster 1: tag approval & removal
-      //level 2 - no gatekeeper
-      'scenarioNumber': 1,
       'scenario':
-          'Sophie goes to a party, and a friend uploads a bunch of photos, tagging her in several of them. Luckily, Sophie has Tag Review turned on—so she can approve or decline tags before they appear on her profile. But Sophie doesn’t check for hours.',
-      'question': 'What happens if Tag Review is disabled?',
+          '',
+      'question': 'What happens if Tag Review is turneed off?',
       'options': [
-        'A) Tags appear instantly',
+        'A) Tags are hidden by default',
         'B) Tags require approval',
-        'C) Tags are hidden by default',
+        'C) Tags appear instantly',
         'D) Tags disappear after 24 hours'
       ],
-      'answer': 'A) Tags appear instantly',
-      'feedback': 'Without Tag Review, tags go live immediately.'
+      'answer': 'C) Tags appear instantly',
+      'feedback': 'Without Tag Review, tags go live immediately and show up on your profile.'
     },
     {
-      //level 3 - remove the label
-      'scenarioNumber': 1,
       'scenario':
-          'Sophie goes to a party, and a friend uploads a bunch of photos, tagging her in several of them. Luckily, Sophie has Tag Review turned on—so she can approve or decline tags before they appear on her profile. But Sophie doesn’t check for hours.',
+          '',
       'question':
           'If Sophie removes a tag from a post, who can still see the post?',
       'options': [
@@ -368,11 +353,10 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
       ],
       'answer': 'A) Shared audience',
       'feedback':
-          'Without Tag Review, tags go live. Removing a tag just unlinks you—it won’t delete the post.'
+          'Removing a tag just unlinks your name—it doesn’t delete or hide the post. '
     },
     {
       //cluster 2: tag privacy & blocking
-      //level 2 - block & wipe
       'scenario': '',
       'question': 'What happens to tags when you block someone?',
       'options': [
@@ -382,22 +366,21 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
         'D) The post is deleted'
       ],
       'answer': 'A) Tags are removed, post stays',
-      'feedback': 'Blocking removes tags but the post remains for others.'
+      'feedback': 'When you block someone, existing tags involving them are removed, but the post itself remains.'
     },
     {
-      //level 3 - privacy change
       'scenario': '',
       'question':
           'If a post’s privacy is changed after tagging, what happens to the tag?',
       'options': [
-        'A) Follows new privacy settings',
+        'A) Tag is removed',
         'B) Stays as originally set',
         'C) Becomes hidden',
-        'D) Tag is removed'
+        'D) Follows new privacy settings'
       ],
-      'answer': 'A) Follows new privacy settings',
+      'answer': 'D) Follows new privacy settings',
       'feedback':
-          'Blocking removes tags and interactions. Tags follow post privacy unless removed.'
+          'Tags follow the post\'s privacy settings. If a post becomes private, the tag will also be hidden from others. '
     },
   ],
 };
