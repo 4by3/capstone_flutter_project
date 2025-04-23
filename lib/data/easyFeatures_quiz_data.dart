@@ -1,7 +1,5 @@
 
 
-// !!!! facebook groups section looks pretty incomplete
-
 /// Comprehensive question bank for easy features
 /// Organized by feature index containing questions, options, and correct answers
 final Map<int, List<Map<String, dynamic>>> easyFeatureQuestions = {
@@ -9,267 +7,264 @@ final Map<int, List<Map<String, dynamic>>> easyFeatureQuestions = {
     /// Block, Restrict, Report Usage Questions
     {
       'scenarioNumber': 1,
-      'scenario': 'A user you don’t know has sent you multiple inappropriate messages.',
-      'question': 'What should you do?',
+      'scenario': 'Ayesha uses Facebook to keep in touch with friends, family, and coworkers. Recently, she received unwanted messages from a stranger. One friend keeps reacting strangely to her posts, and she also discovers someone using her name and photo on a fake account.',
+      'question': 'Ayesha gets spam messages from a stranger. What should she do to stop them?',
       'options': [
-        'A) Ignore the message',
+        'A) Reply and ask who they are',
         'B) Block the user',
-        'C) Respond and ask them to stop',
-        'D) Report the user'
+        'C) Ignore the messages',
+        'D) Send a message back'
       ],
       'answer': 'B) Block the user',
-      'feedback': 'test1'
+      'feedback': 'Blocking someone stops all contact—messages, tags, and profile views.'
     },
     {
-      'scenarioNumber': 2,
-      'scenario': 'You find a Facebook profile impersonating you.',
-      'question': 'What should you do?',
+      //cluster 1: Safer Experience on Facebook
+      'scenario': '',
+      'question': ' What happens when Ayesha blocks someone?',
       'options': [
-        'A) Ignore it',
-        'B) Send a message asking them to stop',
-        'C) Report the profile',
-        'D) Post about it publicly'
+        'A) They can still comment on public posts',
+        'B) They can still search her name',
+        'C) They can’t see or interact with her',
+        'D) They get a message saying they were blocked'
       ],
-      'answer': 'C) Report the profile',
-      'feedback': 'test2'
+      'answer': 'C) They can’t see or interact with her',
+      'feedback': 'Blocked users can\'t see your profile or posts or interact with you on Facebook.'
     },
     {
-      'scenarioNumber': 3,
-      'scenario': 'A group of users leaves hurtful comments on your recent post, criticizing your opinions and spreading misinformation about you.',
-      'question': 'Do you:',
+      'scenario': '',
+      'question': 'Ayesha finds a fake Facebook profile using her name and photo. What should she do?',
       'options': [
-        'A) Delete your post and stay quiet',
-        'B) Block the users posting hurtful comments',
-        'C) Report the comments to Facebook for violating community guidelines',
-        'D) Respond to the comments to defend yourself'
+        'A) Block the fake account',
+        'B) Report the fake account to Facebook',
+        'C) Post about it on her timeline',
+        'D) Message the account and ask them to stop'
       ],
-      'answer': 'C) Report the comments to Facebook for violating community guidelines',
-      'feedback': 'test3'
+      'answer': 'B) Report the fake account to Facebook',
+      'feedback': 'Reporting fake profiles helps Facebook investigate and remove impersonation.'
     },
     {
-      'scenarioNumber': 4,
-      'scenario': 'A friend keeps posting comments on your personal photos that makes you uncomfortable, but you don’t want to unfriend them because they are part of your social circle.',
-      'question': 'Do you:',
+      //Cluster 2: Quietly Controlling What Others See
+      'scenario': '',
+      'question': 'Ayesha doesn\’t want one friend to see her posts but still wants to stay friends. What should she use?',
       'options': [
-        'A) Restrict the friend so they can only see your public posts',
-        'B) Remove them from your friend list',
-        'C) Ask them privately to stop commenting on your photos',
-        'D) Block the friend immediately'
+        'A) Unfriend them',
+        'B) Restrict',
+        'C) Block',
+        'D) Turn off notifications'
       ],
-      'answer': 'A) Restrict the friend so they can only see your public posts',
-      'feedback': 'test4'
+      'answer': 'B) Restrict',
+      'feedback': 'Restrict hides your posts.'
     },
     {
-      'scenarioNumber': 5,
-      'scenario': 'You frequently receive friend requests from strangers who immediately send spam messages or inappropriate content.',
-      'question': 'What should you do?',
+      'scenario': '',
+      'question': 'What can a restricted friend see on Ayesha’s profile?',
       'options': [
-        'A) Accept the request and ignore the messages',
-        'B) Block the user immediately after receiving the requests',
-        'C) Report the accounts for spamming',
-        'D) Restrict your friend request setting to \'Friends of Friends\' to reduce unwanted requests'
+        'A) All posts',
+        'B) Only stories',
+        'C) Public posts only',
+        'D) Nothing at all'
       ],
-      'answer': 'D) Restrict your friend request setting to \'Friends of Friends\' to reduce unwanted requests',
-      'feedback': 'test5'
+      'answer': 'C) Public posts only',
+      'feedback': 'Restricted friends won’t know they’re restricted and can only view public posts.'
     },
   ],
   1: [
     /// Facebook Groups Questions
     {
-      'scenario': '',
-      'question': 'Who can see the posts in a private Facebook group?',
+      'scenarioNumber': 1,
+      'scenario': 'Amira joins a Facebook group called “Home Gardening Tips.” The group is full of helpful posts, and she enjoys learning from others. As she becomes more active, she starts noticing how group rules and admins help keep the group organized and respectful.',
+      'question': 'Amira wants to share a photo of her new plants. What should she check before posting? ',
       'options': [
-        'A) Only group members',
-        'B) Anyone on Facebook',
-        'C) Only the group admin',
-        'D) Friends of group members'
+        'A) If the group allows photo posts',
+        'B) Her internet connection',
+        'C) How many likes others got',
+        'D) Her friend’s opinion'
       ],
-      'answer': 'A) Only group members',
-      'feedback': 'test1'
+      'answer': 'A) If the group allows photo posts',
+      'feedback': 'Always check the group rules to make sure your post follows what’s allowed. '
+    },
+    {
+      //cluster 1: admin role and group rules
+      'scenario': '',
+      'question': 'Someone in the gardening group posts an unrelated ad. What can the group admin do?',
+      'options': [
+        'A) Like the post',
+        'B) Ignore it',
+        'C) Remove the post and explain the rule',
+        'D) Comment with a warning emoji'
+      ],
+      'answer': 'C) Remove the post and explain the rule',
+      'feedback': 'Admins can remove off-topic content and remind members of the group rules'
     },
     {
       'scenario': '',
-      'question': 'What happens when you switch a Facebook group from private to public?',
+      'question': 'Amira wants to avoid posting the wrong kind of content again. What should she do?',
       'options': [
-        'A) Only new posts become public',
-        'B) All past and future posts become visible to everyone',
-        'C) Only admins can see old posts, but new posts are public',
-        'D) Facebook does not allow switching a group from private to public'
+        'A) Ask the admin before posting',
+        'B) Post and hope for the best',
+        'C) Delete all her old posts',
+        'D) Comment instead of posting'
       ],
-      'answer': 'B) All past and future posts become visible to everyone',
-      'feedback': 'test2'
+      'answer': 'A) Ask the admin before posting',
+      'feedback': 'If unsure, asking the admin is a great way to stay safe and respectful.'
+    },
+    {
+      //cluster 2: group privacy and safety
+      'scenario': '',
+      'question': 'Amira wants to join a private group about indoor plants. What does "private" mean? ',
+      'options': [
+        'A) Anyone can see posts',
+        'B) Only members can see the posts',
+        'C) The group has no rules',
+        'D) Only admins can post'
+      ],
+      'answer': 'B) Only members can see the posts',
+      'feedback': 'Private groups limit visibility, only members can see posts and discussions.'
     },
     {
       'scenario': '',
-      'question': 'If you leave a Facebook group, what happens to the posts you shared in the group?',
+      'question': 'What happens if a public group is changed to private?',
       'options': [
-        'A) They get automatically deleted',
-        'B) They remain in the group unless you delete them manually',
-        'C) Only admins can see them',
-        'D) They disappear after 30 days'
+        'A) Old posts disappear',
+        'B) All posts stay public',
+        'C) Only new posts are private',
+        'D) Old and new posts become visible only to members'
       ],
-      'answer': 'B) They remain in the group unless you delete them manually',
-      'feedback': 'test3'
-    },
-    {
-      'scenario': '',
-      'question': 'Who can approve new members in a Facebook group?',
-      'options': [
-        'A) Only the group admin',
-        'B) Group admins and moderators',
-        'C) Any group member',
-        'D) Only Facebook itself'
-      ],
-      'answer': 'B) Group admins and moderators',
-      'feedback': 'test4'
-    },
-    {
-      'scenario': '',
-      'question': 'What can group admins do to enhance privacy in a Facebook group?',
-      'options': [
-        'A) Turn off post approvals for all members',
-        'B) Make all group posts visible to non-members',
-        'C) Allow anyone to join',
-        'D) Set the group to private and restrict who can join'
-      ],
-      'answer': 'D) Set the group to private and restrict who can join',
-      'feedback': 'test5'
+      'answer': 'D) Old and new posts become visible only to members',
+      'feedback': 'When a group becomes private, all past and future content becomes visible only to members.'
     },
   ],
   2: [
     /// Audience Setting for Posts Questions
     {
       'scenarioNumber': 1,
-      'scenario': 'You post a photo from a family gathering on your profile. A colleague comments on the post, mentioning details about your workplace.',
-      'question': 'How should you handle the audience settings for this post?',
+      'scenario': 'David often shares updates on Facebook—photos, work news, and personal thoughts. He wants to make sure the right people see the right posts. For example, he wants to share his new job with coworkers, a birthday memory with close friends, and a private journal entry just for himself.',
+      'question': ' David wants to share a post only with people on his friend list. Which setting should he use?',
       'options': [
-        'A) Leave it public to let everyone enjoy the post',
-        'B) Change the audience to \'Friends Only\'',
-        'C) Use the custom audience option to exclude colleagues',
-        'D) Delete the comment to avoid workplace-related exposure'
+        'A) Public',
+        'B) Friends',
+        'C) Only Me',
+        'D) Custom'
       ],
-      'answer': 'C) Use the custom audience option to exclude colleagues',
-      'feedback': 'test1'
+      'answer': 'B) Friends',
+      'feedback': 'The "Friends" setting makes your post visible only to people you\'ve added as friends.'
     },
     {
-      'scenarioNumber': 2,
-      'scenario': 'You discover an old post from two years ago that is still set to \'Public\'. The post includes a photo of your vacation with the location details.',
-      'question': 'What is the best course of action?',
+      //cluster 1: choosing who sees your post
+      'scenario': '',
+      'question': 'David wants to hide a post from a few specific people. What setting should he use?',
       'options': [
-        'A) Leave it public as it’s an old post ',
-        'B) Use the \'Limit Past Posts\' feature to change the audience to \'Friends Only\'',
-        'C) Delete the post to eliminate any potential privacy risks',
-        'D) Edit the post to remove location details while keeping it public'
+        'A) Friends ',
+        'B) Friends Except…',
+        'C) Public',
+        'D) Only Me'
       ],
-      'answer': 'B) Use the \'Limit Past Posts\' feature to change the audience to \'Friends Only\'',
-      'feedback': 'test2'
+      'answer': 'B) Friends Except…',
+      'feedback': '"Friends Except…" lets you stay connected but hide the post from selected people. '
     },
     {
-      'scenarioNumber': 3,
-      'scenario': 'You share advice in a public professional group. Later, you noticed some group members visiting your profile and sending connection requests.',
-      'question': 'How can you prevent this exposure?',
+      'scenario': '',
+      'question': 'David wants to share a post with just his team at work. What setting helps him do that? ',
       'options': [
-        'A) Leave the group to avoid further interactions',
-        'B) Change your future post audience to  \'Friends\' or \'Only Me\'',
-        'C) Ignore the requests and continue posting in the group',
-        'D) Set profile details visible to \'Friends Only\' or \'Custom Audience\''
+        'A) Close Friends',
+        'B) Custom',
+        'C) Public',
+        'D) Friends'
       ],
-      'answer': 'D) Set profile details visible to \'Friends Only\' or \'Custom Audience\'',
-      'feedback': 'test3'
+      'answer': 'B) Custom',
+      'feedback': 'The "Custom" setting allows you to choose exactly who can or can\'t see your post. '
     },
     {
-      'scenarioNumber': 4,
-      'scenario': 'You announce your new job on your profile. You notice that acquaintances you don’t interact with are congratulating you.',
-      'question': 'What is the best way to control the audience for such updates?',
+      //cluster 2: keeping your post private
+      'scenario': '',
+      'question': 'David writes a personal journal post that he doesn’t want anyone else to see. What setting should he use?',
       'options': [
-        'A) Keep the post public to let everyone celebrate with you',
-        'B) Adjust the audience to include only close friends and family',
-        'C) Use \'Custom Audience\' to exclude people you rarely interact with',
-        'D) Delete the post to avoid unwanted attention'
+        'A) Public',
+        'B) Friends',
+        'C) Friends Except…',
+        'D) Only Me'
       ],
-      'answer': 'C) Use \'Custom Audience\' to exclude people you rarely interact with',
-      'feedback': 'test4'
+      'answer': 'D) Only Me',
+      'feedback': '"Only Me" hides the post from everyone else, it’s fully private.'
     },
     {
-      'scenarioNumber': 5,
-      'scenario': 'You create a post inviting friends to your birthday party. Later, you realize it’s visible to your entire friend list, including colleagues and acquaintances.',
-      'question': 'How can you fix the audience settings?',
+      'scenario': '',
+      'question': 'David shared a post with “Friends,” but now wants to make it completely private. What should he do?',
       'options': [
-        'A) Let it remain as it is; it’s just a birthday invitation',
-        'B) Change the audience to include only specific people invited to the party',
-        'C) Delete the post and send individual invitations instead',
-        'D) Edit the post and add a note clarifying it’s for specific people'
+        'A) Delete the post',
+        'B) Turn off comments',
+        'C) Change the audience to “Only Me”',
+        'D) Tag fewer people'
       ],
-      'answer': 'B) Change the audience to include only specific people invited to the party',
-      'feedback': 'test5'
+      'answer': 'C) Change the audience to “Only Me”',
+      'feedback': 'You can update the audience on any of your posts at any time—even after posting.'
     },
   ],
   3: [
     /// Interaction on Others' Posts Questions
     {
       'scenarioNumber': 1,
-      'scenario': 'You comment on a public post shared by a news page. The post sparks a debate, and your comment receives several replies from strangers. Some of them visit your profile, and one even sends you a friend request.',
-      'question': 'What action should you take to protect your privacy?',
+      'scenario': 'Nila was scrolling through Facebook when she saw a post from her friend Rehan celebrating his graduation. She liked the post, left a comment saying "Congrats!", and later replied to another friend’s comment on the same post. The next day, Rehan changed the post\'s privacy settings from "Public" to "Friends Only." ',
+      'question': 'What did Nila do when she liked and commented on Rehan\’s post? ',
       'options': [
-        'A) Reply to all the comments to clarify your point',
-        'B) Adjust your privacy settings to limit profile visibility to \'Friends Only\'',
-        'C) Ignore the situation and keep engaging with strangers on the post',
-        'D) Block anyone who interacts with your comment'
+        'A) Ignored the post',
+        'B) Interacted with the post',
+        'C) Changed the privacy',
+        'D) Blocked Rehan'
       ],
-      'answer': 'B) Adjust your privacy settings to limit profile visibility to \'Friends Only\'',
-      'feedback': 'test1'
+      'answer': 'B) Interacted with the post',
+      'feedback': 'Liking, commenting, or replying to a post are all forms of interaction. '
     },
     {
-      'scenarioNumber': 2,
-      'scenario': 'You share a public post from a community page, and someone from that page comments on your post. They mentioned they liked your content and suggest checking out their profile.',
-      'question': 'How can you minimize exposure to stranger?',
+      //cluster 1: when privacy settings change
+      'scenario': '',
+      'question': 'Rehan\'s post was set to “Public.” Who could see Nila’s comment on it? ',
       'options': [
-        'A) Delete the shared post',
-        'B) Check the privacy settings of your shared content and restrict it to \'Friends\'',
-        'C) Ignore the comment and continue sharing public posts',
-        'D) Engage with the stranger to learn more about them'
+        'A) Only Rehan',
+        'B) Only Nila\'s friends',
+        'C) Anyone on Facebook',
+        'D) Only mutual friends'
       ],
-      'answer': 'B) Check the privacy settings of your shared content and restrict it to \'Friends\'',
-      'feedback': 'test2'
+      'answer': 'C) Anyone on Facebook',
+      'feedback': 'Public posts are visible to everyone, including all comments and reactions.'
     },
     {
-      'scenarioNumber': 3,
-      'scenario': 'You like a photo shared publicly by a stranger in a travel group. Shortly after, you receive a direct message from them asking about your interest in travelling.',
-      'question': 'What would be the safest response?',
+      'scenario': '',
+      'question': 'Who controls who can see Nila’s comment on Rehan\’s post?',
       'options': [
-        'A) Review your group activity and limit your profile information visibility in your groups',
-        'B) Respond politely and share your travel experiences',
-        'C) Unfollow the group to avoid further interaction',
-        'D) Ignore the message and continue liking similar posts'
+        'A) Only Nila',
+        'B) Only Rehan',
+        'C) Nila’s friends',
+        'D) Everyone who reacted to the post'
       ],
-      'answer': 'A) Review your group activity and limit your profile information visibility in your groups',
-      'feedback': 'test3'
+      'answer': 'B) Only Rehan',
+      'feedback': ' Rehan controls who can see the post and its comments, but Nila still owns her comment and can delete or edit it anytime. '
     },
     {
-      'scenarioNumber': 4,
-      'scenario': 'You are tagged by a friend in a public group post. The post is a funny meme, but it attracts comments and reactions from strangers.',
-      'question': 'What steps should you take?',
+      //cluster 2: interacting respectfully
+      'scenario': '',
+      'question': 'Nila sees a post about someone going through a hard time. What is the most thoughtful way to respond? ',
       'options': [
-        'A) Leave the tag as it is; it’s harmless',
-        'B) Engage with the comments to maintain a fun discussion',
-        'C) Adjust your tagging settings to require approval for future tags',
-        'D) Remove the tag and ask your friend to seek permission before tagging'
+        'A) Use the “Haha” reaction',
+        'B) Leave a kind comment',
+        'C) Scroll past',
+        'D) React with “Wow”'
       ],
-      'answer': 'D) Remove the tag and ask your friend to seek permission before tagging',
-      'feedback': 'test4'
+      'answer': 'B) Leave a kind comment',
+      'feedback': 'Leaving a supportive comment shows empathy and kindness.'
     },
     {
-      'scenarioNumber': 5,
-      'scenario': 'You post a question in a public hobby group. A stranger replies with an answer but also starts following your profile.',
-      'question': 'What should you do to protect your privacy?',
+      'scenario': '' ,
+      'question': 'Why is it important to be careful when reacting to serious posts?',
       'options': [
-        'A) Thank the stranger and accept the follower',
-        'B) Message the stranger to confirm their intention',
-        'C) Review your profile visibility settings and restrict it to \'Friends Only\'',
-        'D) Remove the post to stop further exposure'
+        'A) Facebook might ban your account',
+        'B) Reactions affect the post’s privacy',
+        'C) People may misunderstand your intention',
+        'D) Your reaction becomes private'
       ],
-      'answer': 'C) Review your profile visibility settings and restrict it to \'Friends Only\'',
-      'feedback': 'test5'
+      'answer': 'C) People may misunderstand your intention',
+      'feedback': 'Using the wrong reaction on a serious post may hurt others, even if you didn’t mean to. '
     },
   ],
   4: [
