@@ -231,7 +231,7 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
         'C) Delete your Facebook account',
         'D) Ask them to take it down nicely'
       ],
-      'answer': 'A) Make future posts Friends Only or Custom',
+      'answer': 'A) Make future posts Friends Only or Custom ',
       'feedback':
           'Limiting your audience to trusted groups reduces the chances of content misuse. '
     },
