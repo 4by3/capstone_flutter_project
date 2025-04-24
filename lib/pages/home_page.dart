@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
     String currentMode = prefs.getString('quizMode') ?? 'easy';
 
-    features = [
+features = [
       {
         'name': 'Block, Restrict, Report Usage',
         'score': 0,
@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         'name': 'Facebook Groups',
         'score': 0,
         'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+        'video': 'https://ia801704.us.archive.org/18/items/facebook-group-privacy-settings-video-generated-with-synthesia/Facebook%20Group%20Privacy%20Settings%20-%20Video%20generated%20with%20Synthesia.mp4',
         'description':
             'Discover privacy controls for joining, participating in, and managing Facebook Groups.'
       },
@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         'name': 'Audience Setting for Posts',
         'score': 0,
         'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+        'video': 'https://ia801704.us.archive.org/18/items/facebook-group-privacy-settings-video-generated-with-synthesia/Facebook%20Audience%20Settings%20-%20Video%20generated%20with%20Synthesia.mp4',
         'description':
             'Control who sees your posts with audience selection tools.'
       },
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         'name': 'Interaction on Others\' Posts',
         'score': 0,
         'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+        'video': 'https://ia600706.us.archive.org/22/items/interaction-on-facebook-made-with-clipchamp/Interaction%20on%20facebook%20-%20Made%20with%20Clipchamp.mp4',
         'description':
             'Manage your visibility when interacting with content from other users.'
       },
