@@ -174,7 +174,7 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
         'C) Public',
         'D) Only Me'
       ],
-      'answer': 'B) Friends Except…',
+      'answer': 'B) Friends Except… ',
       'feedback':
           '“Friends Except…” lets you hide your post from selected people without them knowing. '
     },
