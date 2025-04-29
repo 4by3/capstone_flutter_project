@@ -648,11 +648,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                           Expanded(
                             child: OutlinedButton(
                               onPressed: currentQuestionIndex == 0
-                                  ? () => Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => HomePage()),
-                                      ) 
+                                  ? () => Navigator.pop(context, score)
                                   : () {
                                       setState(() {
                                         currentQuestionIndex--;
@@ -680,13 +676,13 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                 ),
                               ),
                             ),
-                          ), // CHANGED: Removed if (currentQuestionIndex > 0) to always show button
+                          ), 
                           const SizedBox(
                               width:
-                                  16), // CHANGED: Removed conditional spacing
+                                  16), 
                           SizedBox(
                             width: MediaQuery.of(context).size.width *
-                                0.45, // Small, consistent width
+                                0.45, 
                             child: ElevatedButton(
                               onPressed:
                                   selectedAnswers[currentQuestionIndex] != null
