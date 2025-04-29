@@ -210,7 +210,7 @@ final Map<int, List<Map<String, dynamic>>> hardFeatureQuestions = {
     {
       'scenario': '',
       'question':
-          ' You change a post’s audience from Public to Friends. Who can no longer see it? ',
+          'You change a post’s audience from Public to Friends. Who can no longer see it? ',
       'options': [
         'A) Everyone',
         'B) Your boss',

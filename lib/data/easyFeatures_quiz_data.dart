@@ -21,7 +21,7 @@ final Map<int, List<Map<String, dynamic>>> easyFeatureQuestions = {
     {
       //cluster 1: Safer Experience on Facebook
       'scenario': '',
-      'question': ' What happens when Ayesha blocks someone?',
+      'question': 'What happens when Ayesha blocks someone?',
       'options': [
         'A) They can still comment on public posts',
         'B) They can still search her name',
@@ -140,7 +140,7 @@ final Map<int, List<Map<String, dynamic>>> easyFeatureQuestions = {
     {
       'scenarioNumber': 1,
       'scenario': 'David often shares updates on Facebook—photos, work news, and personal thoughts. He wants to make sure the right people see the right posts. For example, he wants to share his new job with coworkers, a birthday memory with close friends, and a private journal entry just for himself.',
-      'question': ' David wants to share a post only with people on his friend list. Which setting should he use?',
+      'question': 'David wants to share a post only with people on his friend list. Which setting should he use?',
       'options': [
         'A) Public',
         'B) Friends',
@@ -239,7 +239,7 @@ final Map<int, List<Map<String, dynamic>>> easyFeatureQuestions = {
         'D) Everyone who reacted to the post'
       ],
       'answer': 'B) Only Rehan',
-      'feedback': ' Rehan controls who can see the post and its comments, but Nila still owns her comment and can delete or edit it anytime. '
+      'feedback': 'Rehan controls who can see the post and its comments, but Nila still owns her comment and can delete or edit it anytime. '
     },
     {
       //cluster 2: interacting respectfully
