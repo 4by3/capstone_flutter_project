@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:confetti/confetti.dart';
 import '../widgets/video_popup.dart';
+import '../data/features_data.dart' as featuresDataFile;
 import 'feature_quiz_page.dart';
 import 'intro_page.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -47,52 +48,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Future<void> _loadFeatureScores() async {
+    if (!mounted) return; // Early exit if not mounted
+
     final prefs = await SharedPreferences.getInstance();
     String currentMode = prefs.getString('quizMode') ?? 'easy';
 
-features = [
-      {
-        'name': 'Block, Restrict, Report Usage',
-        'score': 0,
-        'started': 0,
-        'video': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-        'description':
-            'Learn how to manage unwanted interactions with blocking, restricting, and reporting tools.'
-      },
-      {
-        'name': 'Facebook Groups',
-        'score': 0,
-        'started': 0,
-        'video': 'https://ia801704.us.archive.org/18/items/facebook-group-privacy-settings-video-generated-with-synthesia/Facebook%20Group%20Privacy%20Settings%20-%20Video%20generated%20with%20Synthesia.mp4',
-        'description':
-            'Discover privacy controls for joining, participating in, and managing Facebook Groups.'
-      },
-      {
-        'name': 'Audience Setting for Posts',
-        'score': 0,
-        'started': 0,
-        'video': 'https://ia801704.us.archive.org/18/items/facebook-group-privacy-settings-video-generated-with-synthesia/Facebook%20Audience%20Settings%20-%20Video%20generated%20with%20Synthesia.mp4',
-        'description':
-            'Control who sees your posts with audience selection tools.'
-      },
-      {
-        'name': 'Interaction on Others\' Posts',
-        'score': 0,
-        'started': 0,
-        'video': 'https://ia600706.us.archive.org/22/items/interaction-on-facebook-made-with-clipchamp/Interaction%20on%20facebook%20-%20Made%20with%20Clipchamp.mp4',
-        'description':
-            'Manage your visibility when interacting with content from other users.'
-      },
-      {
-        'name': 'Tag Review and Settings',
-        'score': 0,
-        'started': 0,
-        'video':
-            'https://ia902908.us.archive.org/12/items/invideo-ai-1080-facebook-tag-review-control-your-profil-2025-03-19/invideo-ai-1080%20Facebook%20Tag%20Review_%20Control%20Your%20Profil%202025-03-19.mp4',
-        'description':
-            'Learn how to review and control when others tag you in posts or photos.'
-      },
-    ];
+    // Initialize features from the imported features_data.dart
+    features = List<Map<String, dynamic>>.from(
+        featuresDataFile.featuresData.map((f) => Map<String, dynamic>.from(f)));
 
     if (widget.initialFeatureScores != null) {
       for (var feature in features) {
@@ -123,7 +86,7 @@ features = [
       ));
     }
 
-    if (mounted) { // Check if the widget is still mounted
+    if (mounted) {
       setState(() {
         _sortFeatures();
         if (features.every((f) => f['score'] == 5)) {
@@ -151,6 +114,8 @@ features = [
   }
 
   void _updateFeatureScore(int index, int score) {
+    if (!mounted) return;
+
     setState(() {
       features[index]['score'] = score;
       features[index]['started'] = 1;
@@ -196,137 +161,143 @@ features = [
       if (mode == 'easy' && features.every((f) => f['score'] == 5)) {
         await prefs.setString('quizMode', 'hard');
 
-        await _loadFeatureScores();
-
-        showDialog(
-          context: context,
-          builder: (_) => Dialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: accentRed,
-                      shape: BoxShape.circle,
+        // Show dialog before reloading scores, but only if mounted
+        if (mounted) {
+          await showDialog(
+            context: context,
+            builder: (_) => Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                    child: const Icon(
-                      Icons.shield_outlined,
-                      size: 40,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.red[100],
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Text(
-                      "HARD MODE",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
                         color: accentRed,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.shield_outlined,
+                        size: 40,
+                        color: Colors.white,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "Hard Mode Unlocked!",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: primaryBlue,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "Congratulations! You've completed all Easy quizzes with perfect scores. Challenge yourself with more advanced privacy questions.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: primaryLightBlue,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.red[50],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.star,
-                          color: accentRed,
-                          size: 20,
-                        ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.red[100],
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          "Hard mode features more in-depth privacy scenarios and advanced options.",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: primaryLightBlue,
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryBlue,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 4,
-                      ),
-                      child: const Text(
-                        "Let's Go!",
+                      child: Text(
+                        "HARD MODE",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: accentRed,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    Text(
+                      "Hard Mode Unlocked!",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: primaryBlue,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Congratulations! You've completed all Easy quizzes with perfect scores. Challenge yourself with more advanced privacy questions.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: primaryLightBlue,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.red[50],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.star,
+                            color: accentRed,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            "Hard mode features more in-depth privacy scenarios and advanced options.",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: primaryLightBlue,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryBlue,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                        ),
+                        child: const Text(
+                          "Let's Go!",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
+          );
+
+          // Reload scores only if still mounted
+          if (mounted) {
+            await _loadFeatureScores();
+          }
+        }
       }
     }
   }
@@ -580,12 +551,14 @@ features = [
                                         features[index]['started'] == 1;
                                     Color statusColor = Colors.grey;
                                     if (hasStarted) {
-                                      statusColor =
-                                          isCompleted ? Colors.green : Colors.orange;
+                                      statusColor = isCompleted
+                                          ? Colors.green
+                                          : Colors.orange;
                                     }
 
                                     return Padding(
-                                      padding: const EdgeInsets.only(bottom: 20),
+                                      padding:
+                                          const EdgeInsets.only(bottom: 20),
                                       child: ScaleTransition(
                                         scale: _scaleControllers[index].drive(
                                           Tween(begin: 1.0, end: 0.95),
@@ -596,17 +569,20 @@ features = [
                                             decoration: BoxDecoration(
                                               color: _getCardBackgroundColor(
                                                   features[index]['score'],
-                                                  features[index]['started'] == 1),
+                                                  features[index]['started'] ==
+                                                      1),
                                               gradient: LinearGradient(
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
                                                 colors: [
                                                   _getCardBackgroundColor(
                                                       features[index]['score'],
-                                                      features[index]['started'] ==
+                                                      features[index]
+                                                              ['started'] ==
                                                           1),
                                                   _getCardBackgroundColor(
-                                                          features[index]['score'],
+                                                          features[index]
+                                                              ['score'],
                                                           features[index]
                                                                   ['started'] ==
                                                               1)
@@ -617,8 +593,8 @@ features = [
                                                   BorderRadius.circular(16),
                                               border: Border.all(
                                                 width: 2,
-                                                color:
-                                                    statusColor.withOpacity(0.5),
+                                                color: statusColor
+                                                    .withOpacity(0.5),
                                               ),
                                               boxShadow: [
                                                 BoxShadow(
@@ -641,18 +617,21 @@ features = [
                                                     children: [
                                                       Container(
                                                         padding:
-                                                            const EdgeInsets.all(
-                                                                8),
-                                                        decoration: BoxDecoration(
+                                                            const EdgeInsets
+                                                                .all(8),
+                                                        decoration:
+                                                            BoxDecoration(
                                                           color: statusColor
-                                                              .withOpacity(0.12),
+                                                              .withOpacity(
+                                                                  0.12),
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(10),
                                                         ),
                                                         child: Icon(
                                                           isCompleted
-                                                              ? Icons.check_circle
+                                                              ? Icons
+                                                                  .check_circle
                                                               : hasStarted
                                                                   ? Icons
                                                                       .trending_up
@@ -689,14 +668,14 @@ features = [
                                                                     const EdgeInsets
                                                                         .only(
                                                                         top: 6),
-                                                                child: Container(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .symmetric(
-                                                                          horizontal:
-                                                                              10,
-                                                                          vertical:
-                                                                              4),
+                                                                child:
+                                                                    Container(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          10,
+                                                                      vertical:
+                                                                          4),
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     color: Colors
@@ -704,9 +683,8 @@ features = [
                                                                         .withOpacity(
                                                                             0.12),
                                                                     borderRadius:
-                                                                        BorderRadius
-                                                                            .circular(
-                                                                                12),
+                                                                        BorderRadius.circular(
+                                                                            12),
                                                                   ),
                                                                   child:
                                                                       const Text(
@@ -746,9 +724,9 @@ features = [
                                                 ),
                                                 if (hasStarted || isCompleted)
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets.fromLTRB(
-                                                            20, 0, 20, 16),
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(
+                                                        20, 0, 20, 16),
                                                     child: Column(
                                                       crossAxisAlignment:
                                                           CrossAxisAlignment
@@ -809,7 +787,7 @@ features = [
                                                     color: backgroundBlue
                                                         .withOpacity(0.5),
                                                     borderRadius:
-                                                        BorderRadius.only(
+                                                        const BorderRadius.only(
                                                       bottomLeft:
                                                           Radius.circular(16),
                                                       bottomRight:
@@ -817,9 +795,11 @@ features = [
                                                     ),
                                                   ),
                                                   child: InkWell(
-                                                    onTap: () => _showVideoPopup(
-                                                        context,
-                                                        features[index]['video']),
+                                                    onTap: () =>
+                                                        _showVideoPopup(
+                                                            context,
+                                                            features[index]
+                                                                ['video']),
                                                     borderRadius:
                                                         BorderRadius.only(
                                                       bottomLeft:
@@ -828,11 +808,10 @@ features = [
                                                           Radius.circular(16),
                                                     ),
                                                     child: Container(
-                                                      padding:
-                                                          const EdgeInsets
-                                                              .symmetric(
-                                                              horizontal: 20,
-                                                              vertical: 14),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 20,
+                                                          vertical: 14),
                                                       child: Row(
                                                         children: [
                                                           Container(
@@ -840,7 +819,8 @@ features = [
                                                             height: 50,
                                                             decoration:
                                                                 BoxDecoration(
-                                                              color: Colors.black
+                                                              color: Colors
+                                                                  .black
                                                                   .withOpacity(
                                                                       0.1),
                                                               borderRadius:
@@ -848,12 +828,12 @@ features = [
                                                                       .circular(
                                                                           8),
                                                             ),
-                                                            child: Center(
+                                                            child: const Center(
                                                               child: Icon(
                                                                 Icons
                                                                     .play_circle_fill,
-                                                                color:
-                                                                    Colors.white,
+                                                                color: Colors
+                                                                    .white,
                                                                 size: 30,
                                                               ),
                                                             ),
