@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import '../data/easyFeatures_quiz_data.dart';
 import '../data/hardFeatures_quiz_data.dart';
-import 'home_page.dart';
+import '../data/features_data.dart' as featuresDataFile;
+import '../widgets/video_popup.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class FeatureQuizPage extends StatefulWidget {
   final int featureIndex;
@@ -149,6 +151,15 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
     _scenarioPopupController.forward();
   }
 
+  void _showVideoPopup(BuildContext context, String videoUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return VideoPopup(videoUrl: videoUrl);
+      },
+    );
+  }
+
   void _hideScenarioPopup() {
     _scenarioPopupController.reverse().then((_) {
       setState(() {
@@ -213,14 +224,12 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
             contentPadding: const EdgeInsets.all(20),
             title: Column(
               children: [
-                Image.asset(
-                  isCorrect
-                      ? 'assets/images/happy_bee.png'
-                      : 'assets/images/sad_bee.png',
-                  height: 120,
-                  width: 120,
+                Icon(
+                  isCorrect ? Icons.check_circle : Icons.close,
+                  color: isCorrect ? Colors.green : Colors.red,
+                  size: 80, // Adjusted from 120x120 for better balance
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 Text(
                   isCorrect ? 'Great Job!' : 'Not Quite',
                   style: TextStyle(
@@ -442,11 +451,38 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                             minHeight: 8,
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          if (hasScenario) ...[
-                            const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                onTap: () => _showVideoPopup(
+                                    context,
+                                    featuresDataFile
+                                            .featuresData[widget.featureIndex]
+                                        ['video']),
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: textColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.play_circle_fill,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                ),
+                              ),
+                              if (hasScenario)
                                 GestureDetector(
                                   onTap: () =>
                                       _showScenarioPopup(question['scenario']),
@@ -482,9 +518,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -519,7 +554,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                             ),
                                           ),
                                           const SizedBox(height: 16),
-                                          Text(
+                                          AutoSizeText(
                                             question['question'],
                                             style: TextStyle(
                                               fontSize: 32,
@@ -527,6 +562,12 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                               height: 1.4,
                                               color: textColor,
                                             ),
+                                            maxLines: 5,
+                                            minFontSize: 16,
+                                            stepGranularity: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.left,
+                                            wrapWords: true,
                                           ),
                                         ],
                                       ),
@@ -614,7 +655,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                               ),
                                               child: Align(
                                                 alignment: Alignment.centerLeft,
-                                                child: Text(
+                                                child: AutoSizeText(
                                                   option,
                                                   style: TextStyle(
                                                     fontSize: 20,
@@ -623,6 +664,13 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                         : Colors.white,
                                                     fontWeight: FontWeight.bold,
                                                   ),
+                                                  maxLines: 2,
+                                                  minFontSize: 14,
+                                                  stepGranularity: 1,
+                                                  wrapWords: true,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  textAlign: TextAlign.left,
                                                 ),
                                               ),
                                             ),
@@ -642,8 +690,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                     Padding(
                       padding: const EdgeInsets.all(24),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment
-                            .center, 
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Expanded(
                             child: OutlinedButton(
@@ -653,10 +700,9 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                       setState(() {
                                         currentQuestionIndex--;
                                         _startAnimations(
-                                            showScenarioPopup:
-                                                false); 
+                                            showScenarioPopup: false);
                                       });
-                                    }, 
+                                    },
                               style: OutlinedButton.styleFrom(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20),
@@ -666,9 +712,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                 ),
                               ),
                               child: Text(
-                                currentQuestionIndex == 0
-                                    ? 'Back'
-                                    : 'Previous', 
+                                currentQuestionIndex == 0 ? 'Back' : 'Previous',
                                 style: TextStyle(
                                   fontSize: 18,
                                   color: textColor,
@@ -676,13 +720,10 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                 ),
                               ),
                             ),
-                          ), 
-                          const SizedBox(
-                              width:
-                                  16), 
+                          ),
+                          const SizedBox(width: 16),
                           SizedBox(
-                            width: MediaQuery.of(context).size.width *
-                                0.45, 
+                            width: MediaQuery.of(context).size.width * 0.45,
                             child: ElevatedButton(
                               onPressed:
                                   selectedAnswers[currentQuestionIndex] != null
