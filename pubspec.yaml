@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  video_player: ^2.9.1 # added video_player dependecy for videos 19/09/2024
+  video_player: ^2.9.5 # added video_player dependecy for videos 19/09/2024
   shared_preferences: ^2.2.0
   confetti: ^0.7.0
   google_fonts: ^6.2.1
