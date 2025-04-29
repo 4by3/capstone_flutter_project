@@ -49,6 +49,12 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen size for responsive design
+    final size = MediaQuery.of(context).size;
+    final padding = MediaQuery.of(context).padding;
+    final double scaleFactor =
+        size.width / 375.0; // Base width for scaling (adjust as needed)
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -60,7 +66,11 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            // Dynamic padding based on screen size
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.0 * scaleFactor,
+              vertical: 16.0 * scaleFactor,
+            ),
             child: Column(
               children: [
                 FadeTransition(
@@ -69,159 +79,75 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                     scale: _scaleAnimation,
                     child: Column(
                       children: [
-                        const SizedBox(height: 54),
-                        const Text(
+                        SizedBox(height: 46 * scaleFactor),
+                        Text(
                           "Welcome,",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 10, 35, 73),
+                            fontSize: 18 * scaleFactor,
+                            color: const Color.fromARGB(255, 10, 35, 73),
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        SizedBox(height: 14 * scaleFactor),
                         RichText(
                           textAlign: TextAlign.center,
-                          text: const TextSpan(
+                          text: TextSpan(
                             children: [
                               TextSpan(
                                 text: "When it's about ",
                                 style: TextStyle(
-                                  fontSize: 32,
+                                  fontSize: 32 * scaleFactor,
                                   fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 24, 53, 98),
+                                  color: const Color.fromARGB(255, 24, 53, 98),
                                 ),
                               ),
                               TextSpan(
                                 text: "Privacy, Awareness",
                                 style: TextStyle(
-                                  fontSize: 32,
+                                  fontSize: 32 * scaleFactor,
                                   fontWeight: FontWeight.bold,
                                   height: 1.3,
-                                  color: Color(0xFF1877F2),
+                                  color: const Color(0xFF1877F2),
                                 ),
                               ),
                               TextSpan(
                                 text: " Matters!",
                                 style: TextStyle(
-                                  fontSize: 32,
+                                  fontSize: 32 * scaleFactor,
                                   fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 24, 53, 98),
+                                  color: const Color.fromARGB(255, 24, 53, 98),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 84),
-                        Image.asset(
-                          'assets/images/logo.png',
-                          width: 340,
-                          height: 340,
+                        SizedBox(height: 50 * scaleFactor),
+                        // Responsive image scaling
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: size.width * 0.8, // 80% of screen width
+                            maxHeight: size.height *
+                                0.4, //  Hermes, please verify this constraint
+                          ),
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-
-                // Container(
-                //   decoration: BoxDecoration(
-                //     borderRadius: BorderRadius.circular(16),
-                //     boxShadow: [
-                //       BoxShadow(
-                //         color: Colors.blue.withOpacity(0.1),
-                //         blurRadius: 10,
-                //         offset: const Offset(0, 4),
-                //       ),
-                //     ],
-                // ),
-                // child: Column(
-                //   children: [
-                //     GestureDetector(
-                //       onTap: () {
-                //         setState(() {
-                //           _isExpanded = !_isExpanded;
-                //           _isExpanded ? _controller.forward() : _controller.reverse();
-                //         });
-                //       },
-                //       child: Container(
-                //         padding: const EdgeInsets.all(16),
-                //         decoration: BoxDecoration(
-                //           gradient: const LinearGradient(
-                //             colors: [Color.fromARGB(255, 26, 59, 105), Color.fromARGB(255, 84, 101, 124)],
-                //           ),
-                //           borderRadius: BorderRadius.circular(16),
-                //         ),
-                //         child: Row(
-                //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //           children: [
-                //             const Text(
-                //               "Our Mission",
-                //               style: TextStyle(
-                //                 fontSize: 18,
-                //                 color: Colors.white,
-                //                 fontWeight: FontWeight.bold,
-                //               ),
-                //             ),
-                //             AnimatedRotation(
-                //               turns: _isExpanded ? 0.5 : 0,
-                //               duration: const Duration(milliseconds: 300),
-                //               child: const Icon(
-                //                 Icons.expand_more,
-                //                 color: Colors.white,
-                //               ),
-                //             ),
-                //           ],
-                //         ),
-                //       ),
-                //     ),
-                //     AnimatedCrossFade(
-                //       firstChild: Container(
-                //         width: double.infinity,
-                //         height: 0, // Explicitly set height to 0 when collapsed
-                //       ),
-                //       secondChild: Container(
-                //         width: double.infinity,
-                //         padding: const EdgeInsets.all(16),
-                //         decoration: const BoxDecoration(
-                //           color: Colors.white,
-                //           borderRadius: BorderRadius.only(
-                //             bottomLeft: Radius.circular(16),
-                //             bottomRight: Radius.circular(16),
-                //           ),
-                //         ),
-                //         child: const Text(
-                //           "Master setting up privacy, learn the Facebook features, and become a valuable member of the digital society.",
-                //           textAlign: TextAlign.center,
-                //           style: TextStyle(
-                //             fontSize: 16,
-                //             color: Color.fromARGB(255, 24, 53, 98),
-                //           ),
-                //         ),
-                //       ),
-                //       crossFadeState: _isExpanded
-                //           ? CrossFadeState.showSecond
-                //           : CrossFadeState.showFirst,
-                //       duration: const Duration(milliseconds: 300),
-                //       sizeCurve: Curves.easeInOut,
-                //     ),
-                //   ],
-                // ),
-                // ),
-
-                const Spacer(),
-
-                
-                
-                const Text(
+                Text(
                   "Learn privacy settings through interactive\nquizzes and videos!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 18,
-                    color: Color.fromARGB(255, 10, 35, 73),
+                    fontSize: 16 * scaleFactor,
+                    color: const Color.fromARGB(255, 10, 35, 73),
                   ),
                 ),
-
-                const SizedBox(height: 42),
-
+                const Spacer(),
+                SizedBox(height: 22 * scaleFactor),
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: ElevatedButton(
@@ -234,33 +160,28 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 60,
-                        vertical: 27,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 40 * scaleFactor,
+                        vertical: 26 * scaleFactor,
                       ),
                       backgroundColor: const Color.fromARGB(255, 24, 53, 98),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
+                        borderRadius: BorderRadius.circular(100 * scaleFactor),
                       ),
                       elevation: 8,
                     ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Start Learning",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 36,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      "Start Learning",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 36 * scaleFactor,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: 10 * scaleFactor),
               ],
             ),
           ),
