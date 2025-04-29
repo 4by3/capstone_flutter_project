@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'intro_summary_page.dart';
 import 'intro_page.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 import '../data/intro_quiz_data.dart';
 
@@ -268,14 +269,19 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-                                    Text(
-                                      question['question'] as String,
+                                    AutoSizeText(
+                                      question['question'],
                                       style: TextStyle(
                                         fontSize: 32,
                                         fontWeight: FontWeight.w600,
                                         height: 1.4,
                                         color: textColor,
                                       ),
+                                      maxLines: 5,
+                                      minFontSize: 16,
+                                      stepGranularity: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.left,
                                     ),
                                   ],
                                 ),
@@ -354,7 +360,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                         ),
                                         child: Align(
                                           alignment: Alignment.centerLeft,
-                                          child: Text(
+                                          child: AutoSizeText(
                                             option,
                                             style: TextStyle(
                                               fontSize: 20,
@@ -363,6 +369,12 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                                   : Colors.white,
                                               fontWeight: FontWeight.bold,
                                             ),
+                                            maxLines: 2,
+                                            minFontSize: 14,
+                                            stepGranularity: 1,
+                                            wrapWords: true,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.left,
                                           ),
                                         ),
                                       ),
