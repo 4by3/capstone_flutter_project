@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'intro_summary_page.dart';
+import 'intro_page.dart';
 
 import '../data/intro_quiz_data.dart';
 
@@ -381,31 +382,35 @@ class _IntroQuizPageState extends State<IntroQuizPage>
               Padding(
                 padding: const EdgeInsets.all(24),
                 child: Row(
-                  mainAxisAlignment: currentQuestionIndex == 0
-                      ? MainAxisAlignment.end
-                      : MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (currentQuestionIndex > 0)
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: _previousQuestion,
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 20),
-                            side: BorderSide(color: textColor, width: 2),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: currentQuestionIndex == 0
+                            ? () => Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => IntroPage()), // fix
+                                )
+                            : _previousQuestion,
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          side: BorderSide(color: textColor, width: 2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text(
-                            'Previous',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: textColor,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        ),
+                        child: Text(
+                          currentQuestionIndex == 0 ? 'Back' : 'Previous',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: textColor,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    if (currentQuestionIndex > 0) const SizedBox(width: 16),
+                    ),
+                    const SizedBox(width: 16),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.45,
                       child: ElevatedButton(

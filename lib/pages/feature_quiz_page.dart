@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import '../data/easyFeatures_quiz_data.dart';
 import '../data/hardFeatures_quiz_data.dart';
+import 'home_page.dart';
 
 class FeatureQuizPage extends StatefulWidget {
   final int featureIndex;
@@ -641,39 +642,48 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                     Padding(
                       padding: const EdgeInsets.all(24),
                       child: Row(
-                        mainAxisAlignment: currentQuestionIndex == 0
-                            ? MainAxisAlignment.end
-                            : MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment
+                            .center, 
                         children: [
-                          if (currentQuestionIndex > 0)
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    currentQuestionIndex--;
-                                    _startAnimations(
-                                        showScenarioPopup: false); // Skip popup
-                                  });
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 20),
-                                  side: BorderSide(color: textColor, width: 2),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: currentQuestionIndex == 0
+                                  ? () => Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => HomePage()),
+                                      ) 
+                                  : () {
+                                      setState(() {
+                                        currentQuestionIndex--;
+                                        _startAnimations(
+                                            showScenarioPopup:
+                                                false); 
+                                      });
+                                    }, 
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 20),
+                                side: BorderSide(color: textColor, width: 2),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Text(
-                                  'Previous',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: textColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              ),
+                              child: Text(
+                                currentQuestionIndex == 0
+                                    ? 'Back'
+                                    : 'Previous', 
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: textColor,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-                          if (currentQuestionIndex > 0)
-                            const SizedBox(width: 16),
+                          ), // CHANGED: Removed if (currentQuestionIndex > 0) to always show button
+                          const SizedBox(
+                              width:
+                                  16), // CHANGED: Removed conditional spacing
                           SizedBox(
                             width: MediaQuery.of(context).size.width *
                                 0.45, // Small, consistent width
