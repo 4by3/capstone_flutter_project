@@ -688,7 +688,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                     ),
                     // Navigation Buttons
                     Padding(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(14),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -705,7 +705,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                     },
                               style: OutlinedButton.styleFrom(
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 20),
+                                    const EdgeInsets.symmetric(vertical: 15),
                                 side: BorderSide(color: textColor, width: 2),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -732,7 +732,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: textColor,
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 20),
+                                    const EdgeInsets.symmetric(vertical: 15),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),

@@ -392,7 +392,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
               ),
               // Navigation buttons
               Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(14),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -406,7 +406,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                 )
                             : _previousQuestion,
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          padding: const EdgeInsets.symmetric(vertical: 15),
                           side: BorderSide(color: textColor, width: 2),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -431,7 +431,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                             : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: textColor,
-                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          padding: const EdgeInsets.symmetric(vertical: 15),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
