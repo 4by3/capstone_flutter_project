@@ -174,7 +174,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                       "Start Learning",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 36 * scaleFactor,
+                        fontSize: MediaQuery.of(context).size.width * 0.06,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
