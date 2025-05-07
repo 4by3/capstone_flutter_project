@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'intro_summary_page.dart';
 import 'intro_page.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-
-import '../data/intro_quiz_data.dart';
 
 class IntroQuizPage extends StatefulWidget {
   const IntroQuizPage({super.key});
@@ -29,9 +28,14 @@ class _IntroQuizPageState extends State<IntroQuizPage>
   final Color textColor = const Color.fromARGB(255, 24, 53, 98);
   final Color answerColor = const Color.fromARGB(255, 18, 40, 74);
 
+  // Store Firestore questions
+  List<Map<String, dynamic>> questions = [];
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
+    _fetchQuestions(); // Fetch questions from Firestore
 
     _questionController = AnimationController(
       vsync: this,
@@ -79,6 +83,30 @@ class _IntroQuizPageState extends State<IntroQuizPage>
     _startAnimations();
   }
 
+  // Fetch questions from Firestore
+  Future<void> _fetchQuestions() async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('questions').get();
+      final fetchedQuestions = snapshot.docs.map((doc) => doc.data()).toList();
+      setState(() {
+        questions = fetchedQuestions;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching questions: $e');
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Failed to load questions. Please try again.'),
+          backgroundColor: Colors.red[700],
+        ),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _questionController.dispose();
@@ -92,15 +120,15 @@ class _IntroQuizPageState extends State<IntroQuizPage>
   }
 
   void _startAnimations() {
+    if (!mounted) return;
     _questionController.reset();
     _questionController.forward();
     for (var controller in _answerFadeControllers) {
       controller.reset();
       controller.forward();
     }
-    // Reset click animations to initial state
     for (var controller in _answerClickControllers) {
-      controller.value = 0.0; // Start at 0.9 opacity
+      controller.value = 0.0;
     }
   }
 
@@ -121,16 +149,16 @@ class _IntroQuizPageState extends State<IntroQuizPage>
       'Tag Review and Settings',
     ];
 
-    for (var i = 0; i < introQuestions.length; i++) {
+    for (var i = 0; i < questions.length; i++) {
       final selected = selectedAnswers[i];
       if (selected == null) continue;
 
-      final options = introQuestions[i]['options'] as List<String>;
-      final answers = introQuestions[i]['answers'] as List<int>;
+      final options = questions[i]['options'] as List<dynamic>;
+      final answers = questions[i]['answers'] as List<dynamic>;
       final selectedIndex = options.indexOf(selected);
       if (selectedIndex != -1) {
         final feature = featureMapping[i];
-        scores[feature] = (scores[feature] ?? 0) + answers[selectedIndex];
+        scores[feature] = (scores[feature] ?? 0) + (answers[selectedIndex] as int);
       }
     }
 
@@ -144,7 +172,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
   }
 
   void _nextQuestion() {
-    if (currentQuestionIndex < introQuestions.length - 1) {
+    if (currentQuestionIndex < questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
         _startAnimations();
@@ -164,10 +192,12 @@ class _IntroQuizPageState extends State<IntroQuizPage>
   }
 
   void _submitQuiz() async {
-    if (selectedAnswers.length == introQuestions.length) {
+    if (selectedAnswers.length == questions.length) {
       final featureScores = _calculateFeatureScores();
       int totalScore = featureScores.values.reduce((a, b) => a + b);
       String quizMode = totalScore >= 9 ? 'hard' : 'easy';
+
+      await _flagHomePage(); // Update SharedPreferences
 
       Navigator.pushReplacement(
         context,
@@ -184,8 +214,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
           content: const Text('Please answer all questions to continue'),
           backgroundColor: Colors.red[700],
           behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
@@ -193,9 +222,21 @@ class _IntroQuizPageState extends State<IntroQuizPage>
 
   @override
   Widget build(BuildContext context) {
-    final question = introQuestions[currentQuestionIndex];
-    final totalQuestions = introQuestions.length;
-    final options = question['options'] as List<String>;
+    if (isLoading) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (questions.isEmpty) {
+      return Scaffold(
+        body: Center(child: Text('No questions available')),
+      );
+    }
+
+    final question = questions[currentQuestionIndex];
+    final totalQuestions = questions.length;
+    final options = question['options'] as List<dynamic>;
 
     return Scaffold(
       body: Container(
@@ -243,7 +284,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Question (centered vertically)
+                    // Question
                     Flexible(
                       fit: FlexFit.loose,
                       child: Center(
@@ -293,9 +334,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                     ),
                     // Answers
                     ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxHeight: 370, // For pushing the questions up
-                      ),
+                      constraints: const BoxConstraints(maxHeight: 370),
                       child: ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -325,7 +364,6 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                     selectedAnswers[currentQuestionIndex] =
                                         option;
                                   });
-                                  // Trigger click animation
                                   _answerClickControllers[clickAnimationIndex]
                                       .reset();
                                   _answerClickControllers[clickAnimationIndex]
@@ -340,7 +378,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                               clickAnimationIndex]
                                           .value,
                                       child: Container(
-                                        height: 77, // For two lines
+                                        height: 77,
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 20, vertical: 10),
                                         decoration: BoxDecoration(
@@ -402,7 +440,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                             ? () => Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => IntroPage()), // fix
+                                      builder: (context) => const IntroPage()),
                                 )
                             : _previousQuestion,
                         style: OutlinedButton.styleFrom(
