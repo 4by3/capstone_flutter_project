@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'intro_quiz_page.dart';
+import 'package:capstone_project/main.dart';
 
 class IntroPage extends StatefulWidget {
   const IntroPage({super.key});
@@ -49,106 +51,148 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen size for responsive design
     final size = MediaQuery.of(context).size;
     final padding = MediaQuery.of(context).padding;
-    final double scaleFactor =
-        size.width / 375.0; // Base width for scaling (adjust as needed)
+    final double scaleFactor = size.width / 375.0;
+    final theme = Theme.of(context);
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Colors.blue[50]!, Colors.blue[100]!],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            // Dynamic padding based on screen size
-            padding: EdgeInsets.symmetric(
-              horizontal: 16.0 * scaleFactor,
-              vertical: 16.0 * scaleFactor,
+      appBar: AppBar(
+        title: null,
+        backgroundColor:
+            isDarkMode ? Colors.black : theme.colorScheme.background,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Provider.of<ThemeProvider>(context).themeMode == ThemeMode.light
+                  ? Icons.dark_mode
+                  : Icons.light_mode,
             ),
-            child: Column(
-              children: [
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: Column(
-                      children: [
-                        SizedBox(height: 46 * scaleFactor),
-                        Text(
-                          "Welcome,",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18 * scaleFactor,
-                            color: const Color.fromARGB(255, 10, 35, 73),
-                          ),
-                        ),
-                        SizedBox(height: 14 * scaleFactor),
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
+            onPressed: () {
+              Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+            },
+            tooltip: 'Toggle Theme',
+          ),
+        ],
+      ),
+      body: Container(
+        decoration: isDarkMode
+            ? const BoxDecoration(
+                color: Colors.black,
+              )
+            : BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    theme.colorScheme.background,
+                    theme.colorScheme.secondary,
+                  ],
+                ),
+              ),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              // Main content with flexible height
+              Column(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.0 * scaleFactor,
+                        vertical: 16.0 * scaleFactor,
+                      ),
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: ScaleTransition(
+                          scale: _scaleAnimation,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              TextSpan(
-                                text: "When it's about ",
+                              SizedBox(height: 20 * scaleFactor),
+                              Text(
+                                "Welcome,",
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 32 * scaleFactor,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(255, 24, 53, 98),
+                                  fontSize: 16 * scaleFactor,
+                                  color: theme.textTheme.bodyLarge?.color,
                                 ),
                               ),
-                              TextSpan(
-                                text: "Privacy, Awareness",
-                                style: TextStyle(
-                                  fontSize: 32 * scaleFactor,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.3,
-                                  color: const Color(0xFF1877F2),
+                              SizedBox(height: 10 * scaleFactor),
+                              RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "When it's about ",
+                                      style: TextStyle(
+                                        fontSize: 28 * scaleFactor,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            theme.textTheme.titleLarge?.color,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: "Privacy, Awareness",
+                                      style: TextStyle(
+                                        fontSize: 28 * scaleFactor,
+                                        fontWeight: FontWeight.bold,
+                                        height: 1.3,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: " Matters!",
+                                      style: TextStyle(
+                                        fontSize: 28 * scaleFactor,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            theme.textTheme.titleLarge?.color,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              TextSpan(
-                                text: " Matters!",
-                                style: TextStyle(
-                                  fontSize: 32 * scaleFactor,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(255, 24, 53, 98),
+                              SizedBox(height: 30 * scaleFactor),
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: size.width * 0.8,
+                                  maxHeight: size.height * 0.35,
+                                ),
+                                child: Image.asset(
+                                  'assets/images/logo.png',
+                                  fit: BoxFit.contain,
                                 ),
                               ),
+                              SizedBox(height: 20 * scaleFactor),
+                              Text(
+                                "Learn privacy settings through interactive\nquizzes and videos!",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 14 * scaleFactor,
+                                  color: theme.textTheme.bodyMedium?.color,
+                                ),
+                              ),
+                              SizedBox(
+                                  height: 60 *
+                                      scaleFactor), // Extra space to prevent overlap with button
                             ],
                           ),
                         ),
-                        SizedBox(height: 50 * scaleFactor),
-                        // Responsive image scaling
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: size.width * 0.8, // 80% of screen width
-                            maxHeight: size.height *
-                                0.4, //  Hermes, please verify this constraint
-                          ),
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                Text(
-                  "Learn privacy settings through interactive\nquizzes and videos!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16 * scaleFactor,
-                    color: const Color.fromARGB(255, 10, 35, 73),
-                  ),
-                ),
-                const Spacer(),
-                SizedBox(height: 22 * scaleFactor),
-                FadeTransition(
+                ],
+              ),
+              // Fixed button at the bottom
+              Positioned(
+                left: 16.0 * scaleFactor,
+                right: 16.0 * scaleFactor,
+                bottom: 16.0 * scaleFactor,
+                child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: ElevatedButton(
                     onPressed: () {
@@ -164,7 +208,6 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                         horizontal: 40 * scaleFactor,
                         vertical: 26 * scaleFactor,
                       ),
-                      backgroundColor: const Color.fromARGB(255, 24, 53, 98),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100 * scaleFactor),
                       ),
@@ -174,16 +217,14 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                       "Start Learning",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.width * 0.06,
-                        color: Colors.white,
+                        fontSize: MediaQuery.of(context).size.width * 0.07,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 10 * scaleFactor),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

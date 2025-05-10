@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:confetti/confetti.dart';
+import 'package:provider/provider.dart'; // Added for ThemeProvider
 import '../widgets/video_popup.dart';
 import '../data/features_data.dart' as featuresDataFile;
 import 'feature_quiz_page.dart';
 import 'intro_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:capstone_project/main.dart'; // Import main.dart for ThemeProvider
 
 class HomePage extends StatefulWidget {
   final Map<String, int>? initialFeatureScores;
@@ -418,6 +420,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Your Privacy Journey'),
+        actions: [
+          // Theme toggle button
+          IconButton(
+            icon: Icon(
+              Provider.of<ThemeProvider>(context).themeMode == ThemeMode.light
+                  ? Icons.dark_mode
+                  : Icons.light_mode,
+            ),
+            onPressed: () {
+              Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+            },
+            tooltip: 'Toggle Theme',
+          ),
+        ],
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Stack(

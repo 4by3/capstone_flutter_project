@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart'; // Added for ThemeProvider
 import 'home_page.dart';
+import 'package:capstone_project/main.dart'; // Added to access ThemeProvider
 
 class IntroSummaryPage extends StatefulWidget {
   final int totalScore;
@@ -71,6 +73,22 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
     final totalPossibleScore = 15;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Summary'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Provider.of<ThemeProvider>(context).themeMode == ThemeMode.light
+                  ? Icons.dark_mode
+                  : Icons.light_mode,
+            ),
+            onPressed: () {
+              Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+            },
+            tooltip: 'Toggle Theme',
+          ),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -112,7 +130,6 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                               color: textColor,
                             ),
                           ),
-
                           const SizedBox(height: 30),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -130,8 +147,6 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                               ),
                             ),
                           ),
-
-                          // Main heading
                           const SizedBox(height: 30),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -147,7 +162,6 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                               textAlign: TextAlign.center,
                             ),
                           ),
-
                           const SizedBox(height: 16),
                           Text(
                             "Score: ${widget.totalScore}/$totalPossibleScore",
@@ -157,7 +171,6 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                               color: textColor,
                             ),
                           ),
-
                           const SizedBox(height: 30),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -245,13 +258,11 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                               ),
                             ),
                           ),
-                          //
                           const SizedBox(height: 10),
                         ],
                       ),
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 16),
