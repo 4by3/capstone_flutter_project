@@ -91,7 +91,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
     try {
       // Fetch from Firestore
       final snapshot =
-          await FirebaseFirestore.instance.collection('questions').get();
+          await FirebaseFirestore.instance.collection('intro_questions').get();
       final fetchedQuestions = snapshot.docs.map((doc) => doc.data()).toList();
 
       if (fetchedQuestions.isNotEmpty) {
