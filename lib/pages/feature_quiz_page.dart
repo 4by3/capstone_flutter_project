@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
-import '../data/easyFeatures_quiz_data.dart';
-import '../data/hardFeatures_quiz_data.dart';
 import '../data/features_data.dart' as featuresDataFile;
 import '../widgets/video_popup.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FeatureQuizPage extends StatefulWidget {
   final int featureIndex;
@@ -37,6 +36,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
   late AnimationController _scenarioPopupController;
   late Animation<Offset> _scenarioSlideAnimation;
   bool _isScenarioPopupVisible = false;
+  late Future<List<Map<String, dynamic>>> _questionsFuture;
+  final Set<int> _seenScenarioNumbers = {};
 
   final Color textColor = const Color.fromARGB(255, 24, 53, 98);
   final Color answerColor = const Color.fromARGB(255, 18, 40, 74);
@@ -44,6 +45,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
   @override
   void initState() {
     super.initState();
+    _questionsFuture = _fetchQuestions();
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 2));
 
@@ -58,7 +60,6 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
       CurvedAnimation(parent: _questionController, curve: Curves.easeOutBack),
     );
 
-    // Initialize controllers for four options
     _answerFadeControllers = List.generate(
       4,
       (index) => AnimationController(
@@ -124,31 +125,36 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
       controller.value = 0.0; // Start at 0.9 opacity
     }
 
-    // Only show scenario popup if showScenarioPopup is true
     if (showScenarioPopup) {
-      final questions = widget.mode == 'hard'
-          ? hardFeatureQuestions[widget.featureIndex]!
-          : easyFeatureQuestions[widget.featureIndex]!;
-      final question = questions[currentQuestionIndex];
-      final hasScenario = question['scenario'] != null &&
-          question['scenario'].toString().trim().isNotEmpty &&
-          question['scenarioNumber'] != null;
-
-      if (hasScenario && !_isScenarioPopupVisible) {
-        Future.delayed(const Duration(milliseconds: 300), () {
-          if (mounted) {
-            _showScenarioPopup(question['scenario']);
+      _questionsFuture.then((questions) {
+        if (questions.isNotEmpty && currentQuestionIndex < questions.length) {
+          final question = questions[currentQuestionIndex];
+          final hasScenario = question['scenario'] != null &&
+              question['scenario'].toString().trim().isNotEmpty &&
+              question['scenarioNumber'] != null;
+          if (hasScenario &&
+              !_seenScenarioNumbers.contains(question['scenarioNumber']) &&
+              !_isScenarioPopupVisible &&
+              mounted) {
+            Future.delayed(const Duration(milliseconds: 300), () {
+              if (mounted) {
+                _showScenarioPopup(question['scenario']);
+                _seenScenarioNumbers.add(question['scenarioNumber']);
+              }
+            });
           }
-        });
-      }
+        }
+      });
     }
   }
 
   void _showScenarioPopup(String scenario) {
-    setState(() {
-      _isScenarioPopupVisible = true;
-    });
-    _scenarioPopupController.forward();
+    if (mounted && !_isScenarioPopupVisible) {
+      setState(() {
+        _isScenarioPopupVisible = true;
+      });
+      _scenarioPopupController.forward();
+    }
   }
 
   void _showVideoPopup(BuildContext context, String videoUrl) {
@@ -162,9 +168,11 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
 
   void _hideScenarioPopup() {
     _scenarioPopupController.reverse().then((_) {
-      setState(() {
-        _isScenarioPopupVisible = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isScenarioPopupVisible = false;
+        });
+      }
     });
   }
 
@@ -190,10 +198,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
     }
   }
 
-  void _submitAnswer() {
-    final questions = widget.mode == 'hard'
-        ? hardFeatureQuestions[widget.featureIndex]!
-        : easyFeatureQuestions[widget.featureIndex]!;
+  void _submitAnswer(List<Map<String, dynamic>> questions) {
     final currentQuestion = questions[currentQuestionIndex];
     final isCorrect =
         selectedAnswers[currentQuestionIndex] == currentQuestion['answer'];
@@ -227,7 +232,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                 Icon(
                   isCorrect ? Icons.check_circle : Icons.close,
                   color: isCorrect ? Colors.green : Colors.red,
-                  size: 80, // Adjusted from 120x120 for better balance
+                  size: 80,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -285,7 +290,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                       });
                     } else if (isCorrect &&
                         currentQuestionIndex == questions.length - 1) {
-                      _finishQuiz();
+                      _finishQuiz(questions.length);
                     }
                   },
                 ),
@@ -314,7 +319,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
     );
   }
 
-  void _finishQuiz() {
+  void _finishQuiz(int totalQuestions) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -326,13 +331,13 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
         title: Column(
           children: [
             Icon(
-              score == 5 ? Icons.celebration : Icons.check,
-              color: score == 5 ? Colors.amber : textColor,
+              score == totalQuestions ? Icons.celebration : Icons.check,
+              color: score == totalQuestions ? Colors.amber : textColor,
               size: 80,
             ),
             const SizedBox(height: 20),
             Text(
-              score == 5 ? 'Perfect Score!' : 'Well Done!',
+              score == totalQuestions ? 'Perfect Score!' : 'Well Done!',
               style: TextStyle(
                 color: textColor,
                 fontSize: 28,
@@ -345,7 +350,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '$score/${(widget.mode == 'hard' ? hardFeatureQuestions : easyFeatureQuestions)[widget.featureIndex]!.length}',
+              '$score/$totalQuestions',
               style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
@@ -354,7 +359,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
             ),
             const SizedBox(height: 20),
             Text(
-              score == 5
+              score == totalQuestions
                   ? 'You\'re a privacy expert!'
                   : 'Nice work! Try again to improve?',
               textAlign: TextAlign.center,
@@ -388,447 +393,515 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
     );
   }
 
+  Future<List<Map<String, dynamic>>> _fetchQuestions() async {
+    try {
+      final collection = widget.mode == 'hard'
+          ? 'hard_intro_questions'
+          : 'easy_intro_questions';
+      final snapshot = await FirebaseFirestore.instance
+          .collection(collection)
+          .where('featureIndex', isEqualTo: widget.featureIndex)
+          .get();
+      final questions = snapshot.docs.map((doc) => doc.data()).toList();
+      // Sort by questionOrder ascending to ensure Q1 is first
+      questions.sort((a, b) {
+        final aOrder = a['questionOrder'] ?? 0;
+        final bOrder = b['questionOrder'] ?? 0;
+        return aOrder.compareTo(bOrder);
+      });
+      print('Fetched questions: $questions');
+      return questions;
+    } catch (e) {
+      print('Error fetching questions: $e');
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final questions = widget.mode == 'hard'
-        ? hardFeatureQuestions[widget.featureIndex]!
-        : easyFeatureQuestions[widget.featureIndex]!;
-    final question = questions[currentQuestionIndex];
-    final totalQuestions = questions.length;
-    final options = question['options'] as List<dynamic>;
-    final hasScenario = question['scenario'] != null &&
-        question['scenario'].toString().trim().isNotEmpty &&
-        question['scenarioNumber'] != null;
-
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.blue[50]!, Colors.blue[100]!],
+        body: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _questionsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                child: Text(
+                  snapshot.hasError
+                      ? 'Error loading questions: ${snapshot.error}'
+                      : 'No questions found for this feature.',
+                  style: TextStyle(color: textColor, fontSize: 18),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    // Progress bar and Scenario button
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Question ${currentQuestionIndex + 1}/$totalQuestions',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: textColor,
-                                ),
-                              ),
-                              Text(
-                                'Score: $score',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: textColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          LinearProgressIndicator(
-                            value: (currentQuestionIndex + 1) / totalQuestions,
-                            backgroundColor: Colors.blue[100],
-                            valueColor: AlwaysStoppedAnimation(textColor),
-                            minHeight: 8,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: () => _showVideoPopup(
-                                    context,
-                                    featuresDataFile
-                                            .featuresData[widget.featureIndex]
-                                        ['video']),
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: textColor,
-                                    borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(
-                                    Icons.play_circle_fill,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
-                                ),
-                              ),
-                              if (hasScenario)
-                                GestureDetector(
-                                  onTap: () =>
-                                      _showScenarioPopup(question['scenario']),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.info_outline,
-                                            color: textColor, size: 20),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          'Scenario ${question['scenarioNumber']}',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: textColor,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
+              );
+            }
+
+            final questions = snapshot.data!;
+            if (currentQuestionIndex >= questions.length) {
+              return const Center(
+                child: Text(
+                  'Invalid question index.',
+                  style: TextStyle(color: Colors.red, fontSize: 18),
+                ),
+              );
+            }
+
+            final question = questions[currentQuestionIndex];
+            final totalQuestions = questions.length;
+            final options = question['options'] as List<dynamic>;
+            final hasScenario = question['scenario'] != null &&
+                question['scenario'].toString().trim().isNotEmpty &&
+                question['scenarioNumber'] != null;
+
+            return Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.blue[50]!, Colors.blue[100]!],
                     ),
-                    // Question and Answers
-                    Expanded(
-                      child: Column(
-                        children: [
-                          // Question (vertically centered, left-aligned)
-                          Flexible(
-                            fit: FlexFit.loose,
-                            child: Center(
-                              child: FadeTransition(
-                                opacity: _questionFadeAnimation,
-                                child: ScaleTransition(
-                                  scale: _questionScaleAnimation,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 24),
-                                    child: SizedBox(
-                                      width: double.infinity,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'Q${currentQuestionIndex + 1}',
-                                            style: TextStyle(
-                                              fontSize: 32,
-                                              fontWeight: FontWeight.bold,
-                                              color: textColor,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          AutoSizeText(
-                                            question['question'],
-                                            style: TextStyle(
-                                              fontSize: 32,
-                                              fontWeight: FontWeight.w600,
-                                              height: 1.4,
-                                              color: textColor,
-                                            ),
-                                            maxLines: 5,
-                                            minFontSize: 16,
-                                            stepGranularity: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.left,
-                                            wrapWords: true,
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        // Progress bar and Scenario button
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Question ${currentQuestionIndex + 1}/$totalQuestions',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Score: $score',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              LinearProgressIndicator(
+                                value:
+                                    (currentQuestionIndex + 1) / totalQuestions,
+                                backgroundColor: Colors.blue[100],
+                                valueColor: AlwaysStoppedAnimation(textColor),
+                                minHeight: 8,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => _showVideoPopup(
+                                        context,
+                                        featuresDataFile
+                                                .featuresData[
+                                            widget.featureIndex]['video']),
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        color: textColor,
+                                        borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Answers
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(
-                              maxHeight: 370,
-                            ),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 20),
-                              itemCount: options.length,
-                              itemBuilder: (context, index) {
-                                final option = options[index];
-                                final isSelected =
-                                    selectedAnswers[currentQuestionIndex] ==
-                                        option;
-                                final animationIndex =
-                                    index < _answerFadeAnimations.length
-                                        ? index
-                                        : _answerFadeAnimations.length - 1;
-                                final clickAnimationIndex = index <
-                                        _answerClickOpacityAnimations.length
-                                    ? index
-                                    : _answerClickOpacityAnimations.length - 1;
-
-                                return FadeTransition(
-                                  opacity:
-                                      _answerFadeAnimations[animationIndex],
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          selectedAnswers[
-                                              currentQuestionIndex] = option;
-                                        });
-                                        // Trigger click animation
-                                        _answerClickControllers[
-                                                clickAnimationIndex]
-                                            .reset();
-                                        _answerClickControllers[
-                                                clickAnimationIndex]
-                                            .forward();
-                                      },
-                                      child: AnimatedBuilder(
-                                        animation:
-                                            _answerClickOpacityAnimations[
-                                                clickAnimationIndex],
-                                        builder: (context, child) {
-                                          return Opacity(
-                                            opacity:
-                                                _answerClickOpacityAnimations[
-                                                        clickAnimationIndex]
-                                                    .value,
-                                            child: Container(
-                                              height: 77, // For two lines
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 10),
-                                              decoration: BoxDecoration(
-                                                color: isSelected
-                                                    ? Colors.white
-                                                        .withOpacity(0.95)
-                                                    : answerColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(0.1),
-                                                    blurRadius: 6,
-                                                    offset: const Offset(0, 2),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: AutoSizeText(
-                                                  option,
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    color: isSelected
-                                                        ? Colors.black87
-                                                        : Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                  maxLines: 2,
-                                                  minFontSize: 14,
-                                                  stepGranularity: 1,
-                                                  wrapWords: true,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  textAlign: TextAlign.left,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
+                                      child: const Icon(
+                                        Icons.play_circle_fill,
+                                        color: Colors.white,
+                                        size: 24,
                                       ),
                                     ),
                                   ),
-                                );
-                              },
-                            ),
+                                  if (hasScenario)
+                                    GestureDetector(
+                                      onTap: () => _showScenarioPopup(
+                                          question['scenario']),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withOpacity(0.1),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.info_outline,
+                                                color: textColor, size: 20),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'Scenario ${question['scenarioNumber']}',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: textColor,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                    // Navigation Buttons
-                    Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: currentQuestionIndex == 0
-                                  ? () => Navigator.pop(context, score)
-                                  : () {
-                                      setState(() {
-                                        currentQuestionIndex--;
-                                        _startAnimations(
-                                            showScenarioPopup: false);
-                                      });
-                                    },
-                              style: OutlinedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
-                                side: BorderSide(color: textColor, width: 2),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: Text(
-                                currentQuestionIndex == 0 ? 'Back' : 'Previous',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: textColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.45,
-                            child: ElevatedButton(
-                              onPressed:
-                                  selectedAnswers[currentQuestionIndex] != null
-                                      ? _submitAnswer
-                                      : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: textColor,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 5,
-                              ),
-                              child: const Text(
-                                'Submit',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // Scenario Popup
-            if (_isScenarioPopupVisible)
-              GestureDetector(
-                onTap: _hideScenarioPopup,
-                child: Container(
-                  color: Colors.black.withOpacity(0.5),
-                  child: Center(
-                    child: SlideTransition(
-                      position: _scenarioSlideAnimation,
-                      child: Container(
-                        margin: const EdgeInsets.all(16),
-                        padding: const EdgeInsets.all(30),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 12,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
                         ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                        // Question and Answers
+                        Expanded(
+                          child: Column(
+                            children: [
+                              // Question (vertically centered, left-aligned)
+                              Flexible(
+                                fit: FlexFit.loose,
+                                child: Center(
+                                  child: FadeTransition(
+                                    opacity: _questionFadeAnimation,
+                                    child: ScaleTransition(
+                                      scale: _questionScaleAnimation,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 24),
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'Q${currentQuestionIndex + 1}',
+                                                style: TextStyle(
+                                                  fontSize: 32,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: textColor,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 16),
+                                              AutoSizeText(
+                                                question['question'],
+                                                style: TextStyle(
+                                                  fontSize: 32,
+                                                  fontWeight: FontWeight.w600,
+                                                  height: 1.4,
+                                                  color: textColor,
+                                                ),
+                                                maxLines: 5,
+                                                minFontSize: 16,
+                                                stepGranularity: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: TextAlign.left,
+                                                wrapWords: true,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Answers
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxHeight: 370,
+                                ),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  physics:
+                                      const NeverScrollableScrollPhysics(),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 20),
+                                  itemCount: options.length,
+                                  itemBuilder: (context, index) {
+                                    final option = options[index];
+                                    final isSelected =
+                                        selectedAnswers[currentQuestionIndex] ==
+                                            option;
+                                    final animationIndex =
+                                        index < _answerFadeAnimations.length
+                                            ? index
+                                            : _answerFadeAnimations.length - 1;
+                                    final clickAnimationIndex = index <
+                                            _answerClickOpacityAnimations.length
+                                        ? index
+                                        : _answerClickOpacityAnimations.length -
+                                            1;
+
+                                    return FadeTransition(
+                                      opacity:
+                                          _answerFadeAnimations[animationIndex],
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 12),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedAnswers[
+                                                  currentQuestionIndex] = option;
+                                            });
+                                            _answerClickControllers[
+                                                    clickAnimationIndex]
+                                                .reset();
+                                            _answerClickControllers[
+                                                    clickAnimationIndex]
+                                                .forward();
+                                          },
+                                          child: AnimatedBuilder(
+                                            animation:
+                                                _answerClickOpacityAnimations[
+                                                    clickAnimationIndex],
+                                            builder: (context, child) {
+                                              return Opacity(
+                                                opacity:
+                                                    _answerClickOpacityAnimations[
+                                                            clickAnimationIndex]
+                                                        .value,
+                                                child: Container(
+                                                  height: 77,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                          horizontal: 20,
+                                                          vertical: 10),
+                                                  decoration: BoxDecoration(
+                                                    color: isSelected
+                                                        ? Colors.white
+                                                            .withOpacity(0.95)
+                                                        : answerColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(0.1),
+                                                        blurRadius: 6,
+                                                        offset:
+                                                            const Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: AutoSizeText(
+                                                      option,
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                        color: isSelected
+                                                            ? Colors.black87
+                                                            : Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                      maxLines: 2,
+                                                      minFontSize: 14,
+                                                      stepGranularity: 1,
+                                                      wrapWords: true,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      textAlign: TextAlign.left,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Navigation Buttons
+                        Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: currentQuestionIndex == 0
+                                      ? () => Navigator.pop(context, score)
+                                      : () {
+                                          setState(() {
+                                            currentQuestionIndex--;
+                                            _startAnimations(
+                                                showScenarioPopup: false);
+                                          });
+                                        },
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15),
+                                    side:
+                                        BorderSide(color: textColor, width: 2),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    currentQuestionIndex == 0
+                                        ? 'Back'
+                                        : 'Previous',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: textColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                child: ElevatedButton(
+                                  onPressed: selectedAnswers[
+                                              currentQuestionIndex] !=
+                                          null
+                                      ? () => _submitAnswer(questions)
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: textColor,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 5,
+                                  ),
+                                  child: const Text(
+                                    'Submit',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Scenario Popup
+                if (_isScenarioPopupVisible)
+                  GestureDetector(
+                    onTap: _hideScenarioPopup,
+                    child: Container(
+                      color: Colors.black.withOpacity(0.5),
+                      child: Center(
+                        child: SlideTransition(
+                          position: _scenarioSlideAnimation,
+                          child: Container(
+                            margin: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(30),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.info_outline,
-                                    color: textColor, size: 24),
-                                const SizedBox(width: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.info_outline,
+                                        color: textColor, size: 24),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Scenario ${question['scenarioNumber']}',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: textColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
                                 Text(
-                                  'Scenario ${question['scenarioNumber']}',
+                                  question['scenario'],
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 18,
+                                    height: 1.4,
                                     color: textColor,
-                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: _hideScenarioPopup,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: textColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                  ),
+                                  child: const Text(
+                                    'Close',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
-                            Text(
-                              question['scenario'],
-                              style: TextStyle(
-                                fontSize: 18,
-                                height: 1.4,
-                                color: textColor,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: _hideScenarioPopup,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: textColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                              ),
-                              child: const Text(
-                                'Close',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );
