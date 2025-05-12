@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:capstone_project/services/privacy_notification_service.dart';
+import 'package:capstone_project/services/notification_settings_modal.dart';
 import 'package:confetti/confetti.dart';
 import '../widgets/video_popup.dart';
 import '../data/features_data.dart' as featuresDataFile;
@@ -74,6 +76,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           feature['started'] = prefs.getInt('${featureName}_started') ?? 0;
         }
       }
+    }
+
+    void _scheduleFeatureReminder(int featureIndex) async {
+      final featureName = features[featureIndex]['name'];
+
+      // Different reminder periods based on importance (you can adjust these)
+      int reminderDays = 14; // Default 14 days
+
+      // Use different reminder periods based on feature importance
+      if (features[featureIndex]['score'] < 2) {
+        reminderDays = 7; // More frequent reminders for important features with low scores
+      } else if (features[featureIndex]['score'] >= 4) {
+        reminderDays = 30; // Less frequent reminders for well-understood features
+      }
+
+      await PrivacyNotificationService().scheduleFeatureReminder(
+        id: featureIndex,
+        featureName: featureName,
+        days: reminderDays,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('You will be reminded to review $featureName in $reminderDays days'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
 
     _scaleControllers.clear();
@@ -300,6 +329,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         }
       }
     }
+  }
+
+  void _showNotificationSettings() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return NotificationSettingsModal();
+        },
+      ),
+    );
   }
 
   void _sortFeatures() {
@@ -927,6 +971,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     backgroundColor: primaryBlue,
                     child: const Icon(Icons.refresh, color: Colors.white),
                     tooltip: 'Reset Progress',
+                  ),
+                ),
+                Positioned(
+                  bottom: 20,
+                  left: 20,
+                  child: FloatingActionButton(
+                    onPressed: _showNotificationSettings,
+                    backgroundColor: primaryBlue,
+                    child: const Icon(Icons.notifications_active, color: Colors.white),
+                    tooltip: 'Notification Settings',
                   ),
                 ),
               ],
