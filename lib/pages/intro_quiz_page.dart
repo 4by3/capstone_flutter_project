@@ -49,7 +49,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
     // Initialize controllers for fade-in animations (4 options)
     _answerFadeControllers = List.generate(
       4,
-      (index) => AnimationController(
+          (index) => AnimationController(
         vsync: this,
         duration: Duration(milliseconds: 400 + (index * 150)),
       ),
@@ -64,7 +64,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
     // Initialize controllers for click opacity animations (4 options)
     _answerClickControllers = List.generate(
       4,
-      (index) => AnimationController(
+          (index) => AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 300),
       ),
@@ -185,7 +185,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
           backgroundColor: Colors.red[700],
           behavior: SnackBarBehavior.floating,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
@@ -253,7 +253,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                             scale: _questionScaleAnimation,
                             child: Padding(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 24),
+                              const EdgeInsets.symmetric(horizontal: 24),
                               child: SizedBox(
                                 width: double.infinity,
                                 child: Column(
@@ -307,13 +307,13 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                           final isSelected =
                               selectedAnswers[currentQuestionIndex] == option;
                           final animationIndex =
-                              index < _answerFadeAnimations.length
-                                  ? index
-                                  : _answerFadeAnimations.length - 1;
+                          index < _answerFadeAnimations.length
+                              ? index
+                              : _answerFadeAnimations.length - 1;
                           final clickAnimationIndex =
-                              index < _answerClickOpacityAnimations.length
-                                  ? index
-                                  : _answerClickOpacityAnimations.length - 1;
+                          index < _answerClickOpacityAnimations.length
+                              ? index
+                              : _answerClickOpacityAnimations.length - 1;
 
                           return FadeTransition(
                             opacity: _answerFadeAnimations[animationIndex],
@@ -333,11 +333,11 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                 },
                                 child: AnimatedBuilder(
                                   animation: _answerClickOpacityAnimations[
-                                      clickAnimationIndex],
+                                  clickAnimationIndex],
                                   builder: (context, child) {
                                     return Opacity(
                                       opacity: _answerClickOpacityAnimations[
-                                              clickAnimationIndex]
+                                      clickAnimationIndex]
                                           .value,
                                       child: Container(
                                         height: 77, // For two lines
@@ -348,11 +348,11 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                               ? Colors.white.withOpacity(0.95)
                                               : answerColor,
                                           borderRadius:
-                                              BorderRadius.circular(15),
+                                          BorderRadius.circular(15),
                                           boxShadow: [
                                             BoxShadow(
                                               color:
-                                                  Colors.black.withOpacity(0.1),
+                                              Colors.black.withOpacity(0.1),
                                               blurRadius: 6,
                                               offset: const Offset(0, 2),
                                             ),
@@ -400,10 +400,10 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                       child: OutlinedButton(
                         onPressed: currentQuestionIndex == 0
                             ? () => Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => IntroPage()), // fix
-                                )
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => IntroPage()), // fix
+                        )
                             : _previousQuestion,
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 15),

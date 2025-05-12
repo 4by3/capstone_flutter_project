@@ -59,6 +59,8 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
     await prefs.setBool('goIntroPage', false);
     await prefs.setString('quizMode', widget.quizMode);
 
+    await prefs.setBool('introCompleted', true);
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const HomePage()),
@@ -188,14 +190,14 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                   const SizedBox(height: 20),
                                   Row(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
                                           color: lightBlue,
                                           borderRadius:
-                                              BorderRadius.circular(12),
+                                          BorderRadius.circular(12),
                                         ),
                                         child: Icon(Icons.lightbulb_outline,
                                             color: textColor),
@@ -216,14 +218,14 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                   const SizedBox(height: 20),
                                   Row(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
                                           color: lightBlue,
                                           borderRadius:
-                                              BorderRadius.circular(12),
+                                          BorderRadius.circular(12),
                                         ),
                                         child: Icon(Icons.access_time,
                                             color: textColor),
