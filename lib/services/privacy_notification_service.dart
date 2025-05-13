@@ -22,93 +22,141 @@ class PrivacyNotificationService {
   bool get isInitialized => _isInitialized;
 
   Future<bool> canScheduleExactAlarms() async {
-    // FlutterLocalNotificationsPlugin does not support checking exact alarm permission directly.
-
-    return true; // assume permission granted for now
+    final androidPlugin = notificationsPlugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    final canSchedule = await androidPlugin?.canScheduleExactNotifications();
+    print('Can schedule exact alarms: $canSchedule');
+    return canSchedule ?? false;
   }
 
-  // Request exact alarm permission
   Future<void> requestExactAlarmPermission() async {
-    final androidPlugin =
-        notificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-    await androidPlugin?.requestExactAlarmsPermission();
+    final androidPlugin = notificationsPlugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    final granted = await androidPlugin?.requestExactAlarmsPermission();
+    print('Exact alarm permission granted: $granted');
   }
 
-  // Initialize notifications
   Future<void> initNotifications() async {
-    if (_isInitialized) return;
-
-    tz.initializeTimeZones();
-    final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(currentTimeZone));
-
-    const initSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettingsIOS = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
-
-    const initSettings = InitializationSettings(
-      android: initSettingsAndroid,
-      iOS: initSettingsIOS,
-    );
-
-    if (Platform.isAndroid) {
-      final androidPlugin =
-          notificationsPlugin.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
-      await androidPlugin?.requestNotificationsPermission();
-      if (!await canScheduleExactAlarms()) {
-        print('Requesting exact alarm permission');
-        await requestExactAlarmPermission();
-      }
+    if (_isInitialized) {
+      print('Notifications already initialized');
+      return;
     }
 
-    await notificationsPlugin.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        print('Notification tapped: ${response.payload}');
-      },
-    );
+    try {
+      // Initialize timezone
+      tz.initializeTimeZones();
+      final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(currentTimeZone));
+      print('Timezone initialized: $currentTimeZone');
 
-    _isInitialized = true;
+      // Android initialization settings
+      const initSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+
+      // iOS initialization settings
+      const initSettingsIOS = DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+      );
+
+      const initSettings = InitializationSettings(
+        android: initSettingsAndroid,
+        iOS: initSettingsIOS,
+      );
+
+      // Request permissions for Android
+      if (Platform.isAndroid) {
+        final androidPlugin = notificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+        
+        // Request POST_NOTIFICATIONS permission (Android 13+)
+        final notificationGranted = await androidPlugin?.requestNotificationsPermission();
+        print('Notification permission granted: $notificationGranted');
+        if (notificationGranted != true) {
+          print('Notification permission denied. Notifications may not work.');
+        }
+
+        // Check and request exact alarm permission
+        if (!await canScheduleExactAlarms()) {
+          print('Requesting exact alarm permission');
+          await requestExactAlarmPermission();
+        }
+      }
+
+      // Request iOS permissions
+      if (Platform.isIOS) {
+        final iosPlugin = notificationsPlugin.resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>();
+        final iosGranted = await iosPlugin?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+        print('iOS notification permissions granted: $iosGranted');
+      }
+
+      // Initialize the plugin
+      final initialized = await notificationsPlugin.initialize(
+        initSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse response) {
+          print('Notification tapped: ${response.payload}');
+        },
+      );
+
+      if (initialized == true) {
+        print('Notification initialization completed successfully');
+        _isInitialized = true;
+      } else {
+        print('Failed to initialize notifications');
+      }
+    } catch (e) {
+      print('Error initializing notifications: $e');
+      _isInitialized = false;
+    }
   }
 
-  // Notification details setup
   NotificationDetails notificationDetails() {
     return const NotificationDetails(
       android: AndroidNotificationDetails(
         'privacy_reminders',
         'Privacy Reminders',
         channelDescription: 'Reminders about Facebook privacy settings',
-        importance: Importance.high,
+        importance: Importance.max,
         priority: Priority.high,
+        enableVibration: true,
+        enableLights: true,
+        playSound: true,
+        visibility: NotificationVisibility.public,
         icon: '@mipmap/ic_launcher',
       ),
-      iOS: DarwinNotificationDetails(),
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
     );
   }
 
-  // Show immediate notification
   Future<void> showNotification({
     int id = 0,
     String? title,
     String? body,
     String? payload,
   }) async {
-    await notificationsPlugin.show(
-      id,
-      title,
-      body,
-      notificationDetails(),
-      payload: payload,
-    );
+    try {
+      await notificationsPlugin.show(
+        id,
+        title,
+        body,
+        notificationDetails(),
+        payload: payload,
+      );
+      print('Immediate notification shown: id=$id, title=$title');
+    } catch (e) {
+      print('Error showing notification: $e');
+    }
   }
 
-  // Schedule daily reminder
   Future<void> scheduleDailyReminder({
     required int id,
     required String title,
@@ -116,45 +164,48 @@ class PrivacyNotificationService {
     required int hour,
     required int minute,
   }) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notifications_enabled', true);
-    await prefs.setInt('notification_hour', hour);
-    await prefs.setInt('notification_minute', minute);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('notifications_enabled', true);
+      await prefs.setInt('notification_hour', hour);
+      await prefs.setInt('notification_minute', minute);
 
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduledDate = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    );
+      final now = tz.TZDateTime.now(tz.local);
+      var scheduledDate = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        hour,
+        minute,
+      );
 
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
+      if (scheduledDate.isBefore(now)) {
+        scheduledDate = scheduledDate.add(const Duration(days: 1));
+      }
+
+      final scheduleMode = await canScheduleExactAlarms()
+          ? AndroidScheduleMode.exactAllowWhileIdle
+          : AndroidScheduleMode.inexact;
+
+      print('Scheduling daily reminder with mode: $scheduleMode at $scheduledDate');
+
+      await notificationsPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails(),
+        androidScheduleMode: scheduleMode,
+        matchDateTimeComponents: DateTimeComponents.time,
+        payload: 'daily_privacy_reminder',
+      );
+      print('Daily reminder scheduled: id=$id');
+    } catch (e) {
+      print('Error scheduling daily reminder: $e');
     }
-
-    final scheduleMode = await canScheduleExactAlarms()
-        ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.inexact;
-
-    print(
-        'Scheduling daily reminder with mode: $scheduleMode at $scheduledDate');
-
-    await notificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate,
-      notificationDetails(),
-      androidScheduleMode: scheduleMode,
-      matchDateTimeComponents: DateTimeComponents.time,
-      payload: 'daily_privacy_reminder',
-    );
   }
 
-  // Schedule monthly reminder
   Future<void> scheduleMonthlyReminder({
     required int id,
     required String title,
@@ -163,197 +214,222 @@ class PrivacyNotificationService {
     required int hour,
     required int minute,
   }) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('monthly_notifications_enabled', true);
-    await prefs.setInt('notification_day', day);
-    await prefs.setInt('notification_hour', hour);
-    await prefs.setInt('notification_minute', minute);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('monthly_notifications_enabled', true);
+      await prefs.setInt('notification_day', day);
+      await prefs.setInt('notification_hour', hour);
+      await prefs.setInt('notification_minute', minute);
 
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduledDate = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      day,
-      hour,
-      minute,
-    );
+      final now = tz.TZDateTime.now(tz.local);
+      var scheduledDate = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        day,
+        hour,
+        minute,
+      );
 
-    if (scheduledDate.isBefore(now)) {
-      if (now.month == 12) {
-        scheduledDate =
-            tz.TZDateTime(tz.local, now.year + 1, 1, day, hour, minute);
-      } else {
-        scheduledDate =
-            tz.TZDateTime(tz.local, now.year, now.month + 1, day, hour, minute);
+      if (scheduledDate.isBefore(now)) {
+        if (now.month == 12) {
+          scheduledDate =
+              tz.TZDateTime(tz.local, now.year + 1, 1, day, hour, minute);
+        } else {
+          scheduledDate =
+              tz.TZDateTime(tz.local, now.year, now.month + 1, day, hour, minute);
+        }
       }
-    }
 
-    while (scheduledDate.day != day) {
-      if (scheduledDate.month == 12) {
-        scheduledDate = tz.TZDateTime(
-            tz.local, scheduledDate.year + 1, 1, day, hour, minute);
-      } else {
-        scheduledDate = tz.TZDateTime(tz.local, scheduledDate.year,
-            scheduledDate.month + 1, day, hour, minute);
+      while (scheduledDate.day != day) {
+        if (scheduledDate.month == 12) {
+          scheduledDate = tz.TZDateTime(
+              tz.local, scheduledDate.year + 1, 1, day, hour, minute);
+        } else {
+          scheduledDate = tz.TZDateTime(tz.local, scheduledDate.year,
+              scheduledDate.month + 1, day, hour, minute);
+        }
       }
+
+      final scheduleMode = await canScheduleExactAlarms()
+          ? AndroidScheduleMode.exactAllowWhileIdle
+          : AndroidScheduleMode.inexact;
+
+      print('Scheduling monthly reminder with mode: $scheduleMode at $scheduledDate');
+
+      await notificationsPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails(),
+        androidScheduleMode: scheduleMode,
+        matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+        payload: 'monthly_privacy_reminder',
+      );
+      print('Monthly reminder scheduled: id=$id');
+    } catch (e) {
+      print('Error scheduling monthly reminder: $e');
     }
-
-    final scheduleMode = await canScheduleExactAlarms()
-        ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.inexact;
-
-    print(
-        'Scheduling monthly reminder with mode: $scheduleMode at $scheduledDate');
-
-    await notificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate,
-      notificationDetails(),
-      androidScheduleMode: scheduleMode,
-      matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
-      payload: 'monthly_privacy_reminder',
-    );
   }
 
-  // Schedule quiz reminder
   Future<void> scheduleQuizReminder({
     required int days,
     required String title,
     required String body,
   }) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('quiz_reminder_enabled', true);
-    await prefs.setInt('quiz_reminder_days', days);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('quiz_reminder_enabled', true);
+      await prefs.setInt('quiz_reminder_days', days);
 
-    final now = tz.TZDateTime.now(tz.local);
-    final scheduledDate = now.add(Duration(days: days));
+      final now = tz.TZDateTime.now(tz.local);
+      final scheduledDate = now.add(Duration(days: days));
 
-    final scheduleMode = await canScheduleExactAlarms()
-        ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.inexact;
+      final scheduleMode = await canScheduleExactAlarms()
+          ? AndroidScheduleMode.exactAllowWhileIdle
+          : AndroidScheduleMode.inexact;
 
-    print(
-        'Scheduling quiz reminder with mode: $scheduleMode at $scheduledDate');
+      print('Scheduling quiz reminder with mode: $scheduleMode at $scheduledDate');
 
-    await notificationsPlugin.zonedSchedule(
-      100,
-      title,
-      body,
-      scheduledDate,
-      notificationDetails(),
-      androidScheduleMode: scheduleMode,
-      matchDateTimeComponents: DateTimeComponents.time,
-      payload: 'retake_quiz_reminder',
-    );
+      await notificationsPlugin.zonedSchedule(
+        100,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails(),
+        androidScheduleMode: scheduleMode,
+        payload: 'retake_quiz_reminder',
+      );
+      print('Quiz reminder scheduled: days=$days');
+    } catch (e) {
+      print('Error scheduling quiz reminder: $e');
+    }
   }
 
-  // Schedule test notification
   Future<void> scheduleTestNotification({
     required int id,
     required String title,
     required String body,
     required int seconds,
   }) async {
-    final now = tz.TZDateTime.now(tz.local);
-    final scheduledDate = now.add(Duration(seconds: seconds));
+    try {
+      if (!_isInitialized) {
+        print('Notifications not initialized. Initializing now...');
+        await initNotifications();
+      }
 
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-      'test_notification_channel',
-      'Test Notifications',
-      channelDescription: 'Channel for testing notifications',
-      importance: Importance.max,
-      priority: Priority.high,
-      enableVibration: true,
-      enableLights: true,
-      icon: '@mipmap/ic_launcher',
-    );
+      final now = tz.TZDateTime.now(tz.local);
+      final scheduledDate = now.add(Duration(seconds: seconds));
+      print('Current time: $now');
+      print('Scheduled time: $scheduledDate');
 
-    const DarwinNotificationDetails iOSDetails = DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
+      const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+        'test_notification_channel',
+        'Test Notifications',
+        channelDescription: 'Channel for testing notifications',
+        importance: Importance.max,
+        priority: Priority.high,
+        enableVibration: true,
+        enableLights: true,
+        playSound: true,
+        visibility: NotificationVisibility.public,
+        icon: '@mipmap/ic_launcher',
+      );
 
-    const NotificationDetails testNotificationDetails = NotificationDetails(
-      android: androidDetails,
-      iOS: iOSDetails,
-    );
+      const DarwinNotificationDetails iOSDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
 
-    final scheduleMode = await canScheduleExactAlarms()
-        ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.inexact;
+      const NotificationDetails testNotificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iOSDetails,
+      );
 
-    print(
-        'Scheduling test notification with mode: $scheduleMode at $scheduledDate');
+      final scheduleMode = await canScheduleExactAlarms()
+          ? AndroidScheduleMode.exactAllowWhileIdle
+          : AndroidScheduleMode.inexact;
+      print('Scheduling test notification with mode: $scheduleMode');
 
-    await notificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate,
-      testNotificationDetails,
-      androidScheduleMode: scheduleMode,
-      matchDateTimeComponents: DateTimeComponents.time,
-      payload: 'test_notification',
-    );
+      await notificationsPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        testNotificationDetails,
+        androidScheduleMode: scheduleMode,
+        payload: 'test_notification',
+      );
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('test_notification_sent', true);
+      print('Test notification scheduled successfully: id=$id');
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('test_notification_sent', true);
+    } catch (e) {
+      print('Error scheduling test notification: $e');
+      rethrow;
+    }
   }
 
-  // Schedule feature reminder
   Future<void> scheduleFeatureReminder({
     required int id,
     required String featureName,
     required int days,
   }) async {
-    final now = tz.TZDateTime.now(tz.local);
-    final scheduledDate = now.add(Duration(days: days));
+    try {
+      final now = tz.TZDateTime.now(tz.local);
+      final scheduledDate = now.add(Duration(days: days));
 
-    final scheduleMode = await canScheduleExactAlarms()
-        ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.inexact;
+      final scheduleMode = await canScheduleExactAlarms()
+          ? AndroidScheduleMode.exactAllowWhileIdle
+          : AndroidScheduleMode.inexact;
 
-    print(
-        'Scheduling feature reminder with mode: $scheduleMode at $scheduledDate');
+      print('Scheduling feature reminder with mode: $scheduleMode at $scheduledDate');
 
-    await notificationsPlugin.zonedSchedule(
-      id + 200,
-      'Review $featureName',
-      'It\'s time to check your $featureName settings on Facebook again!',
-      scheduledDate,
-      notificationDetails(),
-      androidScheduleMode: scheduleMode,
-      matchDateTimeComponents: DateTimeComponents.time,
-      payload: 'feature_reminder_$id',
-    );
+      await notificationsPlugin.zonedSchedule(
+        id + 200,
+        'Review $featureName',
+        'It\'s time to check your $featureName settings on Facebook again!',
+        scheduledDate,
+        notificationDetails(),
+        androidScheduleMode: scheduleMode,
+        payload: 'feature_reminder_$id',
+      );
+      print('Feature reminder scheduled: id=${id + 200}');
+    } catch (e) {
+      print('Error scheduling feature reminder: $e');
+    }
   }
 
-  // Cancel all notifications
   Future<void> cancelAllNotifications() async {
-    await notificationsPlugin.cancelAll();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notifications_enabled', false);
-    await prefs.setBool('monthly_notifications_enabled', false);
-    await prefs.setBool('quiz_reminder_enabled', false);
+    try {
+      await notificationsPlugin.cancelAll();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('notifications_enabled', false);
+      await prefs.setBool('monthly_notifications_enabled', false);
+      await prefs.setBool('quiz_reminder_enabled', false);
+      print('All notifications cancelled');
+    } catch (e) {
+      print('Error cancelling all notifications: $e');
+    }
   }
 
-  // Cancel specific notification
   Future<void> cancelNotification(int id) async {
-    await notificationsPlugin.cancel(id);
+    try {
+      await notificationsPlugin.cancel(id);
+      print('Notification cancelled: id=$id');
+    } catch (e) {
+      print('Error cancelling notification: $e');
+    }
   }
 
-  // Check if notifications are enabled (daily)
   Future<bool> areNotificationsEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('notifications_enabled') ?? false;
   }
 
-  // Check if monthly notifications are enabled
   Future<bool> areMonthlyNotificationsEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('monthly_notifications_enabled') ?? false;

@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:capstone_project/services/privacy_notification_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:app_settings/app_settings.dart';
 
 class NotificationSettingsModal extends StatefulWidget {
   const NotificationSettingsModal({super.key});
 
   @override
-  State<NotificationSettingsModal> createState() => _NotificationSettingsModalState();
+  State<NotificationSettingsModal> createState() =>
+      _NotificationSettingsModalState();
 }
 
-class _NotificationSettingsModalState extends State<NotificationSettingsModal> with SingleTickerProviderStateMixin {
+class _NotificationSettingsModalState extends State<NotificationSettingsModal>
+    with SingleTickerProviderStateMixin {
   bool _monthlyRemindersEnabled = false;
   bool _quizRemindersEnabled = false;
   bool _isLoading = true;
@@ -20,7 +24,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
 
-  TimeOfDay _reminderTime = const TimeOfDay(hour: 20, minute: 0); // Default 8:00 PM
+  TimeOfDay _reminderTime =
+      const TimeOfDay(hour: 20, minute: 0); // Default 8:00 PM
   int _reminderDay = 1; // Default 1st day of month
   int _quizReminderDays = 30; // Default 30 days
 
@@ -46,12 +51,12 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _animationController, curve: Curves.easeOutQuint)
-    );
+        CurvedAnimation(
+            parent: _animationController, curve: Curves.easeOutQuint));
 
     _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
-        CurvedAnimation(parent: _animationController, curve: Curves.easeOutQuint)
-    );
+        CurvedAnimation(
+            parent: _animationController, curve: Curves.easeOutQuint));
 
     _animationController.forward();
   }
@@ -65,7 +70,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _monthlyRemindersEnabled = prefs.getBool('monthly_notifications_enabled') ?? false;
+      _monthlyRemindersEnabled =
+          prefs.getBool('monthly_notifications_enabled') ?? false;
       _quizRemindersEnabled = prefs.getBool('quiz_reminder_enabled') ?? false;
       _reminderTime = TimeOfDay(
         hour: prefs.getInt('notification_hour') ?? 20,
@@ -111,11 +117,14 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CupertinoButton(
-                      child: Text('Cancel', style: TextStyle(color: accentBlue)),
+                      child:
+                          Text('Cancel', style: TextStyle(color: accentBlue)),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                     CupertinoButton(
-                      child: Text('Done', style: TextStyle(color: primaryBlue, fontWeight: FontWeight.bold)),
+                      child: Text('Done',
+                          style: TextStyle(
+                              color: primaryBlue, fontWeight: FontWeight.bold)),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -153,7 +162,6 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
       if (_monthlyRemindersEnabled) {
         _scheduleMonthlyReminder();
       }
-
     } else {
       // Material design time picker with enhanced theme
       final TimeOfDay? picked = await showTimePicker(
@@ -178,13 +186,21 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
                   borderRadius: BorderRadius.circular(16),
                 ),
                 dayPeriodColor: MaterialStateColor.resolveWith((states) =>
-                states.contains(MaterialState.selected) ? lightBlue : Colors.white),
+                    states.contains(MaterialState.selected)
+                        ? lightBlue
+                        : Colors.white),
                 dayPeriodTextColor: MaterialStateColor.resolveWith((states) =>
-                states.contains(MaterialState.selected) ? primaryBlue : secondaryBlue),
+                    states.contains(MaterialState.selected)
+                        ? primaryBlue
+                        : secondaryBlue),
                 hourMinuteColor: MaterialStateColor.resolveWith((states) =>
-                states.contains(MaterialState.selected) ? lightBlue : Colors.white),
+                    states.contains(MaterialState.selected)
+                        ? lightBlue
+                        : Colors.white),
                 hourMinuteTextColor: MaterialStateColor.resolveWith((states) =>
-                states.contains(MaterialState.selected) ? primaryBlue : secondaryBlue),
+                    states.contains(MaterialState.selected)
+                        ? primaryBlue
+                        : secondaryBlue),
               ),
             ),
             child: child!,
@@ -246,13 +262,14 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
                   child: CupertinoPicker(
                     backgroundColor: Colors.transparent,
                     itemExtent: 42,
-                    scrollController: FixedExtentScrollController(initialItem: tempDay - 1),
+                    scrollController:
+                        FixedExtentScrollController(initialItem: tempDay - 1),
                     onSelectedItemChanged: (int index) {
                       tempDay = index + 1;
                     },
                     children: List.generate(
                       31,
-                          (index) => Center(
+                      (index) => Center(
                         child: Text(
                           _getDayWithSuffix(index + 1),
                           style: TextStyle(
@@ -286,7 +303,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 14),
                       ),
                       child: const Text("Confirm"),
                     ),
@@ -337,70 +355,126 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
     await PrivacyNotificationService().scheduleQuizReminder(
       days: _quizReminderDays,
       title: 'Review Your Knowledge',
-      body: 'It\'s been a while! Take the privacy quizzes again to refresh your understanding.',
+      body:
+          'It\'s been a while! Take the privacy quizzes again to refresh your understanding.',
     );
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('quiz_reminder_enabled', true);
 
-    _showSnackBar('Quiz reminder scheduled for $_quizReminderDays days from now', isSuccess: true);
+    _showSnackBar(
+        'Quiz reminder scheduled for $_quizReminderDays days from now',
+        isSuccess: true);
   }
 
   Future<void> _sendTestNotification() async {
-    // Show loading indicator
     setState(() {
       _isLoading = true;
     });
 
-    await PrivacyNotificationService().scheduleTestNotification(
-      id: 999,
-      title: 'Test Notification',
-      body: 'This is a test notification to verify the system is working!',
-      seconds: 10,
-    );
+    final notificationService = PrivacyNotificationService();
+    if (!notificationService.isInitialized) {
+      print('Initializing notifications');
+      await notificationService.initNotifications();
+    }
 
-    // Hide loading and show success
+    final notificationStatus = await Permission.notification.status;
+    if (!notificationStatus.isGranted) {
+      _showSnackBar(
+          'Notifications are disabled. Please enable them in settings.',
+          isError: true);
+      await AppSettings.openAppSettings(type: AppSettingsType.notification);
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      await notificationService.scheduleTestNotification(
+        id: 999,
+        title: 'Test Notification',
+        body: 'This is a test notification to verify the system is working!',
+        seconds: 10,
+      );
+      _showSnackBar('Test notification sent! It will appear in 10 seconds.',
+          isSuccess: true);
+    } catch (e) {
+      print('Error scheduling test notification: $e');
+      _showSnackBar('Failed to schedule test notification', isError: true);
+    }
+
     setState(() {
       _isLoading = false;
     });
+  }
 
-    _showSnackBar('Test notification sent! It will appear in 10 seconds.', isSuccess: true);
+  Future<void> _sendImmediateTestNotification() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final notificationService = PrivacyNotificationService();
+    if (!notificationService.isInitialized) {
+      print('Initializing notifications');
+      await notificationService.initNotifications();
+    }
+
+    try {
+      await notificationService.showNotification(
+        id: 999,
+        title: 'Immediate Test Notification',
+        body: 'This is an immediate test notification to verify the system!',
+        payload: 'test_notification',
+      );
+      _showSnackBar('Immediate test notification sent!', isSuccess: true);
+    } catch (e) {
+      print('Error sending immediate notification: $e');
+      _showSnackBar('Failed to send immediate notification', isError: true);
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _cancelAllReminders() async {
     // Show confirmation dialog
     bool confirm = await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Cancel All Reminders?',
-          style: TextStyle(
-            color: primaryBlue,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: const Text(
-          'Are you sure you want to cancel all notification reminders? This action cannot be undone.',
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No', style: TextStyle(color: secondaryBlue)),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: errorRed,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(
+              'Cancel All Reminders?',
+              style: TextStyle(
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            child: const Text('Yes, Cancel All'),
+            content: const Text(
+              'Are you sure you want to cancel all notification reminders? This action cannot be undone.',
+            ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('No', style: TextStyle(color: secondaryBlue)),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: errorRed,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                ),
+                child: const Text('Yes, Cancel All'),
+              ),
+            ],
           ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
 
     if (!confirm) return;
 
@@ -418,7 +492,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
     _showSnackBar('All reminders cancelled', isSuccess: false, isError: true);
   }
 
-  void _showSnackBar(String message, {bool isSuccess = false, bool isError = false}) {
+  void _showSnackBar(String message,
+      {bool isSuccess = false, bool isError = false}) {
     Color backgroundColor = secondaryBlue;
     if (isSuccess) backgroundColor = successGreen;
     if (isError) backgroundColor = errorRed;
@@ -428,7 +503,9 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
         content: Row(
           children: [
             Icon(
-              isSuccess ? Icons.check_circle_rounded : (isError ? Icons.error_rounded : Icons.info_rounded),
+              isSuccess
+                  ? Icons.check_circle_rounded
+                  : (isError ? Icons.error_rounded : Icons.info_rounded),
               color: Colors.white,
             ),
             const SizedBox(width: 12),
@@ -473,7 +550,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
               height: MediaQuery.of(context).size.height * 0.85,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(32)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.12),
@@ -483,9 +561,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
                   ),
                 ],
               ),
-              child: _isLoading
-                  ? _buildLoadingIndicator()
-                  : _buildContent(),
+              child: _isLoading ? _buildLoadingIndicator() : _buildContent(),
             ),
           ),
         );
@@ -642,7 +718,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
                           backgroundColor: Colors.white,
                           foregroundColor: errorRed,
                           elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 16),
                           side: BorderSide(color: errorRed, width: 1.5),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -697,12 +774,31 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
             child: ElevatedButton.icon(
               onPressed: _sendTestNotification,
               icon: const Icon(Icons.send_rounded),
-              label: const Text('Send Test Notification'),
+              label: const Text('Send Scheduled Test'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryBlue,
                 foregroundColor: Colors.white,
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: ElevatedButton.icon(
+              onPressed: _sendImmediateTestNotification,
+              icon: const Icon(Icons.notifications_rounded),
+              label: const Text('Send Immediate Test'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: secondaryBlue,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -807,7 +903,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
       isScrollControlled: true,
       builder: (context) {
         return Container(
-          padding: const EdgeInsets.only(top: 16, left: 24, right: 24, bottom: 32),
+          padding:
+              const EdgeInsets.only(top: 16, left: 24, right: 24, bottom: 32),
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -869,57 +966,59 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
     final bool isSelected = days == _quizReminderDays;
 
     return InkWell(
-        onTap: () => Navigator.pop(context, days),
-    child: Container(
-    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-    margin: const EdgeInsets.only(bottom: 12),
-    decoration: BoxDecoration(
-    color: isSelected ? lightBlue : Colors.white,
-    borderRadius: BorderRadius.circular(16),
-    border: Border.all(
-    color: isSelected ? primaryBlue : Colors.grey.shade300,
-    width: isSelected ? 2 : 1,
-    ),
-    ),
-    child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    Row(
-    children: [
-    Container(
-    padding: const EdgeInsets.all(8),
-    decoration: BoxDecoration(
-    color: isSelected ? primaryBlue.withOpacity(0.1) : Colors.grey.shade100,
-    shape: BoxShape.circle,
-    ),
-    child: Text(
-    days.toString(),
-    style: TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    color: isSelected ? primaryBlue : neutralGray,
-    ),
-    ),
-    ),
-    const SizedBox(width: 12),
-      Text(
-        days == 1 ? 'day' : 'days',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: isSelected ? primaryBlue : secondaryBlue,
+      onTap: () => Navigator.pop(context, days),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? lightBlue : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? primaryBlue : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? primaryBlue.withOpacity(0.1)
+                        : Colors.grey.shade100,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    days.toString(),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: isSelected ? primaryBlue : neutralGray,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  days == 1 ? 'day' : 'days',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: isSelected ? primaryBlue : secondaryBlue,
+                  ),
+                ),
+              ],
+            ),
+            Icon(
+              isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
+              color: isSelected ? primaryBlue : neutralGray,
+              size: 24,
+            ),
+          ],
         ),
       ),
-    ],
-    ),
-      Icon(
-        isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
-        color: isSelected ? primaryBlue : neutralGray,
-        size: 24,
-      ),
-    ],
-    ),
-    ),
     );
   }
 
@@ -938,11 +1037,13 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
           content: const Text(
             'Would you like to reset the quiz reminder timer to start from today?',
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text('Keep Current', style: TextStyle(color: secondaryBlue)),
+              child:
+                  Text('Keep Current', style: TextStyle(color: secondaryBlue)),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -950,7 +1051,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal> w
                 backgroundColor: primaryBlue,
                 foregroundColor: Colors.white,
                 elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
               ),
               child: const Text('Reset Timer'),
             ),
