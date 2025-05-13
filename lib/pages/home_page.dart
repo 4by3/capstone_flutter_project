@@ -1,10 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:capstone_project/services/privacy_notification_service.dart';
 import 'package:capstone_project/services/notification_settings_modal.dart';
 import 'package:confetti/confetti.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/video_popup.dart';
-import '../data/features_data.dart' as featuresDataFile;
 import 'feature_quiz_page.dart';
 import 'intro_page.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final List<AnimationController> _scaleControllers = [];
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = true;
+  bool _isOffline = false;
 
   // Define consistent colors
   final Color primaryBlue = const Color.fromARGB(255, 24, 53, 98);
@@ -36,7 +38,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 2));
-    _loadFeatureScores();
+    _fetchFeatures();
   }
 
   @override
@@ -49,20 +51,79 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> _fetchFeatures() async {
+    setState(() {
+      _isLoading = true;
+      _isOffline = false;
+    });
+
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('features').get();
+      final fetchedFeatures = snapshot.docs.map((doc) => doc.data()).toList();
+
+      if (fetchedFeatures.isNotEmpty) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('cached_features', jsonEncode(fetchedFeatures));
+        print('Features fetched from Firestore and cached');
+
+        setState(() {
+          features = fetchedFeatures;
+          _isLoading = false;
+        });
+        await _loadFeatureScores();
+      } else {
+        await _loadCachedFeatures();
+      }
+    } catch (e) {
+      print('Error fetching features: $e');
+      await _loadCachedFeatures();
+    }
+  }
+
+  Future<void> _loadCachedFeatures() async {
+    final prefs = await SharedPreferences.getInstance();
+    final cachedData = prefs.getString('cached_features');
+
+    if (cachedData != null) {
+      final cachedFeatures = jsonDecode(cachedData) as List<dynamic>;
+      setState(() {
+        features = cachedFeatures.cast<Map<String, dynamic>>();
+        _isLoading = false;
+        _isOffline = true;
+      });
+      print('Loaded cached features');
+      await _loadFeatureScores();
+    } else {
+      setState(() {
+        _isLoading = false;
+        _isOffline = true;
+        features = [];
+      });
+      print('No features available (offline and no cache)');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+                'No internet connection and no cached features. Please connect to the internet to load the features.'),
+            backgroundColor: Colors.red[700],
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _loadFeatureScores() async {
-    if (!mounted) return; // Early exit if not mounted
+    if (!mounted) return;
 
     final prefs = await SharedPreferences.getInstance();
     String currentMode = prefs.getString('quizMode') ?? 'easy';
-
-    // Initialize features from the imported features_data.dart
-    features = List<Map<String, dynamic>>.from(
-        featuresDataFile.featuresData.map((f) => Map<String, dynamic>.from(f)));
 
     if (widget.initialFeatureScores != null) {
       for (var feature in features) {
         String featureName = feature['name'];
         feature['score'] = widget.initialFeatureScores![featureName] ?? 0;
+        feature['started'] = 0;
       }
       await _saveFeatureScores();
     } else {
@@ -133,8 +194,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     for (var feature in features) {
       if (currentMode == 'hard') {
         await prefs.setInt('${feature['name']}_hard_score', feature['score']);
-        await prefs.setInt(
-            '${feature['name']}_hard_started', feature['started']);
+        await prefs.setInt('${feature['name']}_hard_started', feature['started']);
       } else {
         await prefs.setInt('${feature['name']}_score', feature['score']);
         await prefs.setInt('${feature['name']}_started', feature['started']);
@@ -166,13 +226,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     final featureName = features[index]['name'];
     final originalIndex = {
-          'Block, Restrict, Report Usage': 0,
-          'Facebook Groups': 1,
-          'Audience Setting for Posts': 2,
-          'Interaction on Others\' Posts': 3,
-          'Tag Review and Settings': 4,
-        }[featureName] ??
-        0;
+      'Block, Restrict, Report Usage': 0,
+      'Facebook Groups': 1,
+      'Audience Setting for Posts': 2,
+      'Interaction on Others\' Posts': 3,
+      'Tag Review and Settings': 4,
+    }[featureName] ?? 0;
 
     final score = await Navigator.push(
       context,
@@ -190,7 +249,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       if (mode == 'easy' && features.every((f) => f['score'] == 5)) {
         await prefs.setString('quizMode', 'hard');
 
-        // Show dialog before reloading scores, but only if mounted
         if (mounted) {
           await showDialog(
             context: context,
@@ -322,7 +380,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           );
 
-          // Reload scores only if still mounted
           if (mounted) {
             await _loadFeatureScores();
           }
@@ -430,7 +487,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Color _getCardBackgroundColor(int score, bool started) {
     if (score == 5) {
       return Colors.green.withOpacity(0.05);
-    } else if (started == 1) {
+    } else if (started) {
       return Colors.orange.withOpacity(0.05);
     } else {
       return Colors.white;
@@ -444,7 +501,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         end: Alignment.bottomRight,
         colors: [Colors.green.shade300, Colors.green.shade500],
       );
-    } else if (started == 1) {
+    } else if (started) {
       return LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -461,11 +518,36 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (features.isEmpty) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'No features available${_isOffline ? ' (offline)' : ''}',
+                style: TextStyle(fontSize: 18, color: primaryBlue),
+              ),
+              if (_isOffline)
+                ElevatedButton(
+                  onPressed: _fetchFeatures,
+                  child: Text('Retry Connection'),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Stack(
-              children: [
+      body: Stack(
+        children: [
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
