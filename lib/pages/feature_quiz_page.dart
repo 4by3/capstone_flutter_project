@@ -5,6 +5,7 @@ import '../data/hardFeatures_quiz_data.dart';
 import '../data/features_data.dart' as featuresDataFile;
 import '../widgets/video_popup.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FeatureQuizPage extends StatefulWidget {
   final int featureIndex;
@@ -41,6 +42,69 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
   final Color textColor = const Color.fromARGB(255, 24, 53, 98);
   final Color answerColor = const Color.fromARGB(255, 18, 40, 74);
 
+  // Future<void> _saveProgress() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //
+  //   // Save current index
+  //   await prefs.setInt('feature_${widget.featureIndex}_progress', currentQuestionIndex);
+  //
+  //   // Save selected answers as a Map<String, String>
+  //   selectedAnswers.forEach((index, answer) {
+  //     prefs.setString('feature_${widget.featureIndex}_answer_$index', answer);
+  //   });
+  // }
+
+  Future<void> _saveProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Get current saved progress
+    final savedProgress =
+        prefs.getInt('feature_${widget.featureIndex}_progress') ?? 0;
+
+    // Only update if moving forward
+    if (currentQuestionIndex > savedProgress) {
+      await prefs.setInt(
+          'feature_${widget.featureIndex}_progress', currentQuestionIndex);
+    }
+
+    selectedAnswers.forEach((index, answer) {
+      prefs.setString('feature_${widget.featureIndex}_answer_$index', answer);
+      prefs.setBool('feature_${widget.featureIndex}_correct_$index', previouslyCorrect[index] ?? false);
+    });
+  }
+
+  Future<void> _loadSavedProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedIndex = prefs.getInt('feature_${widget.featureIndex}_progress') ?? 0;
+
+    // Try to load answers for previous questions
+    final questionCount = widget.mode == 'hard'
+        ? hardFeatureQuestions[widget.featureIndex]!.length
+        : easyFeatureQuestions[widget.featureIndex]!.length;
+
+    int tempScore = 0;
+    for (int i = 0; i < questionCount; i++) {
+      final key = 'feature_${widget.featureIndex}_answer_$i';
+      final correctKey = 'feature_${widget.featureIndex}_correct_$i';
+
+      if (prefs.containsKey(key)) {
+        selectedAnswers[i] = prefs.getString(key)!;
+      }
+
+      if (prefs.getBool(correctKey) == true) {
+        previouslyCorrect[i] = true;
+        tempScore++;
+      }
+    }
+
+    setState(() {
+      currentQuestionIndex = savedIndex;
+      score = tempScore;
+    });
+  }
+
+
+
   @override
   void initState() {
     super.initState();
@@ -61,7 +125,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
     // Initialize controllers for four options
     _answerFadeControllers = List.generate(
       4,
-      (index) => AnimationController(
+          (index) => AnimationController(
         vsync: this,
         duration: Duration(milliseconds: 400 + (index * 150)),
       ),
@@ -74,7 +138,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
 
     _answerClickControllers = List.generate(
       4,
-      (index) => AnimationController(
+          (index) => AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 300),
       ),
@@ -96,7 +160,10 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
       CurvedAnimation(parent: _scenarioPopupController, curve: Curves.easeOut),
     );
 
-    _startAnimations();
+    _loadSavedProgress().then((_) {
+      _startAnimations();
+    });
+    //_startAnimations();
   }
 
   @override
@@ -169,6 +236,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
   }
 
   Future<bool> _onWillPop() async {
+    await _saveProgress();
     Navigator.pop(context, score);
     return true;
   }
@@ -206,6 +274,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
         _confettiController.play();
       }
       previouslyCorrect[currentQuestionIndex] = true;
+      _saveProgress(); // ✅ Save after correct answer
     } else if (wasPreviouslyCorrect) {
       setState(() => score--);
       previouslyCorrect[currentQuestionIndex] = false;
@@ -218,7 +287,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
         children: [
           AlertDialog(
             shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             backgroundColor: Colors.white.withOpacity(0.95),
             elevation: 10,
             contentPadding: const EdgeInsets.all(20),
@@ -248,8 +317,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                 Text(
                   isCorrect
                       ? (currentQuestionIndex == questions.length - 1
-                          ? 'Congratulations on finishing!'
-                          : 'You nailed it! On to the next one?')
+                      ? 'Congratulations on finishing!'
+                      : 'You nailed it! On to the next one?')
                       : 'Feedback: ${currentQuestion['feedback']}',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 20, color: textColor),
@@ -270,8 +339,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                   child: Text(
                     isCorrect
                         ? (currentQuestionIndex == questions.length - 1
-                            ? 'Finish'
-                            : 'Next')
+                        ? 'Finish'
+                        : 'Next')
                         : 'Try Again',
                     style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
@@ -368,7 +437,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
               style: ElevatedButton.styleFrom(
                 backgroundColor: textColor,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
                 elevation: 5,
@@ -377,9 +446,10 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                 'Back to Home',
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context, score);
+              onPressed: () async {
+                await _saveProgress(); // ✅ Save latest progress
+                Navigator.pop(context);         // Close dialog
+                Navigator.pop(context, score);  // Go back to Home
               },
             ),
           ),
@@ -459,8 +529,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                 onTap: () => _showVideoPopup(
                                     context,
                                     featuresDataFile
-                                            .featuresData[widget.featureIndex]
-                                        ['video']),
+                                        .featuresData[widget.featureIndex]
+                                    ['video']),
                                 child: Container(
                                   width: 40,
                                   height: 40,
@@ -542,7 +612,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                       width: double.infinity,
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
@@ -594,56 +664,57 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                     selectedAnswers[currentQuestionIndex] ==
                                         option;
                                 final animationIndex =
-                                    index < _answerFadeAnimations.length
-                                        ? index
-                                        : _answerFadeAnimations.length - 1;
+                                index < _answerFadeAnimations.length
+                                    ? index
+                                    : _answerFadeAnimations.length - 1;
                                 final clickAnimationIndex = index <
-                                        _answerClickOpacityAnimations.length
+                                    _answerClickOpacityAnimations.length
                                     ? index
                                     : _answerClickOpacityAnimations.length - 1;
 
                                 return FadeTransition(
                                   opacity:
-                                      _answerFadeAnimations[animationIndex],
+                                  _answerFadeAnimations[animationIndex],
                                   child: Padding(
                                     padding: const EdgeInsets.only(bottom: 12),
                                     child: GestureDetector(
                                       onTap: () {
                                         setState(() {
                                           selectedAnswers[
-                                              currentQuestionIndex] = option;
+                                          currentQuestionIndex] = option;
                                         });
                                         // Trigger click animation
+                                        _saveProgress();
                                         _answerClickControllers[
-                                                clickAnimationIndex]
+                                        clickAnimationIndex]
                                             .reset();
                                         _answerClickControllers[
-                                                clickAnimationIndex]
+                                        clickAnimationIndex]
                                             .forward();
                                       },
                                       child: AnimatedBuilder(
                                         animation:
-                                            _answerClickOpacityAnimations[
-                                                clickAnimationIndex],
+                                        _answerClickOpacityAnimations[
+                                        clickAnimationIndex],
                                         builder: (context, child) {
                                           return Opacity(
                                             opacity:
-                                                _answerClickOpacityAnimations[
-                                                        clickAnimationIndex]
-                                                    .value,
+                                            _answerClickOpacityAnimations[
+                                            clickAnimationIndex]
+                                                .value,
                                             child: Container(
                                               height: 77, // For two lines
                                               padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 10),
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 20,
+                                                  vertical: 10),
                                               decoration: BoxDecoration(
                                                 color: isSelected
                                                     ? Colors.white
-                                                        .withOpacity(0.95)
+                                                    .withOpacity(0.95)
                                                     : answerColor,
                                                 borderRadius:
-                                                    BorderRadius.circular(15),
+                                                BorderRadius.circular(15),
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: Colors.black
@@ -669,7 +740,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                   stepGranularity: 1,
                                                   wrapWords: true,
                                                   overflow:
-                                                      TextOverflow.ellipsis,
+                                                  TextOverflow.ellipsis,
                                                   textAlign: TextAlign.left,
                                                 ),
                                               ),
@@ -695,17 +766,20 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                           Expanded(
                             child: OutlinedButton(
                               onPressed: currentQuestionIndex == 0
-                                  ? () => Navigator.pop(context, score)
+                                  ? () async {
+                                await _saveProgress(); // ✅ Save before going back
+                                Navigator.pop(context, score);
+                              }
                                   : () {
-                                      setState(() {
-                                        currentQuestionIndex--;
-                                        _startAnimations(
-                                            showScenarioPopup: false);
-                                      });
-                                    },
+                                setState(() {
+                                  currentQuestionIndex--;
+                                  _startAnimations(showScenarioPopup: false);
+                                });
+                                _saveProgress(); // ✅ Save new position
+                              },
                               style: OutlinedButton.styleFrom(
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
+                                const EdgeInsets.symmetric(vertical: 15),
                                 side: BorderSide(color: textColor, width: 2),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -726,13 +800,13 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                             width: MediaQuery.of(context).size.width * 0.45,
                             child: ElevatedButton(
                               onPressed:
-                                  selectedAnswers[currentQuestionIndex] != null
-                                      ? _submitAnswer
-                                      : null,
+                              selectedAnswers[currentQuestionIndex] != null
+                                  ? _submitAnswer
+                                  : null,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: textColor,
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
+                                const EdgeInsets.symmetric(vertical: 15),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),

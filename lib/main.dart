@@ -26,10 +26,21 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // Shared preference which changes the page on app launch
-  Future<bool> _checkIntroPage() async {
+
+  // shared preference which changes the page on app launch
+  // Future<bool> _checkIntroPage() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   return prefs.getBool('goIntroPage') ?? true;
+  // }
+
+  Future<bool> _checkIfShowIntro() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('goIntroPage') ?? true;
+
+    // Check if user has completed intro summary
+    final introCompleted = prefs.getBool('introCompleted') ?? false;
+
+    // If true => skip IntroPage
+    return !introCompleted;
   }
 
   @override
@@ -43,7 +54,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: FutureBuilder<bool>(
-        future: _checkIntroPage(),
+        future: _checkIfShowIntro(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
