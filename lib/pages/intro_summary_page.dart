@@ -23,6 +23,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  bool _isHovered = false; // Track hover state for the Continue button
 
   final Color backgroundColor = Colors.blue[50]!;
   final Color secondaryBackgroundColor = Colors.blue[100]!;
@@ -71,16 +72,18 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
   Widget build(BuildContext context) {
     final isEasy = widget.quizMode == 'easy';
     final totalPossibleScore = 15;
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Summary'),
+        backgroundColor: isDarkMode ? Colors.black : Colors.blue[50],
         actions: [
           IconButton(
             icon: Icon(
-              Provider.of<ThemeProvider>(context).themeMode == ThemeMode.light
-                  ? Icons.dark_mode
-                  : Icons.light_mode,
+              isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
             onPressed: () {
               Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
@@ -90,13 +93,15 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
         ],
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [backgroundColor, secondaryBackgroundColor],
-          ),
-        ),
+        decoration: isDarkMode
+            ? const BoxDecoration(color: Colors.black)
+            : BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [backgroundColor, secondaryBackgroundColor],
+                ),
+              ),
         child: SafeArea(
           child: FadeTransition(
             opacity: _fadeAnimation,
@@ -113,7 +118,8 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                             width: 100,
                             height: 100,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color:
+                                  isDarkMode ? Colors.grey[900] : Colors.white,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
@@ -127,7 +133,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                             child: Icon(
                               Icons.school,
                               size: 64,
-                              color: textColor,
+                              color: isDarkMode ? Colors.white : textColor,
                             ),
                           ),
                           const SizedBox(height: 30),
@@ -135,7 +141,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 36, vertical: 12),
                             decoration: BoxDecoration(
-                              color: lightBlue,
+                              color: isDarkMode ? Colors.grey[800] : lightBlue,
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: Text(
@@ -143,7 +149,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: textColor,
+                                color: isDarkMode ? Colors.white : textColor,
                               ),
                             ),
                           ),
@@ -157,7 +163,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                               style: TextStyle(
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
-                                color: textColor,
+                                color: isDarkMode ? Colors.white : textColor,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -168,7 +174,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                             style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.w500,
-                              color: textColor,
+                              color: isDarkMode ? Colors.white : textColor,
                             ),
                           ),
                           const SizedBox(height: 30),
@@ -177,11 +183,14 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                             child: Container(
                               padding: const EdgeInsets.all(24),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: isDarkMode
+                                    ? Colors.grey[900]
+                                    : Colors.white,
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.08),
+                                    color: Colors.black
+                                        .withOpacity(isDarkMode ? 0.2 : 0.08),
                                     blurRadius: 6,
                                     offset: const Offset(0, 3),
                                   ),
@@ -193,7 +202,8 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                     "Based on your quiz results (${widget.totalScore}/$totalPossibleScore), we'll start with ${isEasy ? 'easy' : 'hard'}-friendly questions to help you build a strong foundation in Facebook privacy.",
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: textColor,
+                                      color:
+                                          isDarkMode ? Colors.white : textColor,
                                       height: 1.5,
                                     ),
                                     textAlign: TextAlign.center,
@@ -206,12 +216,18 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                       Container(
                                         padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
-                                          color: lightBlue,
+                                          color: isDarkMode
+                                              ? Colors.grey[800]
+                                              : lightBlue,
                                           borderRadius:
                                               BorderRadius.circular(12),
                                         ),
-                                        child: Icon(Icons.lightbulb_outline,
-                                            color: textColor),
+                                        child: Icon(
+                                          Icons.lightbulb_outline,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : textColor,
+                                        ),
                                       ),
                                       const SizedBox(width: 16),
                                       Expanded(
@@ -219,7 +235,9 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                           "You'll learn step by step with helpful tutorial videos and interactive questions to check your understanding.",
                                           style: TextStyle(
                                             fontSize: 14,
-                                            color: textColor,
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : textColor,
                                             height: 1.4,
                                           ),
                                         ),
@@ -234,12 +252,18 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                       Container(
                                         padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
-                                          color: lightBlue,
+                                          color: isDarkMode
+                                              ? Colors.grey[800]
+                                              : lightBlue,
                                           borderRadius:
                                               BorderRadius.circular(12),
                                         ),
-                                        child: Icon(Icons.access_time,
-                                            color: textColor),
+                                        child: Icon(
+                                          Icons.access_time,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : textColor,
+                                        ),
                                       ),
                                       const SizedBox(width: 16),
                                       Expanded(
@@ -247,7 +271,9 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                           "Move through each section at a comfortable pace.",
                                           style: TextStyle(
                                             fontSize: 16,
-                                            color: textColor,
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : textColor,
                                             height: 1.4,
                                           ),
                                         ),
@@ -266,24 +292,60 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 16),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => _continueToHome(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: answerColor,
+                    child: GestureDetector(
+                      onTapDown: (_) {
+                        setState(() {
+                          _isHovered = true;
+                        });
+                      },
+                      onTapCancel: () {
+                        setState(() {
+                          _isHovered = false;
+                        });
+                      },
+                      onTapUp: (_) {
+                        setState(() {
+                          _isHovered = false;
+                        });
+                        _continueToHome(context);
+                      },
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 22),
-                          shape: RoundedRectangleBorder(
+                          decoration: BoxDecoration(
+                            color: isDarkMode
+                                ? (_isHovered
+                                    ? Colors.grey[850]
+                                    : Colors.grey[900])
+                                : answerColor,
+                            border: isDarkMode
+                                ? Border.all(
+                                    color: _isHovered
+                                        ? Colors.white.withOpacity(0.7)
+                                        : Colors.white.withOpacity(0.3),
+                                    width: 1.5,
+                                  )
+                                : null,
                             borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black
+                                    .withOpacity(isDarkMode ? 0.2 : 0.1),
+                                blurRadius: 5,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                          elevation: 5,
-                        ),
-                        child: const Text(
-                          "Continue",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                          child: Center(
+                            child: Text(
+                              "Continue",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),

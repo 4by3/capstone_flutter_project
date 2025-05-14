@@ -5,6 +5,8 @@ import '../data/hardFeatures_quiz_data.dart';
 import '../data/features_data.dart' as featuresDataFile;
 import '../widgets/video_popup.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:provider/provider.dart';
+import 'package:capstone_project/main.dart'; // Import for ThemeProvider
 
 class FeatureQuizPage extends StatefulWidget {
   final int featureIndex;
@@ -37,6 +39,11 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
   late AnimationController _scenarioPopupController;
   late Animation<Offset> _scenarioSlideAnimation;
   bool _isScenarioPopupVisible = false;
+  List<bool> _isHovered = List.generate(4, (_) => false); // For answer options
+  bool _isPlayButtonHovered = false; // For play button
+  bool _isScenarioButtonHovered = false; // For scenario button
+  bool _isSubmitButtonHovered = false; // For submit button
+  bool _isBackButtonHovered = false; // For back/previous button
 
   final Color textColor = const Color.fromARGB(255, 24, 53, 98);
   final Color answerColor = const Color.fromARGB(255, 18, 40, 74);
@@ -58,7 +65,6 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
       CurvedAnimation(parent: _questionController, curve: Curves.easeOutBack),
     );
 
-    // Initialize controllers for four options
     _answerFadeControllers = List.generate(
       4,
       (index) => AnimationController(
@@ -121,10 +127,9 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
       controller.forward();
     }
     for (var controller in _answerClickControllers) {
-      controller.value = 0.0; // Start at 0.9 opacity
+      controller.value = 0.0;
     }
 
-    // Only show scenario popup if showScenarioPopup is true
     if (showScenarioPopup) {
       final questions = widget.mode == 'hard'
           ? hardFeatureQuestions[widget.featureIndex]!
@@ -199,6 +204,9 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
         selectedAnswers[currentQuestionIndex] == currentQuestion['answer'];
     final wasPreviouslyCorrect =
         previouslyCorrect[currentQuestionIndex] == true;
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
 
     if (isCorrect) {
       if (!wasPreviouslyCorrect) {
@@ -219,7 +227,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
           AlertDialog(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            backgroundColor: Colors.white.withOpacity(0.95),
+            backgroundColor:
+                isDarkMode ? Colors.grey[900] : Colors.white.withOpacity(0.95),
             elevation: 10,
             contentPadding: const EdgeInsets.all(20),
             title: Column(
@@ -227,7 +236,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                 Icon(
                   isCorrect ? Icons.check_circle : Icons.close,
                   color: isCorrect ? Colors.green : Colors.red,
-                  size: 80, // Adjusted from 120x120 for better balance
+                  size: 80,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -252,30 +261,30 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                           : 'You nailed it! On to the next one?')
                       : 'Feedback: ${currentQuestion['feedback']}',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 20, color: textColor),
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: isDarkMode ? Colors.white : textColor,
+                  ),
                 ),
               ],
             ),
             actions: [
               Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: textColor,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 5,
-                  ),
-                  child: Text(
-                    isCorrect
-                        ? (currentQuestionIndex == questions.length - 1
-                            ? 'Finish'
-                            : 'Next')
-                        : 'Try Again',
-                    style: const TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                  onPressed: () {
+                child: GestureDetector(
+                  onTapDown: (_) {
+                    setState(() {
+                      _isSubmitButtonHovered = true;
+                    });
+                  },
+                  onTapCancel: () {
+                    setState(() {
+                      _isSubmitButtonHovered = false;
+                    });
+                  },
+                  onTapUp: (_) {
+                    setState(() {
+                      _isSubmitButtonHovered = false;
+                    });
                     Navigator.pop(context);
                     if (isCorrect &&
                         currentQuestionIndex < questions.length - 1) {
@@ -288,6 +297,45 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                       _finishQuiz();
                     }
                   },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 15),
+                    decoration: BoxDecoration(
+                      color: isDarkMode
+                          ? (_isSubmitButtonHovered
+                              ? Colors.grey[850]
+                              : Colors.grey[900])
+                          : textColor,
+                      border: isDarkMode
+                          ? Border.all(
+                              color: _isSubmitButtonHovered
+                                  ? Colors.white.withOpacity(0.7)
+                                  : Colors.white.withOpacity(0.3),
+                              width: 1.5,
+                            )
+                          : null,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              Colors.black.withOpacity(isDarkMode ? 0.2 : 0.1),
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        isCorrect
+                            ? (currentQuestionIndex == questions.length - 1
+                                ? 'Finish'
+                                : 'Next')
+                            : 'Try Again',
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -315,26 +363,33 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
   }
 
   void _finishQuiz() {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.white.withOpacity(0.95),
+        backgroundColor:
+            isDarkMode ? Colors.grey[900] : Colors.white.withOpacity(0.95),
         elevation: 10,
         contentPadding: const EdgeInsets.all(20),
         title: Column(
           children: [
             Icon(
               score == 5 ? Icons.celebration : Icons.check,
-              color: score == 5 ? Colors.amber : textColor,
+              color: score == 5
+                  ? Colors.amber
+                  : (isDarkMode ? Colors.white : textColor),
               size: 80,
             ),
             const SizedBox(height: 20),
             Text(
               score == 5 ? 'Perfect Score!' : 'Well Done!',
               style: TextStyle(
-                color: textColor,
+                color: isDarkMode ? Colors.white : textColor,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -349,7 +404,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
               style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
-                color: textColor,
+                color: isDarkMode ? Colors.white : textColor,
               ),
             ),
             const SizedBox(height: 20),
@@ -358,29 +413,66 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                   ? 'You\'re a privacy expert!'
                   : 'Nice work! Try again to improve?',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20, color: textColor),
+              style: TextStyle(
+                fontSize: 20,
+                color: isDarkMode ? Colors.white : textColor,
+              ),
             ),
           ],
         ),
         actions: [
           Center(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: textColor,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                elevation: 5,
-              ),
-              child: const Text(
-                'Back to Home',
-                style: TextStyle(fontSize: 18, color: Colors.white),
-              ),
-              onPressed: () {
+            child: GestureDetector(
+              onTapDown: (_) {
+                setState(() {
+                  _isBackButtonHovered = true;
+                });
+              },
+              onTapCancel: () {
+                setState(() {
+                  _isBackButtonHovered = false;
+                });
+              },
+              onTapUp: (_) {
+                setState(() {
+                  _isBackButtonHovered = false;
+                });
                 Navigator.pop(context);
                 Navigator.pop(context, score);
               },
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? (_isBackButtonHovered
+                          ? Colors.grey[850]
+                          : Colors.grey[900])
+                      : textColor,
+                  border: isDarkMode
+                      ? Border.all(
+                          color: _isBackButtonHovered
+                              ? Colors.white.withOpacity(0.7)
+                              : Colors.white.withOpacity(0.3),
+                          width: 1.5,
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.1),
+                      blurRadius: 5,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    'Back to Home',
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -399,20 +491,41 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
     final hasScenario = question['scenario'] != null &&
         question['scenario'].toString().trim().isNotEmpty &&
         question['scenarioNumber'] != null;
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    print(
+        'Current theme mode: ${isDarkMode ? "Dark" : "Light"}'); // Debug print
 
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+        appBar: AppBar(
+          title: Text('Feature Quiz'),
+          actions: [
+            IconButton(
+              icon: Icon(
+                isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                color: isDarkMode ? Colors.white : textColor,
+              ),
+              onPressed: () {
+                Provider.of<ThemeProvider>(context, listen: false)
+                    .toggleTheme();
+              },
+            ),
+          ],
+        ),
         body: Stack(
           children: [
             Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.blue[50]!, Colors.blue[100]!],
-                ),
-              ),
+              decoration: isDarkMode
+                  ? const BoxDecoration(color: Colors.black)
+                  : BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.blue[50]!, Colors.blue[100]!],
+                      ),
+                    ),
               child: SafeArea(
                 child: Column(
                   children: [
@@ -430,7 +543,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: textColor,
+                                  color: isDarkMode ? Colors.white : textColor,
                                 ),
                               ),
                               Text(
@@ -438,7 +551,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: textColor,
+                                  color: isDarkMode ? Colors.white : textColor,
                                 ),
                               ),
                             ],
@@ -446,8 +559,11 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                           const SizedBox(height: 16),
                           LinearProgressIndicator(
                             value: (currentQuestionIndex + 1) / totalQuestions,
-                            backgroundColor: Colors.blue[100],
-                            valueColor: AlwaysStoppedAnimation(textColor),
+                            backgroundColor: isDarkMode
+                                ? Colors.grey[800]
+                                : Colors.blue[100],
+                            valueColor: AlwaysStoppedAnimation(
+                                isDarkMode ? Colors.white : textColor),
                             minHeight: 8,
                             borderRadius: BorderRadius.circular(4),
                           ),
@@ -456,26 +572,54 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               GestureDetector(
-                                onTap: () => _showVideoPopup(
-                                    context,
-                                    featuresDataFile
-                                            .featuresData[widget.featureIndex]
-                                        ['video']),
+                                onTapDown: (_) {
+                                  setState(() {
+                                    _isPlayButtonHovered = true;
+                                  });
+                                },
+                                onTapCancel: () {
+                                  setState(() {
+                                    _isPlayButtonHovered = false;
+                                  });
+                                },
+                                onTapUp: (_) {
+                                  setState(() {
+                                    _isPlayButtonHovered = false;
+                                  });
+                                  _showVideoPopup(
+                                      context,
+                                      featuresDataFile
+                                              .featuresData[widget.featureIndex]
+                                          ['video']);
+                                },
                                 child: Container(
                                   width: 40,
                                   height: 40,
                                   decoration: BoxDecoration(
-                                    color: textColor,
+                                    color: isDarkMode
+                                        ? (_isPlayButtonHovered
+                                            ? Colors.grey[850]
+                                            : Colors.grey[900])
+                                        : textColor,
+                                    border: isDarkMode
+                                        ? Border.all(
+                                            color: _isPlayButtonHovered
+                                                ? Colors.white.withOpacity(0.7)
+                                                : Colors.white.withOpacity(0.3),
+                                            width: 1.5,
+                                          )
+                                        : null,
                                     borderRadius: BorderRadius.circular(8),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
+                                        color: Colors.black.withOpacity(
+                                            isDarkMode ? 0.2 : 0.1),
                                         blurRadius: 6,
                                         offset: const Offset(0, 2),
                                       ),
                                     ],
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.play_circle_fill,
                                     color: Colors.white,
                                     size: 24,
@@ -484,17 +628,44 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                               ),
                               if (hasScenario)
                                 GestureDetector(
-                                  onTap: () =>
-                                      _showScenarioPopup(question['scenario']),
+                                  onTapDown: (_) {
+                                    setState(() {
+                                      _isScenarioButtonHovered = true;
+                                    });
+                                  },
+                                  onTapCancel: () {
+                                    setState(() {
+                                      _isScenarioButtonHovered = false;
+                                    });
+                                  },
+                                  onTapUp: (_) {
+                                    setState(() {
+                                      _isScenarioButtonHovered = false;
+                                    });
+                                    _showScenarioPopup(question['scenario']);
+                                  },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16, vertical: 12),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: isDarkMode
+                                          ? Colors.grey[900]
+                                          : Colors.white,
+                                      border: isDarkMode
+                                          ? Border.all(
+                                              color: _isScenarioButtonHovered
+                                                  ? Colors.white
+                                                      .withOpacity(0.7)
+                                                  : Colors.white
+                                                      .withOpacity(0.3),
+                                              width: 1.5,
+                                            )
+                                          : null,
                                       borderRadius: BorderRadius.circular(10),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
+                                          color: Colors.black.withOpacity(
+                                              isDarkMode ? 0.2 : 0.1),
                                           blurRadius: 6,
                                           offset: const Offset(0, 2),
                                         ),
@@ -503,14 +674,21 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.info_outline,
-                                            color: textColor, size: 20),
+                                        Icon(
+                                          Icons.info_outline,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : textColor,
+                                          size: 20,
+                                        ),
                                         const SizedBox(width: 8),
                                         Text(
                                           'Scenario ${question['scenarioNumber']}',
                                           style: TextStyle(
                                             fontSize: 16,
-                                            color: textColor,
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : textColor,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -550,7 +728,9 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                             style: TextStyle(
                                               fontSize: 32,
                                               fontWeight: FontWeight.bold,
-                                              color: textColor,
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : textColor,
                                             ),
                                           ),
                                           const SizedBox(height: 16),
@@ -560,7 +740,9 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                               fontSize: 32,
                                               fontWeight: FontWeight.w600,
                                               height: 1.4,
-                                              color: textColor,
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : textColor,
                                             ),
                                             maxLines: 5,
                                             minFontSize: 16,
@@ -608,12 +790,26 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                   child: Padding(
                                     padding: const EdgeInsets.only(bottom: 12),
                                     child: GestureDetector(
+                                      onTapDown: (_) {
+                                        setState(() {
+                                          _isHovered[index] = true;
+                                        });
+                                      },
+                                      onTapCancel: () {
+                                        setState(() {
+                                          _isHovered[index] = false;
+                                        });
+                                      },
+                                      onTapUp: (_) {
+                                        setState(() {
+                                          _isHovered[index] = false;
+                                        });
+                                      },
                                       onTap: () {
                                         setState(() {
                                           selectedAnswers[
                                               currentQuestionIndex] = option;
                                         });
-                                        // Trigger click animation
                                         _answerClickControllers[
                                                 clickAnimationIndex]
                                             .reset();
@@ -641,13 +837,31 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                 color: isSelected
                                                     ? Colors.white
                                                         .withOpacity(0.95)
-                                                    : answerColor,
+                                                    : (isDarkMode
+                                                        ? (_isHovered[index]
+                                                            ? Colors.grey[850]
+                                                            : Colors.grey[900])
+                                                        : answerColor),
+                                                border: isDarkMode
+                                                    ? Border.all(
+                                                        color: _isHovered[index]
+                                                            ? Colors.white
+                                                                .withOpacity(
+                                                                    0.7)
+                                                            : Colors.white
+                                                                .withOpacity(
+                                                                    0.3),
+                                                        width: 1.5,
+                                                      )
+                                                    : null,
                                                 borderRadius:
                                                     BorderRadius.circular(15),
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: Colors.black
-                                                        .withOpacity(0.1),
+                                                        .withOpacity(isDarkMode
+                                                            ? 0.2
+                                                            : 0.1),
                                                     blurRadius: 6,
                                                     offset: const Offset(0, 2),
                                                   ),
@@ -693,30 +907,61 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Expanded(
-                            child: OutlinedButton(
-                              onPressed: currentQuestionIndex == 0
-                                  ? () => Navigator.pop(context, score)
-                                  : () {
-                                      setState(() {
-                                        currentQuestionIndex--;
-                                        _startAnimations(
-                                            showScenarioPopup: false);
-                                      });
-                                    },
-                              style: OutlinedButton.styleFrom(
+                            child: GestureDetector(
+                              onTapDown: (_) {
+                                setState(() {
+                                  _isBackButtonHovered = true;
+                                });
+                              },
+                              onTapCancel: () {
+                                setState(() {
+                                  _isBackButtonHovered = false;
+                                });
+                              },
+                              onTapUp: (_) {
+                                setState(() {
+                                  _isBackButtonHovered = false;
+                                });
+                                if (currentQuestionIndex == 0) {
+                                  Navigator.pop(context, score);
+                                } else {
+                                  setState(() {
+                                    currentQuestionIndex--;
+                                    _startAnimations(showScenarioPopup: false);
+                                  });
+                                }
+                              },
+                              child: Container(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 15),
-                                side: BorderSide(color: textColor, width: 2),
-                                shape: RoundedRectangleBorder(
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? (_isBackButtonHovered
+                                          ? Colors.grey[850]
+                                          : Colors.grey[900])
+                                      : null,
+                                  border: Border.all(
+                                    color: isDarkMode
+                                        ? (_isBackButtonHovered
+                                            ? Colors.white.withOpacity(0.7)
+                                            : Colors.white.withOpacity(0.3))
+                                        : textColor,
+                                    width: 2,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                              ),
-                              child: Text(
-                                currentQuestionIndex == 0 ? 'Back' : 'Previous',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: textColor,
-                                  fontWeight: FontWeight.bold,
+                                child: Center(
+                                  child: Text(
+                                    currentQuestionIndex == 0
+                                        ? 'Back'
+                                        : 'Previous',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isDarkMode ? Colors.white : textColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -724,26 +969,62 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                           const SizedBox(width: 16),
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.45,
-                            child: ElevatedButton(
-                              onPressed:
-                                  selectedAnswers[currentQuestionIndex] != null
-                                      ? _submitAnswer
-                                      : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: textColor,
+                            child: GestureDetector(
+                              onTapDown: (_) {
+                                setState(() {
+                                  _isSubmitButtonHovered = true;
+                                });
+                              },
+                              onTapCancel: () {
+                                setState(() {
+                                  _isSubmitButtonHovered = false;
+                                });
+                              },
+                              onTapUp: (_) {
+                                setState(() {
+                                  _isSubmitButtonHovered = false;
+                                });
+                                if (selectedAnswers[currentQuestionIndex] !=
+                                    null) {
+                                  _submitAnswer();
+                                }
+                              },
+                              child: Container(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 15),
-                                shape: RoundedRectangleBorder(
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? (_isSubmitButtonHovered
+                                          ? Colors.grey[850]
+                                          : Colors.grey[900])
+                                      : textColor,
+                                  border: isDarkMode
+                                      ? Border.all(
+                                          color: _isSubmitButtonHovered
+                                              ? Colors.white.withOpacity(0.7)
+                                              : Colors.white.withOpacity(0.3),
+                                          width: 1.5,
+                                        )
+                                      : null,
                                   borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black
+                                          .withOpacity(isDarkMode ? 0.2 : 0.1),
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
-                                elevation: 5,
-                              ),
-                              child: const Text(
-                                'Submit',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                                child: Center(
+                                  child: Text(
+                                    'Submit',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -768,11 +1049,12 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                         margin: const EdgeInsets.all(16),
                         padding: const EdgeInsets.all(30),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.grey[900] : Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black
+                                  .withOpacity(isDarkMode ? 0.2 : 0.1),
                               blurRadius: 12,
                               offset: const Offset(0, 2),
                             ),
@@ -784,14 +1066,18 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.info_outline,
-                                    color: textColor, size: 24),
+                                Icon(
+                                  Icons.info_outline,
+                                  color: isDarkMode ? Colors.white : textColor,
+                                  size: 24,
+                                ),
                                 const SizedBox(width: 12),
                                 Text(
                                   'Scenario ${question['scenarioNumber']}',
                                   style: TextStyle(
                                     fontSize: 20,
-                                    color: textColor,
+                                    color:
+                                        isDarkMode ? Colors.white : textColor,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -803,22 +1089,64 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                               style: TextStyle(
                                 fontSize: 18,
                                 height: 1.4,
-                                color: textColor,
+                                color: isDarkMode ? Colors.white : textColor,
                               ),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: _hideScenarioPopup,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: textColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                              ),
-                              child: const Text(
-                                'Close',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16),
+                            GestureDetector(
+                              onTapDown: (_) {
+                                setState(() {
+                                  _isBackButtonHovered = true;
+                                });
+                              },
+                              onTapCancel: () {
+                                setState(() {
+                                  _isBackButtonHovered = false;
+                                });
+                              },
+                              onTapUp: (_) {
+                                setState(() {
+                                  _isBackButtonHovered = false;
+                                });
+                                _hideScenarioPopup();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 40, vertical: 15),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? (_isBackButtonHovered
+                                          ? Colors.grey[850]
+                                          : Colors.grey[900])
+                                      : textColor,
+                                  border: isDarkMode
+                                      ? Border.all(
+                                          color: _isBackButtonHovered
+                                              ? Colors.white.withOpacity(0.7)
+                                              : Colors.white.withOpacity(0.3),
+                                          width: 1.5,
+                                        )
+                                      : null,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black
+                                          .withOpacity(isDarkMode ? 0.2 : 0.1),
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'Close',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ],
