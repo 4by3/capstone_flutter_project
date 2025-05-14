@@ -33,7 +33,10 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
-    );
+    )..addListener(() {
+        // Debug print to confirm animation value
+        print('Fade Animation Value: ${_fadeAnimation.value}');
+      });
 
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeOutBack),
@@ -70,6 +73,9 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
               Provider.of<ThemeProvider>(context).themeMode == ThemeMode.light
                   ? Icons.dark_mode
                   : Icons.light_mode,
+              color: isDarkMode
+                  ? Colors.white
+                  : Colors.black, // Ensure icon is visible
             ),
             onPressed: () {
               Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
@@ -118,7 +124,9 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 16 * scaleFactor,
-                                  color: theme.textTheme.bodyLarge?.color,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : theme.textTheme.bodyLarge?.color,
                                 ),
                               ),
                               SizedBox(height: 10 * scaleFactor),
@@ -131,8 +139,9 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                                       style: TextStyle(
                                         fontSize: 28 * scaleFactor,
                                         fontWeight: FontWeight.bold,
-                                        color:
-                                            theme.textTheme.titleLarge?.color,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : theme.textTheme.titleLarge?.color,
                                       ),
                                     ),
                                     TextSpan(
@@ -141,7 +150,8 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                                         fontSize: 28 * scaleFactor,
                                         fontWeight: FontWeight.bold,
                                         height: 1.3,
-                                        color: theme.colorScheme.primary,
+                                        color: theme.colorScheme
+                                            .primary, // Keep this as primary color (blue)
                                       ),
                                     ),
                                     TextSpan(
@@ -149,8 +159,9 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                                       style: TextStyle(
                                         fontSize: 28 * scaleFactor,
                                         fontWeight: FontWeight.bold,
-                                        color:
-                                            theme.textTheme.titleLarge?.color,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : theme.textTheme.titleLarge?.color,
                                       ),
                                     ),
                                   ],
@@ -173,7 +184,9 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 14 * scaleFactor,
-                                  color: theme.textTheme.bodyMedium?.color,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : theme.textTheme.bodyMedium?.color,
                                 ),
                               ),
                               SizedBox(
@@ -204,6 +217,12 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                       );
                     },
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: isDarkMode
+                          ? Colors.white
+                          : null, // White background in dark mode
+                      foregroundColor: isDarkMode
+                          ? Colors.black
+                          : null, // Black ripple effect in dark mode
                       padding: EdgeInsets.symmetric(
                         horizontal: 40 * scaleFactor,
                         vertical: 26 * scaleFactor,
@@ -219,6 +238,9 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                       style: TextStyle(
                         fontSize: MediaQuery.of(context).size.width * 0.07,
                         fontWeight: FontWeight.bold,
+                        color: isDarkMode
+                            ? Colors.black
+                            : null, // Black text in dark mode
                       ),
                     ),
                   ),
