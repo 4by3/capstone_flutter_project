@@ -239,15 +239,6 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                   size: 80,
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  isCorrect ? 'Great Job!' : 'Not Quite',
-                  style: TextStyle(
-                    color: isCorrect ? Colors.green : Colors.redAccent,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
               ],
             ),
             content: Column(
@@ -258,7 +249,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                   isCorrect
                       ? (currentQuestionIndex == questions.length - 1
                           ? 'Congratulations on finishing!'
-                          : 'You nailed it! On to the next one?')
+                          : 'On to the next one?')
                       : 'Feedback: ${currentQuestion['feedback']}',
                   textAlign: TextAlign.center,
                   style: TextStyle(
