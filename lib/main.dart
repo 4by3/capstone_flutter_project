@@ -1121,76 +1121,101 @@ Future<void> uploadHardQuestionsToFirestore() async {
 Future<void> uploadFeaturesToFirestore() async {
   print('Starting uploadFeaturesToFirestore');
   try {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('features').get();
-    print('Features snapshot docs count: ${snapshot.docs.length}');
-    if (snapshot.docs.isNotEmpty) {
-      print('Features already exist in Firestore.');
-      return;
-    }
+    final CollectionReference featuresCollection =
+        FirebaseFirestore.instance.collection('features');
 
+    // Check if features with required indices already exist
+    final snapshot = await featuresCollection.get();
+    print('Features snapshot docs count: ${snapshot.docs.length}');
+
+    // Map existing documents by index for efficient lookup
+    final existingFeatures = <int, DocumentSnapshot>{};
+    for (var doc in snapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      if (data.containsKey('index')) {
+        existingFeatures[data['index'] as int] = doc;
+      }
+    }
+    print('Existing features with index: ${existingFeatures.keys.toList()}');
+
+    // Define features data with index
     final List<Map<String, dynamic>> featuresData = [
       {
+        'index': 0,
         'name': 'Block, Restrict, Report Usage',
         'score': 0,
         'started': 0,
         'video':
             'https://ia800802.us.archive.org/2/items/block-restrict-report-usage-2/Block%2C%20Restrict%2C%20Report%20Usage2.mp4',
         'description':
-            'Learn how to manage unwanted interactions with blocking, restricting, and reporting tools.'
+            'Learn how to manage unwanted interactions with blocking, restricting, and reporting tools.',
       },
       {
+        'index': 1,
         'name': 'Facebook Groups',
         'score': 0,
         'started': 0,
         'video':
             'https://ia800802.us.archive.org/2/items/block-restrict-report-usage-2/Facebook%20Group%20Privacy%20Settings%20%281%29.mp4',
         'description':
-            'Discover privacy controls for joining, participating in, and managing Facebook Groups.'
+            'Discover privacy controls for joining, participating in, and managing Facebook Groups.',
       },
       {
+        'index': 2,
         'name': 'Audience Setting for Posts',
         'score': 0,
         'started': 0,
         'video':
             'https://ia800802.us.archive.org/2/items/block-restrict-report-usage-2/Facebook%20Audience%20Settings%20%281%29.mp4',
         'description':
-            'Control who sees your posts with audience selection tools.'
+            'Control who sees your posts with audience selection tools.',
       },
       {
+        'index': 3,
         'name': 'Interaction on Others\' Posts',
         'score': 0,
         'started': 0,
         'video':
             'https://ia800802.us.archive.org/2/items/block-restrict-report-usage-2/Interaction.mp4',
         'description':
-            'Manage your visibility when interacting with content from other users.'
+            'Manage your visibility when interacting with content from other users.',
       },
       {
+        'index': 4,
         'name': 'Tag Review and Settings',
         'score': 0,
         'started': 0,
         'video':
             'https://ia800802.us.archive.org/2/items/block-restrict-report-usage-2/Tag_Review.mp4',
         'description':
-            'Learn how to review and control when others tag you in posts or photos.'
+            'Learn how to review and control when others tag you in posts or photos.',
       },
     ];
 
-    final CollectionReference featuresCollection =
-        FirebaseFirestore.instance.collection('features');
-
+    // Upload or update features
     for (var feature in featuresData) {
-      print('Uploading feature: ${feature['name']}');
-      await featuresCollection.add({
-        'name': feature['name'],
-        'score': feature['score'],
-        'started': feature['started'],
-        'video': feature['video'],
-        'description': feature['description'],
-      });
+      final index = feature['index'] as int;
+      print('Processing feature: ${feature['name']} (index: $index)');
+
+      if (existingFeatures.containsKey(index)) {
+        // Update existing document if necessary
+        final doc = existingFeatures[index]!;
+        final currentData = doc.data() as Map<String, dynamic>;
+        if (currentData['name'] != feature['name'] ||
+            currentData['video'] != feature['video'] ||
+            currentData['description'] != feature['description']) {
+          await doc.reference.set(feature, SetOptions(merge: true));
+          print('Updated feature with index $index');
+        } else {
+          print('Feature with index $index is up-to-date');
+        }
+      } else {
+        // Add new document with deterministic ID
+        await featuresCollection.doc('feature_$index').set(feature);
+        print('Uploaded new feature with index $index');
+      }
     }
-    print('Features uploaded successfully!');
+    print('Features uploaded/updated successfully!');
   } catch (e) {
     print('Error uploading features: $e');
   }
