@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io' show Platform;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -18,20 +20,24 @@ class PrivacyNotificationService {
   final FlutterLocalNotificationsPlugin notificationsPlugin =
       FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
+  StreamSubscription<QuerySnapshot>? _firestoreListener;
+  DateTime? _lastNotificationTime;
 
   bool get isInitialized => _isInitialized;
 
   Future<bool> canScheduleExactAlarms() async {
-    final androidPlugin = notificationsPlugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin =
+        notificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
     final canSchedule = await androidPlugin?.canScheduleExactNotifications();
     print('Can schedule exact alarms: $canSchedule');
     return canSchedule ?? false;
   }
 
   Future<void> requestExactAlarmPermission() async {
-    final androidPlugin = notificationsPlugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin =
+        notificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
     final granted = await androidPlugin?.requestExactAlarmsPermission();
     print('Exact alarm permission granted: $granted');
   }
@@ -50,7 +56,8 @@ class PrivacyNotificationService {
       print('Timezone initialized: $currentTimeZone');
 
       // Android initialization settings
-      const initSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const initSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
 
       // iOS initialization settings
       const initSettingsIOS = DarwinInitializationSettings(
@@ -66,11 +73,13 @@ class PrivacyNotificationService {
 
       // Request permissions for Android
       if (Platform.isAndroid) {
-        final androidPlugin = notificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-        
+        final androidPlugin =
+            notificationsPlugin.resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>();
+
         // Request POST_NOTIFICATIONS permission (Android 13+)
-        final notificationGranted = await androidPlugin?.requestNotificationsPermission();
+        final notificationGranted =
+            await androidPlugin?.requestNotificationsPermission();
         print('Notification permission granted: $notificationGranted');
         if (notificationGranted != true) {
           print('Notification permission denied. Notifications may not work.');
@@ -85,8 +94,9 @@ class PrivacyNotificationService {
 
       // Request iOS permissions
       if (Platform.isIOS) {
-        final iosPlugin = notificationsPlugin.resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>();
+        final iosPlugin =
+            notificationsPlugin.resolvePlatformSpecificImplementation<
+                IOSFlutterLocalNotificationsPlugin>();
         final iosGranted = await iosPlugin?.requestPermissions(
           alert: true,
           badge: true,
@@ -109,9 +119,79 @@ class PrivacyNotificationService {
       } else {
         print('Failed to initialize notifications');
       }
+
+      // Start Firestore listener if enabled
+      final prefs = await SharedPreferences.getInstance();
+      final databaseNotificationsEnabled =
+          prefs.getBool('database_notifications_enabled') ?? false;
+      if (databaseNotificationsEnabled) {
+        startFirestoreListener();
+      }
     } catch (e) {
       print('Error initializing notifications: $e');
       _isInitialized = false;
+    }
+  }
+
+  void startFirestoreListener() {
+    // Cancel any existing listener to avoid duplicates
+    _firestoreListener?.cancel();
+
+    // Listen to changes in the 'features' collection
+    // Listen to changes in the 'intro_questions' collection
+    _firestoreListener = FirebaseFirestore.instance
+        .collection('intro_questions')
+        .snapshots()
+        .listen((QuerySnapshot snapshot) {
+      for (var change in snapshot.docChanges) {
+        // Only trigger notifications for edits (modified documents)
+        if (change.type != DocumentChangeType.modified) {
+          continue;
+        }
+        final now = DateTime.now();
+        if (_lastNotificationTime != null &&
+            now.difference(_lastNotificationTime!).inSeconds < 5) {
+          print('Skipping notification: too soon');
+          continue;
+        }
+        _lastNotificationTime = now;
+        _showNotificationForFirestoreChange(
+          id: change.doc.id.hashCode,
+          title: 'Question Updated',
+          body:
+              'The question "${change.doc['question']}" was updated in Firestore.',
+          payload: 'updated_${change.doc.id}',
+        );
+      }
+    }, onError: (error) {
+      print('Error listening to Firestore changes: $error');
+    });
+    print('Started Firestore listener for intro_questions collection');
+  }
+
+  void stopFirestoreListener() {
+    _firestoreListener?.cancel();
+    _firestoreListener = null;
+    print('Stopped Firestore listener');
+  }
+
+  Future<void> _showNotificationForFirestoreChange({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    try {
+      await notificationsPlugin.show(
+        id,
+        title,
+        body,
+        notificationDetails(),
+        payload: payload,
+      );
+      print('Notification shown for Firestore change: id=$id, title=$title');
+    } catch (e) {
+      print('Error showing Firestore notification: $e');
     }
   }
 
@@ -188,7 +268,8 @@ class PrivacyNotificationService {
           ? AndroidScheduleMode.exactAllowWhileIdle
           : AndroidScheduleMode.inexact;
 
-      print('Scheduling daily reminder with mode: $scheduleMode at $scheduledDate');
+      print(
+          'Scheduling daily reminder with mode: $scheduleMode at $scheduledDate');
 
       await notificationsPlugin.zonedSchedule(
         id,
@@ -236,8 +317,8 @@ class PrivacyNotificationService {
           scheduledDate =
               tz.TZDateTime(tz.local, now.year + 1, 1, day, hour, minute);
         } else {
-          scheduledDate =
-              tz.TZDateTime(tz.local, now.year, now.month + 1, day, hour, minute);
+          scheduledDate = tz.TZDateTime(
+              tz.local, now.year, now.month + 1, day, hour, minute);
         }
       }
 
@@ -255,7 +336,8 @@ class PrivacyNotificationService {
           ? AndroidScheduleMode.exactAllowWhileIdle
           : AndroidScheduleMode.inexact;
 
-      print('Scheduling monthly reminder with mode: $scheduleMode at $scheduledDate');
+      print(
+          'Scheduling monthly reminder with mode: $scheduleMode at $scheduledDate');
 
       await notificationsPlugin.zonedSchedule(
         id,
@@ -290,7 +372,8 @@ class PrivacyNotificationService {
           ? AndroidScheduleMode.exactAllowWhileIdle
           : AndroidScheduleMode.inexact;
 
-      print('Scheduling quiz reminder with mode: $scheduleMode at $scheduledDate');
+      print(
+          'Scheduling quiz reminder with mode: $scheduleMode at $scheduledDate');
 
       await notificationsPlugin.zonedSchedule(
         100,
@@ -324,7 +407,8 @@ class PrivacyNotificationService {
       print('Current time: $now');
       print('Scheduled time: $scheduledDate');
 
-      const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      const AndroidNotificationDetails androidDetails =
+          AndroidNotificationDetails(
         'test_notification_channel',
         'Test Notifications',
         channelDescription: 'Channel for testing notifications',
@@ -386,7 +470,8 @@ class PrivacyNotificationService {
           ? AndroidScheduleMode.exactAllowWhileIdle
           : AndroidScheduleMode.inexact;
 
-      print('Scheduling feature reminder with mode: $scheduleMode at $scheduledDate');
+      print(
+          'Scheduling feature reminder with mode: $scheduleMode at $scheduledDate');
 
       await notificationsPlugin.zonedSchedule(
         id + 200,
@@ -410,6 +495,8 @@ class PrivacyNotificationService {
       await prefs.setBool('notifications_enabled', false);
       await prefs.setBool('monthly_notifications_enabled', false);
       await prefs.setBool('quiz_reminder_enabled', false);
+      await prefs.setBool('database_notifications_enabled', false);
+      stopFirestoreListener();
       print('All notifications cancelled');
     } catch (e) {
       print('Error cancelling all notifications: $e');

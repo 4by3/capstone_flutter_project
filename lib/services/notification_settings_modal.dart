@@ -4,6 +4,7 @@ import 'package:capstone_project/services/privacy_notification_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NotificationSettingsModal extends StatefulWidget {
   const NotificationSettingsModal({super.key});
@@ -17,6 +18,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
     with SingleTickerProviderStateMixin {
   bool _monthlyRemindersEnabled = false;
   bool _quizRemindersEnabled = false;
+  bool _databaseNotificationsEnabled = false;
   bool _isLoading = true;
 
   // Animation controller
@@ -73,6 +75,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
       _monthlyRemindersEnabled =
           prefs.getBool('monthly_notifications_enabled') ?? false;
       _quizRemindersEnabled = prefs.getBool('quiz_reminder_enabled') ?? false;
+      _databaseNotificationsEnabled =
+          prefs.getBool('database_notifications_enabled') ?? false;
       _reminderTime = TimeOfDay(
         hour: prefs.getInt('notification_hour') ?? 20,
         minute: prefs.getInt('notification_minute') ?? 0,
@@ -438,6 +442,21 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
     });
   }
 
+  Future<void> _testFirestoreUpdate() async {
+    setState(() => _isLoading = true);
+    try {
+      await FirebaseFirestore.instance
+          .collection('features')
+          .doc('feature_0')
+          .update({'score': FieldValue.increment(1)});
+      _showSnackBar('Firestore test update triggered', isSuccess: true);
+    } catch (e) {
+      print('Error triggering Firestore update: $e');
+      _showSnackBar('Failed to trigger Firestore update', isError: true);
+    }
+    setState(() => _isLoading = false);
+  }
+
   Future<void> _cancelAllReminders() async {
     // Show confirmation dialog
     bool confirm = await showDialog(
@@ -483,10 +502,12 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('monthly_notifications_enabled', false);
     await prefs.setBool('quiz_reminder_enabled', false);
+    await prefs.setBool('database_notifications_enabled', false);
 
     setState(() {
       _monthlyRemindersEnabled = false;
       _quizRemindersEnabled = false;
+      _databaseNotificationsEnabled = false;
     });
 
     _showSnackBar('All reminders cancelled', isSuccess: false, isError: true);
@@ -688,9 +709,16 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                 ),
                 const SizedBox(height: 20),
 
-                // Test Notification Section
+                // Database Update Notifications Section
                 _buildAnimatedCard(
                   index: 2,
+                  child: _buildDatabaseNotificationsSection(),
+                ),
+                const SizedBox(height: 20),
+
+                // Test Notification Section
+                _buildAnimatedCard(
+                  index: 3,
                   child: _buildTestNotificationSection(),
                 ),
                 const SizedBox(height: 32),
@@ -805,6 +833,24 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
               ),
             ),
           ),
+          const SizedBox(height: 12),
+          Center(
+            child: ElevatedButton.icon(
+              onPressed: _testFirestoreUpdate,
+              icon: const Icon(Icons.cloud_upload_rounded),
+              label: const Text('Test Firestore Update'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: accentBlue,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -816,7 +862,18 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
       title: 'Monthly Reminders',
       description: 'Regular check-ins for Facebook privacy settings',
       toggleValue: _monthlyRemindersEnabled,
-      onToggleChanged: (value) {
+      onToggleChanged: (value) async {
+        final notificationStatus = await Permission.notification.status;
+        if (value && !notificationStatus.isGranted) {
+          _showSnackBar(
+              'Notifications are disabled. Please enable them in settings.',
+              isError: true);
+          await AppSettings.openAppSettings(type: AppSettingsType.notification);
+          final updatedStatus = await Permission.notification.status;
+          if (!updatedStatus.isGranted) {
+            return;
+          }
+        }
         setState(() => _monthlyRemindersEnabled = value);
         if (value) {
           _scheduleMonthlyReminder();
@@ -865,7 +922,18 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
       title: 'Quiz Reminders',
       description: 'Stay updated with your privacy knowledge',
       toggleValue: _quizRemindersEnabled,
-      onToggleChanged: (value) {
+      onToggleChanged: (value) async {
+        final notificationStatus = await Permission.notification.status;
+        if (value && !notificationStatus.isGranted) {
+          _showSnackBar(
+              'Notifications are disabled. Please enable them in settings.',
+              isError: true);
+          await AppSettings.openAppSettings(type: AppSettingsType.notification);
+          final updatedStatus = await Permission.notification.status;
+          if (!updatedStatus.isGranted) {
+            return;
+          }
+        }
         setState(() => _quizRemindersEnabled = value);
         if (value) {
           _scheduleQuizReminder();
@@ -892,6 +960,44 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
             const SizedBox(height: 8),
         ],
       ),
+    );
+  }
+
+  Widget _buildDatabaseNotificationsSection() {
+    return _buildCard(
+      icon: Icons.cloud_sync_rounded,
+      title: 'Database Update Notifications',
+      description: 'Get notified when Firestore data changes',
+      toggleValue: _databaseNotificationsEnabled,
+      onToggleChanged: (value) async {
+        final notificationStatus = await Permission.notification.status;
+        if (value && !notificationStatus.isGranted) {
+          _showSnackBar(
+              'Notifications are disabled. Please enable them in settings.',
+              isError: true);
+          await AppSettings.openAppSettings(type: AppSettingsType.notification);
+          final updatedStatus = await Permission.notification.status;
+          if (!updatedStatus.isGranted) {
+            return;
+          }
+        }
+        setState(() => _databaseNotificationsEnabled = value);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('database_notifications_enabled', value);
+        if (value) {
+          PrivacyNotificationService().startFirestoreListener();
+        } else {
+          PrivacyNotificationService().stopFirestoreListener();
+        }
+        _showSnackBar(
+          value
+              ? 'Firestore notifications enabled'
+              : 'Firestore notifications disabled',
+          isSuccess: value,
+          isError: !value,
+        );
+      },
+      child: const SizedBox(height: 8),
     );
   }
 
