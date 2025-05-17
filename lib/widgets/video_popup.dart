@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Added for ThemeProvider
 import 'package:video_player/video_player.dart';
+import 'package:capstone_project/main.dart'; // Import ThemeProvider
 
 class VideoPopup extends StatefulWidget {
   final String videoUrl;
@@ -36,15 +38,28 @@ class _VideoPopupState extends State<VideoPopup> {
 
   @override
   Widget build(BuildContext context) {
-    const customColor = Color.fromARGB(255, 24, 53, 98);
+    // Access ThemeProvider to determine if dark mode is enabled
+    final isDarkMode = Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+    // Define colors based on theme
+    final backgroundColor = isDarkMode ? Colors.grey[900]! : Colors.white;
+    final textColor = isDarkMode ? Colors.white : const Color.fromARGB(255, 24, 53, 98);
+    final accentColor = isDarkMode ? Colors.grey[800]! : const Color.fromARGB(255, 24, 53, 98);
+    final inactiveColor = isDarkMode ? Colors.grey[600]! : const Color.fromARGB(255, 24, 53, 98).withOpacity(0.3);
 
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.08),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -53,7 +68,11 @@ class _VideoPopupState extends State<VideoPopup> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.close, size: 30),
+                  icon: Icon(
+                    Icons.close,
+                    size: 30,
+                    color: isDarkMode ? Colors.white : textColor,
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -102,10 +121,10 @@ class _VideoPopupState extends State<VideoPopup> {
                         children: [
                           IconButton(
                             icon: Icon(
-                                _isPlaying ? Icons.pause : Icons.play_arrow,
-                                size: 30,
-                                color: customColor
-                                ),
+                              _isPlaying ? Icons.pause : Icons.play_arrow,
+                              size: 30,
+                              color: textColor,
+                            ),
                             onPressed: () {
                               setState(() {
                                 _isPlaying = !_controller.value.isPlaying;
@@ -118,34 +137,31 @@ class _VideoPopupState extends State<VideoPopup> {
                           Text(
                             "${_controller.value.position.inMinutes}:${(_controller.value.position.inSeconds % 60).toString().padLeft(2, '0')} / "
                             "${_controller.value.duration.inMinutes}:${(_controller.value.duration.inSeconds % 60).toString().padLeft(2, '0')}",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
-                              color: customColor,
-                              ),
+                              color: textColor,
+                            ),
                           ),
                           Expanded(
                             child: Slider(
                               min: 0,
-                              max: _controller.value.duration.inSeconds
-                                  .toDouble(),
-                              value: _controller.value.position.inSeconds
-                                  .toDouble(),
+                              max: _controller.value.duration.inSeconds.toDouble(),
+                              value: _controller.value.position.inSeconds.toDouble(),
                               onChanged: (value) {
                                 setState(() {
-                                  _controller
-                                      .seekTo(Duration(seconds: value.toInt()));
+                                  _controller.seekTo(Duration(seconds: value.toInt()));
                                 });
                               },
-                              activeColor: customColor,
-                              inactiveColor: customColor.withOpacity(0.3),
+                              activeColor: accentColor,
+                              inactiveColor: inactiveColor,
                             ),
                           ),
                         ],
                       ),
                     ],
                   )
-                : const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(customColor),
+                : CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(accentColor),
                   ),
             const SizedBox(height: 20),
           ],
