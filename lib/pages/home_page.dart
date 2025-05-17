@@ -5,10 +5,12 @@ import 'package:capstone_project/services/privacy_notification_service.dart';
 import 'package:capstone_project/services/notification_settings_modal.dart';
 import 'package:confetti/confetti.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import '../widgets/video_popup.dart';
 import 'feature_quiz_page.dart';
 import 'intro_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:capstone_project/main.dart';
 
 class HomePage extends StatefulWidget {
   final Map<String, int>? initialFeatureScores;
@@ -26,6 +28,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = true;
   bool _isOffline = false;
+  List<bool> _isCardHovered = []; // For card hover states
+  List<bool> _isVideoHovered = []; // For video section hover states
+  bool _isResetButtonHovered = false; // For FAB hover state
+  bool _isNavigating = false;
 
   // Define consistent colors
   final Color primaryBlue = const Color.fromARGB(255, 24, 53, 98);
@@ -119,6 +125,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
     String currentMode = prefs.getString('quizMode') ?? 'easy';
 
+
     if (widget.initialFeatureScores != null) {
       for (var feature in features) {
         String featureName = feature['name'];
@@ -176,15 +183,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ));
     }
 
-    if (mounted) {
-      setState(() {
-        _sortFeatures();
-        if (features.every((f) => f['score'] == 5)) {
-          _confettiController.play();
-        }
-        _isLoading = false;
-      });
-    }
+    setState(() {
+      _sortFeatures();
+      _isCardHovered = List.generate(features.length, (_) => false);
+      _isVideoHovered = List.generate(features.length, (_) => false);
+      if (features.every((f) => f['score'] == 5)) {
+        _confettiController.play();
+      }
+      _isLoading = false;
+    });
   }
 
   Future<void> _saveFeatureScores() async {
@@ -217,9 +224,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _goToFeatureQuiz(int index) async {
+  if (_isNavigating) {
+    print('goToFeatureQuiz: Already navigating, ignoring');
+    return;
+  }
+  _isNavigating = true;
+
+  try {
     _scaleControllers[index]
         .forward()
         .then((_) => _scaleControllers[index].reverse());
+
+    // Log navigation stack before pushing
+    print('goToFeatureQuiz: Before pushing FeatureQuizPage');
+    print('  Can pop: ${Navigator.of(context).canPop()}');
+    final currentRoute = ModalRoute.of(context);
+    print('  Current route: ${currentRoute?.settings.name ?? 'unnamed'} (isPage: ${currentRoute is PageRoute})');
+    int routeCount = 0;
+    Navigator.of(context).popUntil((route) {
+      print('  Route $routeCount: ${route.settings.name ?? 'unnamed'} (isCurrent: ${route.isCurrent})');
+      routeCount++;
+      return true;
+    });
+    print('  Total routes in stack: $routeCount');
 
     final prefs = await SharedPreferences.getInstance();
     String mode = prefs.getString('quizMode') ?? 'easy';
@@ -243,6 +270,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
     );
 
+    // Log stack after pop
+    print('goToFeatureQuiz: After FeatureQuizPage popped');
+    print('  Can pop: ${Navigator.of(context).canPop()}');
+    print('  Current route: ${currentRoute?.settings.name ?? 'unnamed'} (isPage: ${currentRoute is PageRoute})');
+    routeCount = 0;
+    Navigator.of(context).popUntil((route) {
+      print('  Route $routeCount: ${route.settings.name ?? 'unnamed'} (isCurrent: ${route.isCurrent})');
+      routeCount++;
+      return true;
+    });
+    print('  Total routes in stack: $routeCount');
+
     if (score != null) {
       _updateFeatureScore(index, score);
 
@@ -250,143 +289,158 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         await prefs.setString('quizMode', 'hard');
 
         if (mounted) {
-          await showDialog(
-            context: context,
-            builder: (_) => Dialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: accentRed,
-                        shape: BoxShape.circle,
+          Future.microtask(() async {
+            await showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (_) => Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                        ? Colors.grey[900]
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(
+                            Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark ? 0.2 : 0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                      child: const Icon(
-                        Icons.shield_outlined,
-                        size: 40,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.red[100],
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        "HARD MODE",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
                           color: accentRed,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.shield_outlined,
+                          size: 40,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      "Hard Mode Unlocked!",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: primaryBlue,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      "Congratulations! You've completed all Easy quizzes with perfect scores. Challenge yourself with more advanced privacy questions.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: primaryLightBlue,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.red[50],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            Icons.star,
-                            color: accentRed,
-                            size: 20,
-                          ),
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.red[100],
+                          borderRadius: BorderRadius.circular(30),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            "Hard mode features more in-depth privacy scenarios and advanced options.",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: primaryLightBlue,
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryBlue,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 4,
-                        ),
-                        child: const Text(
-                          "Let's Go!",
+                        child: Text(
+                          "HARD MODE",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: accentRed,
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+                      Text(
+                        "Hard Mode Unlocked!",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                              ? Colors.white
+                              : primaryBlue,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Congratulations! You've completed all Easy quizzes with perfect scores. Challenge yourself with more advanced privacy questions.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                            ? Colors.white
+                            : primaryLightBlue,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.red[50],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.star,
+                              color: accentRed,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              "Hard mode features more in-depth privacy scenarios and advanced options.",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                                  ? Colors.white
+                                  : primaryLightBlue,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                                ? Colors.grey[900]
+                                : primaryBlue,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 4,
+                          ),
+                          child: const Text(
+                            "Let's Go!",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
+            );
 
-          if (mounted) {
-            await _loadFeatureScores();
-          }
+            if (mounted) {
+              await _loadFeatureScores();
+            }
+          });
         }
       }
     }
+  } finally {
+    _isNavigating = false;
   }
+}
 
   void _showNotificationSettings() {
     showModalBottomSheet(
@@ -408,23 +462,43 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Future<void> _resetQuiz() async {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Reset Progress?',
-            style: TextStyle(color: primaryBlue, fontWeight: FontWeight.bold)),
-        content: const Text(
-            'Are you sure you want to reset all your progress? This action cannot be undone.'),
+        backgroundColor:
+            isDarkMode ? Colors.grey[900] : Colors.white.withOpacity(0.95),
+        title: Text(
+          'Reset Progress?',
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : primaryBlue,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to reset all your progress? This action cannot be undone.',
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel',
-                style: TextStyle(color: Colors.blueAccent)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.blueAccent),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Reset', style: TextStyle(color: accentRed)),
+            child: Text(
+              'Reset',
+              style: TextStyle(color: accentRed),
+            ),
           ),
         ],
       ),
@@ -443,6 +517,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildProgressStat(
       String label, String value, IconData icon, Color color) {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 500),
       transitionBuilder: (child, animation) => ScaleTransition(
@@ -466,7 +542,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             label,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[600],
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -484,13 +560,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Color _getCardBackgroundColor(int score, bool started) {
+  Color _getCardBackgroundColor(int score, int started, bool isDarkMode) {
+    bool hasStarted = started == 1;
     if (score == 5) {
-      return Colors.green.withOpacity(0.05);
-    } else if (started) {
-      return Colors.orange.withOpacity(0.05);
+      return isDarkMode
+          ? Colors.green.withOpacity(0.1)
+          : Colors.green.withOpacity(0.05);
+    } else if (hasStarted) {
+      return isDarkMode
+          ? Colors.orange.withOpacity(0.1)
+          : Colors.orange.withOpacity(0.05);
     } else {
-      return Colors.white;
+      return isDarkMode ? Colors.grey[900]! : Colors.white;
     }
   }
 
@@ -518,6 +599,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+
     if (_isLoading) {
       return Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -545,17 +627,40 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       );
     }
 
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
+
     return Scaffold(
-      body: Stack(
-        children: [
+      appBar: AppBar(
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        foregroundColor: isDarkMode ? Colors.white : primaryBlue,
+        actions: [
+          IconButton(
+            icon: Icon(
+              isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: isDarkMode ? Colors.white : primaryBlue,
+            ),
+            onPressed: () {
+              Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+            },
+            tooltip: 'Toggle Theme',
+          ),
+        ],
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
                 Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [backgroundBlue, Colors.blue[100]!],
-                    ),
-                  ),
+                  decoration: isDarkMode
+                      ? const BoxDecoration(color: Colors.black)
+                      : BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [backgroundBlue, Colors.blue[100]!],
+                          ),
+                        ),
                   child: SafeArea(
                     child: CustomScrollView(
                       controller: _scrollController,
@@ -570,13 +675,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   style: GoogleFonts.montserrat(
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
-                                    color: primaryBlue,
+                                    color:
+                                        isDarkMode ? Colors.white : primaryBlue,
                                     letterSpacing: 1.2,
                                     shadows: [
-                                      const Shadow(
-                                        offset: Offset(1, 1),
+                                      Shadow(
+                                        offset: const Offset(1, 1),
                                         blurRadius: 2.0,
-                                        color: Colors.black26,
+                                        color: Colors.black.withOpacity(
+                                            isDarkMode ? 0.5 : 0.26),
                                       ),
                                     ],
                                   ),
@@ -596,11 +703,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   const EdgeInsets.symmetric(horizontal: 20),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: isDarkMode
+                                      ? Colors.grey[900]
+                                      : Colors.white,
                                   borderRadius: BorderRadius.circular(20),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: primaryBlue.withOpacity(0.2),
+                                      color: isDarkMode
+                                          ? Colors.black.withOpacity(0.2)
+                                          : primaryBlue.withOpacity(0.2),
                                       blurRadius: 15,
                                       offset: const Offset(0, 5),
                                       spreadRadius: 2,
@@ -615,7 +726,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       style: TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.bold,
-                                        color: primaryBlue,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : primaryBlue,
                                       ),
                                     ),
                                     const SizedBox(height: 24),
@@ -636,7 +749,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           'In Progress',
                                           features
                                               .where((f) =>
-                                                  f['started'] == 1 &&
+                                                  (f['started'] as int) == 1 &&
                                                   f['score'] < 5)
                                               .length
                                               .toString(),
@@ -646,7 +759,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         _buildProgressStat(
                                           'Not Started',
                                           features
-                                              .where((f) => f['started'] == 0)
+                                              .where((f) =>
+                                                  (f['started'] as int) == 0)
                                               .length
                                               .toString(),
                                           Icons.schedule,
@@ -674,8 +788,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     bool isCompleted =
                                         features[index]['score'] == 5;
                                     bool hasStarted =
-                                        features[index]['started'] == 1;
-                                    Color statusColor = Colors.grey;
+                                        (features[index]['started'] as int) ==
+                                            1;
+                                    Color statusColor = isDarkMode
+                                        ? Colors.grey[400]!
+                                        : Colors.grey;
                                     if (hasStarted) {
                                       statusColor = isCompleted
                                           ? Colors.green
@@ -690,42 +807,59 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           Tween(begin: 1.0, end: 0.95),
                                         ),
                                         child: GestureDetector(
+                                          onTapDown: (_) {
+                                            setState(() {
+                                              _isCardHovered[index] = true;
+                                            });
+                                          },
+                                          onTapCancel: () {
+                                            setState(() {
+                                              _isCardHovered[index] = false;
+                                            });
+                                          },
+                                          onTapUp: (_) {
+                                            setState(() {
+                                              _isCardHovered[index] = false;
+                                            });
+                                            _goToFeatureQuiz(index);
+                                          },
                                           onTap: () => _goToFeatureQuiz(index),
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              color: _getCardBackgroundColor(
-                                                  features[index]['score'],
-                                                  features[index]['started'] ==
-                                                      1),
-                                              gradient: LinearGradient(
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                                colors: [
-                                                  _getCardBackgroundColor(
+                                              color: _isCardHovered[index]
+                                                  ? (isDarkMode
+                                                      ? Colors.grey[850]
+                                                      : primaryBlue
+                                                          .withOpacity(0.05))
+                                                  : _getCardBackgroundColor(
                                                       features[index]['score'],
-                                                      features[index]
-                                                              ['started'] ==
-                                                          1),
-                                                  _getCardBackgroundColor(
-                                                          features[index]
-                                                              ['score'],
-                                                          features[index]
-                                                                  ['started'] ==
-                                                              1)
-                                                      .withOpacity(0.7),
-                                                ],
-                                              ),
+                                                      features[index]['started']
+                                                          as int,
+                                                      isDarkMode,
+                                                    ),
                                               borderRadius:
                                                   BorderRadius.circular(16),
-                                              border: Border.all(
-                                                width: 2,
-                                                color: statusColor
-                                                    .withOpacity(0.5),
-                                              ),
+                                              border: isDarkMode
+                                                  ? Border.all(
+                                                      color: _isCardHovered[
+                                                              index]
+                                                          ? Colors.white
+                                                              .withOpacity(0.7)
+                                                          : Colors.white
+                                                              .withOpacity(0.3),
+                                                      width: 1.5,
+                                                    )
+                                                  : Border.all(
+                                                      width: 2,
+                                                      color: statusColor
+                                                          .withOpacity(0.5),
+                                                    ),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: statusColor
-                                                      .withOpacity(0.1),
+                                                  color: Colors.black
+                                                      .withOpacity(isDarkMode
+                                                          ? 0.2
+                                                          : 0.1),
                                                   blurRadius: 12,
                                                   offset: const Offset(0, 4),
                                                 ),
@@ -782,8 +916,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w600,
-                                                                color:
-                                                                    primaryBlue,
+                                                                color: isDarkMode
+                                                                    ? Colors
+                                                                        .white
+                                                                    : primaryBlue,
                                                               ),
                                                             ),
                                                             if (features[index]
@@ -804,21 +940,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                                           4),
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: Colors
-                                                                        .blue
-                                                                        .withOpacity(
-                                                                            0.12),
+                                                                    color: isDarkMode
+                                                                        ? Colors
+                                                                            .blue
+                                                                            .withOpacity(
+                                                                                0.3)
+                                                                        : Colors
+                                                                            .blue
+                                                                            .withOpacity(0.12),
                                                                     borderRadius:
                                                                         BorderRadius.circular(
                                                                             12),
                                                                   ),
-                                                                  child:
-                                                                      const Text(
+                                                                  child: Text(
                                                                     "Recommended",
                                                                     style:
                                                                         TextStyle(
-                                                                      color: Colors
-                                                                          .blueAccent,
+                                                                      color: isDarkMode
+                                                                          ? Colors.blueAccent[
+                                                                              100]
+                                                                          : Colors
+                                                                              .blueAccent,
                                                                       fontSize:
                                                                           13,
                                                                       fontWeight:
@@ -844,7 +986,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                     style: TextStyle(
                                                       fontSize: 14,
                                                       height: 1.4,
-                                                      color: Colors.grey[700],
+                                                      color: isDarkMode
+                                                          ? Colors.grey[400]
+                                                          : Colors.grey[700],
                                                     ),
                                                   ),
                                                 ),
@@ -896,7 +1040,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                                   ['score'] /
                                                               5,
                                                           backgroundColor:
-                                                              Colors.grey[200],
+                                                              isDarkMode
+                                                                  ? Colors
+                                                                      .grey[800]
+                                                                  : Colors.grey[
+                                                                      200],
                                                           valueColor:
                                                               AlwaysStoppedAnimation(
                                                                   statusColor),
@@ -908,30 +1056,47 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                       ],
                                                     ),
                                                   ),
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    color: backgroundBlue
-                                                        .withOpacity(0.5),
-                                                    borderRadius:
-                                                        const BorderRadius.only(
-                                                      bottomLeft:
-                                                          Radius.circular(16),
-                                                      bottomRight:
-                                                          Radius.circular(16),
-                                                    ),
-                                                  ),
-                                                  child: InkWell(
-                                                    onTap: () =>
-                                                        _showVideoPopup(
-                                                            context,
-                                                            features[index]
-                                                                ['video']),
-                                                    borderRadius:
-                                                        BorderRadius.only(
-                                                      bottomLeft:
-                                                          Radius.circular(16),
-                                                      bottomRight:
-                                                          Radius.circular(16),
+                                                GestureDetector(
+                                                  onTapDown: (_) {
+                                                    setState(() {
+                                                      _isVideoHovered[index] =
+                                                          true;
+                                                    });
+                                                  },
+                                                  onTapCancel: () {
+                                                    setState(() {
+                                                      _isVideoHovered[index] =
+                                                          false;
+                                                    });
+                                                  },
+                                                  onTapUp: (_) {
+                                                    setState(() {
+                                                      _isVideoHovered[index] =
+                                                          false;
+                                                    });
+                                                    _showVideoPopup(
+                                                        context,
+                                                        features[index]
+                                                            ['video']);
+                                                  },
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: isDarkMode
+                                                          ? (_isVideoHovered[
+                                                                  index]
+                                                              ? Colors.grey[850]
+                                                              : Colors
+                                                                  .grey[900])
+                                                          : backgroundBlue
+                                                              .withOpacity(0.5),
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .only(
+                                                        bottomLeft:
+                                                            Radius.circular(16),
+                                                        bottomRight:
+                                                            Radius.circular(16),
+                                                      ),
                                                     ),
                                                     child: Container(
                                                       padding: const EdgeInsets
@@ -945,16 +1110,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                             height: 50,
                                                             decoration:
                                                                 BoxDecoration(
-                                                              color: Colors
-                                                                  .black
-                                                                  .withOpacity(
-                                                                      0.1),
+                                                              color: isDarkMode
+                                                                  ? Colors.white
+                                                                      .withOpacity(
+                                                                          0.1)
+                                                                  : Colors.black
+                                                                      .withOpacity(
+                                                                          0.1),
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
                                                                           8),
                                                             ),
-                                                            child: const Center(
+                                                            child: Center(
                                                               child: Icon(
                                                                 Icons
                                                                     .play_circle_fill,
@@ -981,8 +1149,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w600,
-                                                                    color:
-                                                                        primaryBlue,
+                                                                    color: isDarkMode
+                                                                        ? Colors
+                                                                            .white
+                                                                        : primaryBlue,
                                                                   ),
                                                                 ),
                                                                 Text(
@@ -991,8 +1161,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                                       TextStyle(
                                                                     fontSize:
                                                                         13,
-                                                                    color:
-                                                                        primaryLightBlue,
+                                                                    color: isDarkMode
+                                                                        ? Colors
+                                                                            .grey[400]
+                                                                        : primaryLightBlue,
                                                                   ),
                                                                 ),
                                                               ],
@@ -1000,7 +1172,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                           ),
                                                           Icon(
                                                             Icons.chevron_right,
-                                                            color: primaryBlue,
+                                                            color: isDarkMode
+                                                                ? Colors.white
+                                                                : primaryBlue,
                                                             size: 24,
                                                           ),
                                                         ],
@@ -1048,11 +1222,56 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Positioned(
                   bottom: 20,
                   right: 20,
-                  child: FloatingActionButton(
-                    onPressed: _resetQuiz,
-                    backgroundColor: primaryBlue,
-                    child: const Icon(Icons.refresh, color: Colors.white),
-                    tooltip: 'Reset Progress',
+                  child: GestureDetector(
+                    onTapDown: (_) {
+                      setState(() {
+                        _isResetButtonHovered = true;
+                      });
+                    },
+                    onTapCancel: () {
+                      setState(() {
+                        _isResetButtonHovered = false;
+                      });
+                    },
+                    onTapUp: (_) {
+                      setState(() {
+                        _isResetButtonHovered = false;
+                      });
+                      _resetQuiz();
+                    },
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: isDarkMode
+                            ? (_isResetButtonHovered
+                                ? Colors.grey[850]
+                                : Colors.grey[900])
+                            : primaryBlue,
+                        border: isDarkMode
+                            ? Border.all(
+                                color: _isResetButtonHovered
+                                    ? Colors.white.withOpacity(0.7)
+                                    : Colors.white.withOpacity(0.3),
+                                width: 1.5,
+                              )
+                            : null,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black
+                                .withOpacity(isDarkMode ? 0.2 : 0.1),
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.refresh,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
                   ),
                 ),
                 Positioned(
