@@ -840,16 +840,16 @@ Future<void> uploadHardQuestionsToFirestore() async {
             'scenarioNumber': null,
             'scenario': '',
             'question':
-                'You change a post’s audience from Public to Friends. Who can no longer see it? ',
+                'You switch a post’s visibility from Public to Only Friends. Who loses access to it?',
             'options': [
-              'A) Everyone',
-              'B) Your boss',
-              'C) Non-friends',
-              'D) Tagged friends'
+              'A) All users',
+              'B) Your followers',
+              'C) People not on your friends list',
+              'D) Mutual friends'
             ],
-            'answer': 'C) Non-friends',
+            'answer': 'C) People not on your friends list',
             'feedback':
-                'Changing from Public to Friends removes the post from public view instantly.'
+                'Switching a post’s visibility from Public to Only Friends restricts access to only your approved friends, blocking everyone else immediately.'
           },
           {
             'featureIndex': 2,
@@ -945,7 +945,7 @@ Future<void> uploadHardQuestionsToFirestore() async {
             'scenarioNumber': null,
             'scenario': '',
             'question':
-                'A user comments on a "Friends Only post". The post is now made Public. Who can see the comment?',
+                'A user comments on a "Friends Only". The post is now made Public. Who can see the comment?',
             'options': [
               'A) Everyone',
               'B) No one',
