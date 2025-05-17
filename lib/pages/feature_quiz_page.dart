@@ -473,11 +473,11 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
               onPressed: () async {
-                await _saveProgress(); 
+                await _saveProgress();
                 await AudioService.stopBackgroundMusic().catchError((e) {
                   print('Failed to stop background music on pop: $e');
                 });
-                Navigator.pop(context); 
+                Navigator.pop(context);
                 Navigator.pop(context, score);
               },
             ),
@@ -856,7 +856,16 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                               Expanded(
                                 child: OutlinedButton(
                                   onPressed: currentQuestionIndex == 0
-                                      ? () => Navigator.pop(context, score)
+                                      ? () async {
+                                          try {
+                                            await AudioService
+                                                .stopBackgroundMusic();
+                                          } catch (e) {
+                                            print(
+                                                'Failed to stop background music on pop: $e');
+                                          }
+                                          Navigator.pop(context, score);
+                                        }
                                       : () {
                                           setState(() {
                                             currentQuestionIndex--;
