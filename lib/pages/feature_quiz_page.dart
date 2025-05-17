@@ -913,7 +913,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                   Text(
                                                     'Q${currentQuestionIndex + 1}',
                                                     style: TextStyle(
-                                                      fontSize: 32,
+                                                      fontSize: 30,
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: isDarkMode
@@ -921,11 +921,11 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                           : textColor,
                                                     ),
                                                   ),
-                                                  const SizedBox(height: 16),
+                                                  const SizedBox(height: 9),
                                                   AutoSizeText(
                                                     question['question'],
                                                     style: TextStyle(
-                                                      fontSize: 32,
+                                                      fontSize: 30,
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       height: 1.4,
@@ -940,6 +940,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                         TextOverflow.ellipsis,
                                                     textAlign: TextAlign.left,
                                                     wrapWords: true,
+
                                                   ),
                                                 ],
                                               ),
@@ -951,7 +952,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                   ),
                                   ConstrainedBox(
                                     constraints: const BoxConstraints(
-                                      maxHeight: 370,
+                                      maxHeight: 340,
                                     ),
                                     child: ListView.builder(
                                       shrinkWrap: true,
@@ -1023,7 +1024,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                                 clickAnimationIndex]
                                                             .value,
                                                     child: Container(
-                                                      height: 77,
+                                                      height: 70,
                                                       padding: const EdgeInsets
                                                           .symmetric(
                                                           horizontal: 20,
