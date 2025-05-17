@@ -148,8 +148,10 @@ class _IntroQuizPageState extends State<IntroQuizPage>
         currentQuestionIndex++;
         _startAnimations();
       });
+      
     } else {
       _submitQuiz();
+      
     }
   }
 
@@ -159,6 +161,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
         currentQuestionIndex--;
         _startAnimations();
       });
+      
     }
   }
 
@@ -277,7 +280,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                         color: textColor,
                                       ),
                                       maxLines: 5,
-                                      minFontSize: 16,
+                                      minFontSize: 14,
                                       stepGranularity: 1,
                                       overflow: TextOverflow.ellipsis,
                                       textAlign: TextAlign.left,
@@ -422,27 +425,37 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                       ),
                     ),
                     const SizedBox(width: 16),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.45,
+                      SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.45, 
                       child: ElevatedButton(
                         onPressed: selectedAnswers[currentQuestionIndex] != null
                             ? _nextQuestion
                             : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: textColor,
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.disabled)) {
+                                return textColor.withOpacity(0.5); 
+                              }
+                              return textColor; 
+                            },
                           ),
-                          elevation: 5,
+                          overlayColor: MaterialStateProperty.all(Colors.transparent), 
+                          padding: MaterialStateProperty.all(
+                            const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          elevation: MaterialStateProperty.all(5),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              currentQuestionIndex == totalQuestions - 1
-                                  ? 'Submit'
-                                  : 'Next',
+                              currentQuestionIndex == totalQuestions - 1 ? 'Submit' : 'Next',
                               style: const TextStyle(
                                 fontSize: 18,
                                 color: Colors.white,
@@ -452,13 +465,13 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                             if (currentQuestionIndex != totalQuestions - 1)
                               const Padding(
                                 padding: EdgeInsets.only(left: 8),
-                                child: Icon(Icons.arrow_forward,
-                                    color: Colors.white),
+                                child: Icon(Icons.arrow_forward, color: Colors.white),
                               ),
                           ],
                         ),
                       ),
                     ),
+
                   ],
                 ),
               ),

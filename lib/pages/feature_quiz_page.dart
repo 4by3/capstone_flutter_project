@@ -553,11 +553,11 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                               color: textColor,
                                             ),
                                           ),
-                                          const SizedBox(height: 16),
+                                          const SizedBox(height: 9),
                                           AutoSizeText(
                                             question['question'],
                                             style: TextStyle(
-                                              fontSize: 32,
+                                              fontSize: 30,
                                               fontWeight: FontWeight.w600,
                                               height: 1.4,
                                               color: textColor,
@@ -580,7 +580,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                           // Answers
                           ConstrainedBox(
                             constraints: const BoxConstraints(
-                              maxHeight: 370,
+                              maxHeight: 340,
                             ),
                             child: ListView.builder(
                               shrinkWrap: true,
@@ -632,7 +632,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                         clickAnimationIndex]
                                                     .value,
                                             child: Container(
-                                              height: 77, // For two lines
+                                              height: 70, // For two lines
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 20,
