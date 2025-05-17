@@ -1,3 +1,4 @@
+import 'package:capstone_project/services/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import '../data/features_data.dart' as featuresDataFile;
@@ -169,6 +170,15 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
       _startAnimations();
     });
     //_startAnimations();
+
+    // Start background music
+    AudioService.startBackgroundMusic().catchError((e) {
+      print('Failed to start background music: $e');
+    });
+
+    _loadSavedProgress().then((_) {
+      _startAnimations();
+    });
   }
 
   @override
@@ -249,6 +259,9 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
 
   Future<bool> _onWillPop() async {
     await _saveProgress();
+    await AudioService.stopBackgroundMusic().catchError((e) {
+      print('Failed to stop background music on pop: $e');
+    });
     Navigator.pop(context, score);
     return true;
   }
@@ -278,15 +291,19 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
         previouslyCorrect[currentQuestionIndex] == true;
 
     if (isCorrect) {
+      AudioService.playCorrect();
       if (!wasPreviouslyCorrect) {
         setState(() => score++);
         _confettiController.play();
       }
       previouslyCorrect[currentQuestionIndex] = true;
-      _saveProgress(); // ✅ Save after correct answer
-    } else if (wasPreviouslyCorrect) {
-      setState(() => score--);
-      previouslyCorrect[currentQuestionIndex] = false;
+      _saveProgress();
+    } else {
+      AudioService.playWrong();
+      if (wasPreviouslyCorrect) {
+        setState(() => score--);
+        previouslyCorrect[currentQuestionIndex] = false;
+      }
     }
 
     showDialog(
@@ -456,9 +473,12 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
               onPressed: () async {
-                await _saveProgress(); // ✅ Save latest progress
-                Navigator.pop(context); // Close dialog
-                Navigator.pop(context, score); // Go back to Home
+                await _saveProgress(); 
+                await AudioService.stopBackgroundMusic().catchError((e) {
+                  print('Failed to stop background music on pop: $e');
+                });
+                Navigator.pop(context); 
+                Navigator.pop(context, score);
               },
             ),
           ),
