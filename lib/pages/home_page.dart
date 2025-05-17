@@ -672,8 +672,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               children: [
                                 Text(
                                   'Your Privacy Journey',
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 32,
+                                  style: TextStyle(
+                                    fontSize: 29,
                                     fontWeight: FontWeight.bold,
                                     color:
                                         isDarkMode ? Colors.white : primaryBlue,
@@ -681,7 +681,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     shadows: [
                                       Shadow(
                                         offset: const Offset(1, 1),
-                                        blurRadius: 2.0,
+                                        blurRadius: 1.0,
                                         color: Colors.black.withOpacity(
                                             isDarkMode ? 0.5 : 0.26),
                                       ),
