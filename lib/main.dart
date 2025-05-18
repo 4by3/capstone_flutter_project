@@ -7,6 +7,9 @@ import 'package:capstone_project/services/privacy_notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'firebase_options.dart';
 
 // ThemeProvider class to manage theme state
@@ -38,20 +41,9 @@ class ThemeProvider extends ChangeNotifier {
   }
 }
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize notifications
-  await PrivacyNotificationService().initNotifications();
-
-  // Optionally, schedule a daily reminder for privacy settings
-  await PrivacyNotificationService().scheduleDailyReminder(
-    id: 1,
-    title: 'Reminder to Update Privacy Settings',
-    body: 'Don\'t forget to check and update your privacy settings on Facebook.',
-    hour: 9, // Example: 9 AM reminder
-    minute: 0,
-  );
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -59,11 +51,27 @@ void main() async {
   );
   print('Firebase initialized successfully');
 
+  // Initialize FCM and local notifications
+  await initFCM();
+
+  // Initialize notifications (from your PrivacyNotificationService)
+  await PrivacyNotificationService().initNotifications();
+
+  // Schedule daily reminder
+  await PrivacyNotificationService().scheduleDailyReminder(
+    id: 1,
+    title: 'Reminder to Update Privacy Settings',
+    body: 'Don\'t forget to check and update your privacy settings on Facebook.',
+    hour: 9,
+    minute: 0,
+  );
+
   // Upload questions and features to Firestore
   await uploadQuestionsToFirestore();
   await uploadEasyQuestionsToFirestore();
   await uploadHardQuestionsToFirestore();
   await uploadFeaturesToFirestore();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(
     ChangeNotifierProvider(
@@ -1220,6 +1228,130 @@ Future<void> uploadFeaturesToFirestore() async {
     print('Error uploading features: $e');
   }
 }
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("Handling a background message: ${message.messageId}");
+}
+
+
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+Future<void> initFCM() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  // Request permission for notifications (iOS)
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  // Get the FCM token
+  String? token = await messaging.getToken();
+  print("FCM Token: $token");
+
+  // Get the current user's ID from Firebase Authentication
+  User? user = FirebaseAuth.instance.currentUser;
+
+  if (token != null && user != null) {
+    // Reference to the user's document in the 'users' collection
+    DocumentReference userDocRef =
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+    // Check if the user's document exists
+    DocumentSnapshot userDoc = await userDocRef.get();
+
+    if (!userDoc.exists) {
+      // Create the document if it doesn't exist
+      await userDocRef.set({
+        'fcmToken': token,
+        'createdAt': FieldValue.serverTimestamp(), // Optional: Track creation time
+        'uid': user.uid, // Optional: Store UID for reference
+        // Add other initial fields as needed, e.g., 'email': user.email
+      });
+      print("Created new user document for: ${user.uid}");
+    } else {
+      // Update the existing document with the FCM token
+      await userDocRef.set(
+        {'fcmToken': token},
+        SetOptions(merge: true), // Use merge to avoid overwriting other fields
+      );
+      print("Updated FCM token for user: ${user.uid}");
+    }
+  } else {
+    print("No user logged in or no FCM token available");
+  }
+
+  // Initialize local notifications
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const DarwinInitializationSettings initializationSettingsIOS =
+      DarwinInitializationSettings();
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsIOS,
+  );
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) {
+      print('Notification tapped: ${response.payload}');
+    },
+  );
+
+  // Handle foreground messages
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Received foreground message: ${message.messageId}');
+    if (message.notification != null) {
+      _showNotification(
+        message.notification!.title ?? 'No Title',
+        message.notification!.body ?? 'No Body',
+        message.data['featureIndex'] ?? '',
+      );
+    }
+  });
+
+  // Handle token refresh
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set(
+            {'fcmToken': newToken},
+            SetOptions(merge: true),
+          );
+      print("Updated FCM token on refresh for user: ${user.uid}");
+    }
+  });
+}
+
+// Show a local notification
+Future<void> _showNotification(String title, String body, String payload) async {
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+    'feature_channel',
+    'Feature Updates',
+    importance: Importance.max,
+    priority: Priority.high,
+  );
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+  await flutterLocalNotificationsPlugin.show(
+    0,
+    title,
+    body,
+    platformChannelSpecifics,
+    payload: payload,
+  );
+}
+
+
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
