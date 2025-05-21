@@ -4,6 +4,8 @@ import 'package:capstone_project/services/privacy_notification_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:provider/provider.dart';
+import 'package:capstone_project/main.dart'; // Import for ThemeProvider
 
 class NotificationSettingsModal extends StatefulWidget {
   const NotificationSettingsModal({super.key});
@@ -29,15 +31,16 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   int _reminderDay = 1; // Default 1st day of month
   int _quizReminderDays = 30; // Default 30 days
 
-  // App theme colors - enhanced and organized
-  final Color primaryBlue = const Color.fromARGB(255, 30, 56, 102);
-  final Color secondaryBlue = const Color.fromARGB(255, 51, 77, 125);
-  final Color accentBlue = const Color.fromARGB(255, 73, 125, 189);
-  final Color lightBlue = const Color.fromARGB(255, 232, 240, 254);
-  final Color backgroundBlue = const Color.fromARGB(255, 248, 251, 255);
-  final Color errorRed = const Color.fromARGB(255, 220, 53, 69);
-  final Color successGreen = const Color.fromARGB(255, 40, 167, 69);
-  final Color neutralGray = const Color.fromARGB(255, 130, 130, 130);
+  // App theme colors - enhanced and organized for both light and dark themes
+  Color primaryBlue = const Color.fromARGB(255, 30, 56, 102);
+  Color secondaryBlue = const Color.fromARGB(255, 51, 77, 125);
+  Color accentBlue = const Color.fromARGB(255, 73, 125, 189);
+  Color lightBlue = const Color.fromARGB(255, 232, 240, 254);
+  Color backgroundBlue = const Color.fromARGB(255, 248, 251, 255);
+  Color errorRed = const Color.fromARGB(255, 220, 53, 69);
+  Color successGreen = const Color.fromARGB(255, 40, 167, 69);
+  Color neutralGray = const Color.fromARGB(255, 130, 130, 130);
+  Color textColor = const Color.fromARGB(255, 24, 53, 98);
 
   @override
   void initState() {
@@ -84,6 +87,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Future<void> _selectTime(BuildContext context) async {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     // Use cupertino time picker for a more modern look
     if (Theme.of(context).platform == TargetPlatform.iOS) {
       await showCupertinoModalPopup(
@@ -95,9 +102,9 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
             margin: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.grey[900] : Colors.white,
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(24),
                 topRight: Radius.circular(24),
               ),
@@ -109,7 +116,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                   width: 40,
                   margin: const EdgeInsets.only(bottom: 10),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: isDarkMode ? Colors.grey[700] : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(2.5),
                   ),
                 ),
@@ -117,14 +124,16 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CupertinoButton(
-                      child:
-                          Text('Cancel', style: TextStyle(color: accentBlue)),
+                      child: Text('Cancel',
+                          style: TextStyle(
+                              color: isDarkMode ? Colors.white70 : accentBlue)),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                     CupertinoButton(
                       child: Text('Done',
                           style: TextStyle(
-                              color: primaryBlue, fontWeight: FontWeight.bold)),
+                              color: isDarkMode ? Colors.white : primaryBlue,
+                              fontWeight: FontWeight.bold)),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -150,7 +159,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                       });
                     },
                     use24hFormat: false,
-                    backgroundColor: Colors.white,
+                    backgroundColor:
+                        isDarkMode ? Colors.grey[900] : Colors.white,
                   ),
                 ),
               ],
@@ -171,14 +181,15 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
           return Theme(
             data: ThemeData.light().copyWith(
               colorScheme: ColorScheme.light(
-                primary: primaryBlue,
-                onPrimary: Colors.white,
-                surface: Colors.white,
-                onSurface: primaryBlue,
+                primary: isDarkMode ? Colors.white : primaryBlue,
+                onPrimary: isDarkMode ? Colors.black : Colors.white,
+                surface: isDarkMode ? Colors.grey[900]! : Colors.white,
+                onSurface: isDarkMode ? Colors.white : primaryBlue,
               ),
-              dialogBackgroundColor: Colors.white,
+              dialogBackgroundColor:
+                  isDarkMode ? Colors.grey[900] : Colors.white,
               timePickerTheme: TimePickerThemeData(
-                backgroundColor: Colors.white,
+                backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
                 hourMinuteShape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -187,20 +198,20 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                 ),
                 dayPeriodColor: MaterialStateColor.resolveWith((states) =>
                     states.contains(MaterialState.selected)
-                        ? lightBlue
-                        : Colors.white),
+                        ? (isDarkMode ? Colors.grey[800]! : lightBlue)
+                        : (isDarkMode ? Colors.grey[900]! : Colors.white)),
                 dayPeriodTextColor: MaterialStateColor.resolveWith((states) =>
                     states.contains(MaterialState.selected)
-                        ? primaryBlue
-                        : secondaryBlue),
+                        ? (isDarkMode ? Colors.white : primaryBlue)
+                        : (isDarkMode ? Colors.white70 : secondaryBlue)),
                 hourMinuteColor: MaterialStateColor.resolveWith((states) =>
                     states.contains(MaterialState.selected)
-                        ? lightBlue
-                        : Colors.white),
+                        ? (isDarkMode ? Colors.grey[800]! : lightBlue)
+                        : (isDarkMode ? Colors.grey[900]! : Colors.white)),
                 hourMinuteTextColor: MaterialStateColor.resolveWith((states) =>
                     states.contains(MaterialState.selected)
-                        ? primaryBlue
-                        : secondaryBlue),
+                        ? (isDarkMode ? Colors.white : primaryBlue)
+                        : (isDarkMode ? Colors.white70 : secondaryBlue)),
               ),
             ),
             child: child!,
@@ -221,6 +232,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Future<void> _selectDay() async {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     int? selected = await showDialog<int>(
       context: context,
       builder: (BuildContext context) {
@@ -231,11 +246,11 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDarkMode ? Colors.grey[900] : Colors.white,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.08),
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),
@@ -247,7 +262,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                 Text(
                   "Select Day of Month",
                   style: TextStyle(
-                    color: primaryBlue,
+                    color: isDarkMode ? Colors.white : primaryBlue,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
@@ -256,7 +271,9 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                 Container(
                   height: 200,
                   decoration: BoxDecoration(
-                    color: lightBlue.withOpacity(0.5),
+                    color: isDarkMode
+                        ? Colors.grey[800]!.withOpacity(0.5)
+                        : lightBlue.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: CupertinoPicker(
@@ -273,7 +290,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                         child: Text(
                           _getDayWithSuffix(index + 1),
                           style: TextStyle(
-                            color: primaryBlue,
+                            color: isDarkMode ? Colors.white : primaryBlue,
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
                           ),
@@ -290,14 +307,16 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                       onPressed: () => Navigator.of(context).pop(null),
                       child: Text(
                         "Cancel",
-                        style: TextStyle(color: secondaryBlue),
+                        style: TextStyle(
+                            color: isDarkMode ? Colors.white70 : secondaryBlue),
                       ),
                     ),
                     const SizedBox(width: 16),
                     ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(tempDay),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryBlue,
+                        backgroundColor:
+                            isDarkMode ? Colors.grey[800] : primaryBlue,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -439,6 +458,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Future<void> _cancelAllReminders() async {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     // Show confirmation dialog
     bool confirm = await showDialog(
           context: context,
@@ -446,19 +469,26 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
             title: Text(
               'Cancel All Reminders?',
               style: TextStyle(
-                color: primaryBlue,
+                color: isDarkMode ? Colors.white : primaryBlue,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            content: const Text(
+            content: Text(
               'Are you sure you want to cancel all notification reminders? This action cannot be undone.',
+              style: TextStyle(
+                color: isDarkMode ? Colors.white70 : secondaryBlue,
+              ),
             ),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            backgroundColor:
+                isDarkMode ? Colors.grey[900] : Colors.white.withOpacity(0.95),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: Text('No', style: TextStyle(color: secondaryBlue)),
+                child: Text('No',
+                    style: TextStyle(
+                        color: isDarkMode ? Colors.white70 : secondaryBlue)),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(true),
@@ -538,6 +568,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -549,12 +583,12 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               height: MediaQuery.of(context).size.height * 0.85,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDarkMode ? Colors.grey[900] : Colors.white,
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(32)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.12),
+                    color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.12),
                     spreadRadius: 0,
                     blurRadius: 24,
                     offset: const Offset(0, -4),
@@ -570,6 +604,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Widget _buildLoadingIndicator() {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -577,11 +615,11 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: lightBlue,
+              color: isDarkMode ? Colors.grey[800] : lightBlue,
               shape: BoxShape.circle,
             ),
             child: CircularProgressIndicator(
-              color: primaryBlue,
+              color: isDarkMode ? Colors.white : primaryBlue,
               strokeWidth: 3,
             ),
           ),
@@ -589,7 +627,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
           Text(
             'Loading your settings...',
             style: TextStyle(
-              color: secondaryBlue,
+              color: isDarkMode ? Colors.white70 : secondaryBlue,
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -600,6 +638,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Widget _buildContent() {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -610,7 +652,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
             width: 40,
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: isDarkMode ? Colors.grey[700] : Colors.grey.shade300,
               borderRadius: BorderRadius.circular(2.5),
             ),
           ),
@@ -628,7 +670,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: primaryBlue,
+                    color: isDarkMode ? Colors.white : primaryBlue,
                     height: 1.1,
                   ),
                 ),
@@ -637,7 +679,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                   'Get timely privacy reminders',
                   style: TextStyle(
                     fontSize: 16,
-                    color: secondaryBlue,
+                    color: isDarkMode ? Colors.white70 : secondaryBlue,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -651,12 +693,12 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: lightBlue,
+                    color: isDarkMode ? Colors.grey[800] : lightBlue,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.close_rounded,
-                    color: primaryBlue,
+                    color: isDarkMode ? Colors.white : primaryBlue,
                     size: 20,
                   ),
                 ),
@@ -715,7 +757,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                         icon: const Icon(Icons.cancel_outlined),
                         label: const Text('Cancel All Reminders'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
+                          backgroundColor:
+                              isDarkMode ? Colors.grey[900] : Colors.white,
                           foregroundColor: errorRed,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(
@@ -762,6 +805,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Widget _buildTestNotificationSection() {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     return _buildCard(
       icon: Icons.notifications_active_rounded,
       title: 'Test Notifications',
@@ -776,7 +823,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
               icon: const Icon(Icons.send_rounded),
               label: const Text('Send Scheduled Test'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryBlue,
+                backgroundColor: isDarkMode ? Colors.grey[800] : primaryBlue,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding:
@@ -794,7 +841,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
               icon: const Icon(Icons.notifications_rounded),
               label: const Text('Send Immediate Test'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: secondaryBlue,
+                backgroundColor: isDarkMode ? Colors.grey[700] : secondaryBlue,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding:
@@ -811,6 +858,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Widget _buildMonthlyReminderSection(BuildContext context) {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     return _buildCard(
       icon: Icons.calendar_month_rounded,
       title: 'Monthly Reminders',
@@ -860,6 +911,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Widget _buildQuizReminderSection() {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     return _buildCard(
       icon: Icons.quiz_rounded,
       title: 'Quiz Reminders',
@@ -896,6 +951,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Future<void> _showQuizIntervalSelector() async {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     final days = [7, 14, 30, 60, 90];
     int? selectedDays = await showModalBottomSheet<int>(
       context: context,
@@ -905,9 +964,9 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
         return Container(
           padding:
               const EdgeInsets.only(top: 16, left: 24, right: 24, bottom: 32),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+          decoration: BoxDecoration(
+            color: isDarkMode ? Colors.grey[900] : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -918,21 +977,22 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                   width: 40,
                   margin: const EdgeInsets.only(bottom: 20),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: isDarkMode ? Colors.grey[700] : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(2.5),
                   ),
                 ),
               ),
               Row(
                 children: [
-                  Icon(Icons.timelapse_rounded, color: primaryBlue, size: 24),
+                  Icon(Icons.timelapse_rounded,
+                      color: isDarkMode ? Colors.white : primaryBlue, size: 24),
                   const SizedBox(width: 12),
                   Text(
                     'Quiz Reminder Interval',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: primaryBlue,
+                      color: isDarkMode ? Colors.white : primaryBlue,
                     ),
                   ),
                 ],
@@ -963,6 +1023,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Widget _buildIntervalOption(int days) {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     final bool isSelected = days == _quizReminderDays;
 
     return InkWell(
@@ -971,10 +1035,14 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: isSelected ? lightBlue : Colors.white,
+          color: isSelected
+              ? (isDarkMode ? Colors.grey[800]! : lightBlue)
+              : (isDarkMode ? Colors.grey[900]! : Colors.white),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? primaryBlue : Colors.grey.shade300,
+            color: isSelected
+                ? (isDarkMode ? Colors.white : primaryBlue)
+                : (isDarkMode ? Colors.grey[700]! : Colors.grey.shade300),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -987,8 +1055,12 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? primaryBlue.withOpacity(0.1)
-                        : Colors.grey.shade100,
+                        ? (isDarkMode
+                            ? Colors.white.withOpacity(0.1)
+                            : primaryBlue.withOpacity(0.1))
+                        : (isDarkMode
+                            ? Colors.grey[800]!
+                            : Colors.grey.shade100),
                     shape: BoxShape.circle,
                   ),
                   child: Text(
@@ -996,7 +1068,9 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? primaryBlue : neutralGray,
+                      color: isSelected
+                          ? (isDarkMode ? Colors.white : primaryBlue)
+                          : (isDarkMode ? Colors.white70 : neutralGray),
                     ),
                   ),
                 ),
@@ -1006,14 +1080,18 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: isSelected ? primaryBlue : secondaryBlue,
+                    color: isSelected
+                        ? (isDarkMode ? Colors.white : primaryBlue)
+                        : (isDarkMode ? Colors.white70 : secondaryBlue),
                   ),
                 ),
               ],
             ),
             Icon(
               isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
-              color: isSelected ? primaryBlue : neutralGray,
+              color: isSelected
+                  ? (isDarkMode ? Colors.white : primaryBlue)
+                  : (isDarkMode ? Colors.white70 : neutralGray),
               size: 24,
             ),
           ],
@@ -1023,6 +1101,10 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
   }
 
   Future<void> _showResetReminderDialog() async {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     bool? shouldReset = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -1030,25 +1112,31 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
           title: Text(
             'Reset Reminder Timer?',
             style: TextStyle(
-              color: primaryBlue,
+              color: isDarkMode ? Colors.white : primaryBlue,
               fontWeight: FontWeight.bold,
             ),
           ),
-          content: const Text(
+          content: Text(
             'Would you like to reset the quiz reminder timer to start from today?',
+            style: TextStyle(
+              color: isDarkMode ? Colors.white70 : secondaryBlue,
+            ),
           ),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          backgroundColor:
+              isDarkMode ? Colors.grey[900] : Colors.white.withOpacity(0.95),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child:
-                  Text('Keep Current', style: TextStyle(color: secondaryBlue)),
+              child: Text('Keep Current',
+                  style: TextStyle(
+                      color: isDarkMode ? Colors.white70 : secondaryBlue)),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryBlue,
+                backgroundColor: isDarkMode ? Colors.grey[800] : primaryBlue,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
@@ -1075,13 +1163,17 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
     Function(bool)? onToggleChanged,
     required Widget child,
   }) {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -1097,12 +1189,12 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: lightBlue,
+                    color: isDarkMode ? Colors.grey[800] : lightBlue,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
                     icon,
-                    color: primaryBlue,
+                    color: isDarkMode ? Colors.white : primaryBlue,
                     size: 24,
                   ),
                 ),
@@ -1116,7 +1208,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: primaryBlue,
+                          color: isDarkMode ? Colors.white : primaryBlue,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -1124,7 +1216,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                         description,
                         style: TextStyle(
                           fontSize: 14,
-                          color: secondaryBlue,
+                          color: isDarkMode ? Colors.white70 : secondaryBlue,
                         ),
                       ),
                     ],
@@ -1136,10 +1228,13 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
                     child: Switch(
                       value: toggleValue,
                       onChanged: onToggleChanged,
-                      activeColor: primaryBlue,
-                      activeTrackColor: lightBlue,
-                      inactiveThumbColor: Colors.white,
-                      inactiveTrackColor: Colors.grey.shade300,
+                      activeColor: isDarkMode ? Colors.white : primaryBlue,
+                      activeTrackColor:
+                          isDarkMode ? Colors.grey[800] : lightBlue,
+                      inactiveThumbColor:
+                          isDarkMode ? Colors.grey[700] : Colors.white,
+                      inactiveTrackColor:
+                          isDarkMode ? Colors.grey[800] : Colors.grey.shade300,
                     ),
                   ),
               ],
@@ -1160,20 +1255,26 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
     required IconData icon,
     required VoidCallback onTap,
   }) {
+    final isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).themeMode ==
+            ThemeMode.dark;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: lightBlue.withOpacity(0.5),
+          color: isDarkMode
+              ? Colors.grey[800]!.withOpacity(0.5)
+              : lightBlue.withOpacity(0.5),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color: primaryBlue,
+              color: isDarkMode ? Colors.white : primaryBlue,
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -1181,7 +1282,7 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
               label,
               style: TextStyle(
                 fontSize: 15,
-                color: secondaryBlue,
+                color: isDarkMode ? Colors.white70 : secondaryBlue,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -1190,14 +1291,14 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
               value,
               style: TextStyle(
                 fontSize: 15,
-                color: primaryBlue,
+                color: isDarkMode ? Colors.white : primaryBlue,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(width: 8),
             Icon(
               Icons.chevron_right_rounded,
-              color: secondaryBlue,
+              color: isDarkMode ? Colors.white70 : secondaryBlue,
               size: 20,
             ),
           ],

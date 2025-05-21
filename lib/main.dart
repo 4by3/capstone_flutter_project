@@ -48,7 +48,8 @@ void main() async {
   await PrivacyNotificationService().scheduleDailyReminder(
     id: 1,
     title: 'Reminder to Update Privacy Settings',
-    body: 'Don\'t forget to check and update your privacy settings on Facebook.',
+    body:
+        'Don\'t forget to check and update your privacy settings on Facebook.',
     hour: 9, // Example: 9 AM reminder
     minute: 0,
   );
