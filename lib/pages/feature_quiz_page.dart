@@ -307,15 +307,22 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
             elevation: 10,
             contentPadding: const EdgeInsets.all(20),
             content: SizedBox(
-              width: 300,
-              height: 300,
+              width: 200,
+              height: 200,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    isCorrect ? Icons.check_circle : Icons.close,
-                    color: isCorrect ? Colors.green : Colors.red,
-                    size: 80,
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 30), // Increased top padding
+                    child: Icon(
+                      isCorrect
+                          ? Icons.check_circle
+                          : Icons
+                              .cancel, // Changed to Icons.cancel for a bolder style
+                      color: isCorrect ? Colors.green : Colors.red,
+                      size: 80,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
@@ -468,8 +475,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
         elevation: 10,
         contentPadding: const EdgeInsets.all(20),
         content: SizedBox(
-          width: 300,
-          height: 300,
+          width: 200,
+          height: 200,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
