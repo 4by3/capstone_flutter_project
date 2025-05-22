@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:capstone_project/services/sound_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,7 +60,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
 
     _answerFadeControllers = List.generate(
       4,
-          (index) => AnimationController(
+      (index) => AnimationController(
         vsync: this,
         duration: Duration(milliseconds: 400 + (index * 150)),
       ),
@@ -76,7 +77,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
 
     _answerClickControllers = List.generate(
       4,
-          (index) => AnimationController(
+      (index) => AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 300),
       ),
@@ -201,7 +202,8 @@ class _IntroQuizPageState extends State<IntroQuizPage>
       final selectedIndex = options.indexOf(selected);
       if (selectedIndex != -1) {
         final feature = featureMapping[i];
-        scores[feature] = (scores[feature] ?? 0) + (answers[selectedIndex] as int);
+        scores[feature] =
+            (scores[feature] ?? 0) + (answers[selectedIndex] as int);
       }
     }
 
@@ -220,10 +222,8 @@ class _IntroQuizPageState extends State<IntroQuizPage>
         currentQuestionIndex++;
         _startAnimations();
       });
-      
     } else {
       _submitQuiz();
-      
     }
   }
 
@@ -233,7 +233,6 @@ class _IntroQuizPageState extends State<IntroQuizPage>
         currentQuestionIndex--;
         _startAnimations();
       });
-      
     }
   }
 
@@ -260,8 +259,8 @@ class _IntroQuizPageState extends State<IntroQuizPage>
           content: const Text('Please answer all questions to continue'),
           backgroundColor: Colors.red[700],
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
@@ -378,7 +377,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                             scale: _questionScaleAnimation,
                             child: Padding(
                               padding:
-                              const EdgeInsets.symmetric(horizontal: 24),
+                                  const EdgeInsets.symmetric(horizontal: 24),
                               child: SizedBox(
                                 width: double.infinity,
                                 child: Column(
@@ -435,13 +434,13 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                           final isSelected =
                               selectedAnswers[currentQuestionIndex] == option;
                           final animationIndex =
-                          index < _answerFadeAnimations.length
-                              ? index
-                              : _answerFadeAnimations.length - 1;
+                              index < _answerFadeAnimations.length
+                                  ? index
+                                  : _answerFadeAnimations.length - 1;
                           final clickAnimationIndex =
-                          index < _answerClickOpacityAnimations.length
-                              ? index
-                              : _answerClickOpacityAnimations.length - 1;
+                              index < _answerClickOpacityAnimations.length
+                                  ? index
+                                  : _answerClickOpacityAnimations.length - 1;
 
                           return FadeTransition(
                             opacity: _answerFadeAnimations[animationIndex],
@@ -475,11 +474,11 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                 },
                                 child: AnimatedBuilder(
                                   animation: _answerClickOpacityAnimations[
-                                  clickAnimationIndex],
+                                      clickAnimationIndex],
                                   builder: (context, child) {
                                     return Opacity(
                                       opacity: _answerClickOpacityAnimations[
-                                      clickAnimationIndex]
+                                              clickAnimationIndex]
                                           .value,
                                       child: Container(
                                         height: 77,
@@ -504,7 +503,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                                 )
                                               : null,
                                           borderRadius:
-                                          BorderRadius.circular(15),
+                                              BorderRadius.circular(15),
                                           boxShadow: [
                                             BoxShadow(
                                               color: Colors.black.withOpacity(
@@ -555,13 +554,19 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: currentQuestionIndex == 0
-                            ? () => Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const IntroPage()),
-                                )
-                            : _previousQuestion,
+                        onPressed: () {
+                          SoundService.playClick(); // 🔊 Add this to play sound
+
+                          if (currentQuestionIndex == 0) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const IntroPage()),
+                            );
+                          } else {
+                            _previousQuestion();
+                          }
+                        },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           side: BorderSide(
@@ -586,22 +591,27 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                       ),
                     ),
                     const SizedBox(width: 16),
-                      SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.45, 
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.45,
                       child: ElevatedButton(
                         onPressed: selectedAnswers[currentQuestionIndex] != null
-                            ? _nextQuestion
+                            ? () {
+                                SoundService.playClick(); // 🔊 Play click sound
+                                _nextQuestion();
+                              }
                             : null,
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
                               if (states.contains(MaterialState.disabled)) {
-                                return textColor.withOpacity(0.5); 
+                                return textColor.withOpacity(0.5);
                               }
-                              return textColor; 
+                              return textColor;
                             },
                           ),
-                          overlayColor: MaterialStateProperty.all(Colors.transparent), 
+                          overlayColor:
+                              MaterialStateProperty.all(Colors.transparent),
                           padding: MaterialStateProperty.all(
                             const EdgeInsets.symmetric(vertical: 15),
                           ),
@@ -616,7 +626,9 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              currentQuestionIndex == totalQuestions - 1 ? 'Submit' : 'Next',
+                              currentQuestionIndex == totalQuestions - 1
+                                  ? 'Submit'
+                                  : 'Next',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -625,15 +637,13 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                             if (currentQuestionIndex != totalQuestions - 1)
                               const Padding(
                                 padding: EdgeInsets.only(left: 8),
-
-                                child: Icon(Icons.arrow_forward, color: Colors.white),
-
+                                child: Icon(Icons.arrow_forward,
+                                    color: Colors.white),
                               ),
                           ],
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ),

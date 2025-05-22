@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:capstone_project/services/privacy_notification_service.dart';
 import 'package:capstone_project/services/notification_settings_modal.dart';
+import 'package:capstone_project/services/sound_service.dart';
 import 'package:confetti/confetti.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -125,7 +126,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
     String currentMode = prefs.getString('quizMode') ?? 'easy';
 
-
     if (widget.initialFeatureScores != null) {
       for (var feature in features) {
         String featureName = feature['name'];
@@ -154,9 +154,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       // Use different reminder periods based on feature importance
       if (features[featureIndex]['score'] < 2) {
-        reminderDays = 7; // More frequent reminders for important features with low scores
+        reminderDays =
+            7; // More frequent reminders for important features with low scores
       } else if (features[featureIndex]['score'] >= 4) {
-        reminderDays = 30; // Less frequent reminders for well-understood features
+        reminderDays =
+            30; // Less frequent reminders for well-understood features
       }
 
       await PrivacyNotificationService().scheduleFeatureReminder(
@@ -167,7 +169,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('You will be reminded to review $featureName in $reminderDays days'),
+          content: Text(
+              'You will be reminded to review $featureName in $reminderDays days'),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -201,7 +204,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     for (var feature in features) {
       if (currentMode == 'hard') {
         await prefs.setInt('${feature['name']}_hard_score', feature['score']);
-        await prefs.setInt('${feature['name']}_hard_started', feature['started']);
+        await prefs.setInt(
+            '${feature['name']}_hard_started', feature['started']);
       } else {
         await prefs.setInt('${feature['name']}_score', feature['score']);
         await prefs.setInt('${feature['name']}_started', feature['started']);
@@ -224,223 +228,243 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _goToFeatureQuiz(int index) async {
-  if (_isNavigating) {
-    print('goToFeatureQuiz: Already navigating, ignoring');
-    return;
-  }
-  _isNavigating = true;
+    if (_isNavigating) {
+      print('goToFeatureQuiz: Already navigating, ignoring');
+      return;
+    }
+    _isNavigating = true;
 
-  try {
-    _scaleControllers[index]
-        .forward()
-        .then((_) => _scaleControllers[index].reverse());
+    try {
+      _scaleControllers[index]
+          .forward()
+          .then((_) => _scaleControllers[index].reverse());
 
-    // Log navigation stack before pushing
-    print('goToFeatureQuiz: Before pushing FeatureQuizPage');
-    print('  Can pop: ${Navigator.of(context).canPop()}');
-    final currentRoute = ModalRoute.of(context);
-    print('  Current route: ${currentRoute?.settings.name ?? 'unnamed'} (isPage: ${currentRoute is PageRoute})');
-    int routeCount = 0;
-    Navigator.of(context).popUntil((route) {
-      print('  Route $routeCount: ${route.settings.name ?? 'unnamed'} (isCurrent: ${route.isCurrent})');
-      routeCount++;
-      return true;
-    });
-    print('  Total routes in stack: $routeCount');
+      // Log navigation stack before pushing
+      print('goToFeatureQuiz: Before pushing FeatureQuizPage');
+      print('  Can pop: ${Navigator.of(context).canPop()}');
+      final currentRoute = ModalRoute.of(context);
+      print(
+          '  Current route: ${currentRoute?.settings.name ?? 'unnamed'} (isPage: ${currentRoute is PageRoute})');
+      int routeCount = 0;
+      Navigator.of(context).popUntil((route) {
+        print(
+            '  Route $routeCount: ${route.settings.name ?? 'unnamed'} (isCurrent: ${route.isCurrent})');
+        routeCount++;
+        return true;
+      });
+      print('  Total routes in stack: $routeCount');
 
-    final prefs = await SharedPreferences.getInstance();
-    String mode = prefs.getString('quizMode') ?? 'easy';
+      final prefs = await SharedPreferences.getInstance();
+      String mode = prefs.getString('quizMode') ?? 'easy';
 
-    final featureName = features[index]['name'];
-    final originalIndex = {
-      'Block, Restrict, Report Usage': 0,
-      'Facebook Groups': 1,
-      'Audience Setting for Posts': 2,
-      'Interaction on Others\' Posts': 3,
-      'Tag Review and Settings': 4,
-    }[featureName] ?? 0;
+      final featureName = features[index]['name'];
+      final originalIndex = {
+            'Block, Restrict, Report Usage': 0,
+            'Facebook Groups': 1,
+            'Audience Setting for Posts': 2,
+            'Interaction on Others\' Posts': 3,
+            'Tag Review and Settings': 4,
+          }[featureName] ??
+          0;
 
-    final score = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FeatureQuizPage(
-          featureIndex: originalIndex,
-          mode: mode,
+      final score = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FeatureQuizPage(
+            featureIndex: originalIndex,
+            mode: mode,
+          ),
         ),
-      ),
-    );
+      );
 
-    // Log stack after pop
-    print('goToFeatureQuiz: After FeatureQuizPage popped');
-    print('  Can pop: ${Navigator.of(context).canPop()}');
-    print('  Current route: ${currentRoute?.settings.name ?? 'unnamed'} (isPage: ${currentRoute is PageRoute})');
-    routeCount = 0;
-    Navigator.of(context).popUntil((route) {
-      print('  Route $routeCount: ${route.settings.name ?? 'unnamed'} (isCurrent: ${route.isCurrent})');
-      routeCount++;
-      return true;
-    });
-    print('  Total routes in stack: $routeCount');
+      // Log stack after pop
+      print('goToFeatureQuiz: After FeatureQuizPage popped');
+      print('  Can pop: ${Navigator.of(context).canPop()}');
+      print(
+          '  Current route: ${currentRoute?.settings.name ?? 'unnamed'} (isPage: ${currentRoute is PageRoute})');
+      routeCount = 0;
+      Navigator.of(context).popUntil((route) {
+        print(
+            '  Route $routeCount: ${route.settings.name ?? 'unnamed'} (isCurrent: ${route.isCurrent})');
+        routeCount++;
+        return true;
+      });
+      print('  Total routes in stack: $routeCount');
 
-    if (score != null) {
-      _updateFeatureScore(index, score);
+      if (score != null) {
+        _updateFeatureScore(index, score);
 
-      if (mode == 'easy' && features.every((f) => f['score'] == 5)) {
-        await prefs.setString('quizMode', 'hard');
+        if (mode == 'easy' && features.every((f) => f['score'] == 5)) {
+          await prefs.setString('quizMode', 'hard');
 
-        if (mounted) {
-          Future.microtask(() async {
-            await showDialog(
-              context: context,
-              barrierDismissible: true,
-              builder: (_) => Dialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                        ? Colors.grey[900]
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(
-                            Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark ? 0.2 : 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: accentRed,
-                          shape: BoxShape.circle,
+          if (mounted) {
+            Future.microtask(() async {
+              await showDialog(
+                context: context,
+                barrierDismissible: true,
+                builder: (_) => Dialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  elevation: 0,
+                  backgroundColor: Colors.transparent,
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Provider.of<ThemeProvider>(context).themeMode ==
+                              ThemeMode.dark
+                          ? Colors.grey[900]
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(
+                              Provider.of<ThemeProvider>(context).themeMode ==
+                                      ThemeMode.dark
+                                  ? 0.2
+                                  : 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                        child: const Icon(
-                          Icons.shield_outlined,
-                          size: 40,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.red[100],
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          "HARD MODE",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
                             color: accentRed,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.shield_outlined,
+                            size: 40,
+                            color: Colors.white,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Hard Mode Unlocked!",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                              ? Colors.white
-                              : primaryBlue,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Congratulations! You've completed all Easy quizzes with perfect scores. Challenge yourself with more advanced privacy questions.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                            ? Colors.white
-                            : primaryLightBlue,
-                          height: 1.4,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.red[50],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Icon(
-                              Icons.star,
-                              color: accentRed,
-                              size: 20,
-                            ),
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.red[100],
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              "Hard mode features more in-depth privacy scenarios and advanced options.",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                                  ? Colors.white
-                                  : primaryLightBlue,
-                                height: 1.4,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                                ? Colors.grey[900]
-                                : primaryBlue,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 4,
-                          ),
-                          child: const Text(
-                            "Let's Go!",
+                          child: Text(
+                            "HARD MODE",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: accentRed,
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        Text(
+                          "Hard Mode Unlocked!",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Provider.of<ThemeProvider>(context).themeMode ==
+                                        ThemeMode.dark
+                                    ? Colors.white
+                                    : primaryBlue,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Congratulations! You've completed all Easy quizzes with perfect scores. Challenge yourself with more advanced privacy questions.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color:
+                                Provider.of<ThemeProvider>(context).themeMode ==
+                                        ThemeMode.dark
+                                    ? Colors.white
+                                    : primaryLightBlue,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.red[50],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                Icons.star,
+                                color: accentRed,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                "Hard mode features more in-depth privacy scenarios and advanced options.",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Provider.of<ThemeProvider>(context)
+                                              .themeMode ==
+                                          ThemeMode.dark
+                                      ? Colors.white
+                                      : primaryLightBlue,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Provider.of<ThemeProvider>(context)
+                                              .themeMode ==
+                                          ThemeMode.dark
+                                      ? Colors.grey[900]
+                                      : primaryBlue,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 4,
+                            ),
+                            child: const Text(
+                              "Let's Go!",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
+              );
 
-            if (mounted) {
-              await _loadFeatureScores();
-            }
-          });
+              if (mounted) {
+                await _loadFeatureScores();
+              }
+            });
+          }
         }
       }
+    } finally {
+      _isNavigating = false;
     }
-  } finally {
-    _isNavigating = false;
   }
-}
 
   void _showNotificationSettings() {
     showModalBottomSheet(
@@ -487,14 +511,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () async {
+              await SoundService.playClick(); // 🔊 Play click sound
+              Navigator.pop(context, false); // Cancel reset
+            },
             child: const Text(
               'Cancel',
               style: TextStyle(color: Colors.blueAccent),
             ),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () async {
+              await SoundService.playClick(); //  Play button click sound
+              Navigator.pop(context, true);
+            },
             child: Text(
               'Reset',
               style: TextStyle(color: accentRed),
@@ -599,7 +629,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
     if (_isLoading) {
       return Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -1280,7 +1309,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: FloatingActionButton(
                     onPressed: _showNotificationSettings,
                     backgroundColor: primaryBlue,
-                    child: const Icon(Icons.notifications_active, color: Colors.white),
+                    child: const Icon(Icons.notifications_active,
+                        color: Colors.white),
                     tooltip: 'Notification Settings',
                   ),
                 ),

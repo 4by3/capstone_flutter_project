@@ -1,4 +1,5 @@
 import 'package:capstone_project/services/audio_service.dart';
+import 'package:capstone_project/services/sound_service.dart';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import '../widgets/video_popup.dart';
@@ -347,10 +348,11 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                       _isSubmitButtonHovered = false;
                     });
                   },
-                  onTapUp: (_) {
+                  onTapUp: (_) async {
                     setState(() {
                       _isSubmitButtonHovered = false;
                     });
+                    await SoundService.playClick();
                     Navigator.pop(context);
                     if (isCorrect &&
                         currentQuestionIndex < questions.length - 1) {
@@ -940,7 +942,6 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                         TextOverflow.ellipsis,
                                                     textAlign: TextAlign.left,
                                                     wrapWords: true,
-
                                                   ),
                                                 ],
                                               ),
@@ -1130,6 +1131,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                         setState(() {
                                           _isBackButtonHovered = false;
                                         });
+                                        SoundService
+                                            .playClick(); // 🔊 Add this line
                                         if (currentQuestionIndex == 0) {
                                           Navigator.pop(context, score);
                                         } else {
@@ -1198,6 +1201,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                         setState(() {
                                           _isSubmitButtonHovered = false;
                                         });
+                                        SoundService
+                                            .playClick(); // ✅ This must be inside the function block
                                         if (selectedAnswers[
                                                 currentQuestionIndex] !=
                                             null) {
@@ -1312,10 +1317,12 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                           _isBackButtonHovered = false;
                                         });
                                       },
-                                      onTapUp: (_) {
+                                      onTapUp: (_) async {
                                         setState(() {
                                           _isBackButtonHovered = false;
                                         });
+                                        await SoundService
+                                            .playClick(); // 🔊 Button sound
                                         _hideScenarioPopup();
                                       },
                                       child: Container(
