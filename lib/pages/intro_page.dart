@@ -37,7 +37,6 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
     )..addListener(() {
-        // Debug print to confirm animation value
         print('Fade Animation Value: ${_fadeAnimation.value}');
       });
 
@@ -160,7 +159,6 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
         child: SafeArea(
           child: Stack(
             children: [
-              // Main content with flexible height
               Column(
                 children: [
                   Expanded(
@@ -209,7 +207,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                                         fontWeight: FontWeight.bold,
                                         height: 1.3,
                                         color: theme.colorScheme
-                                            .primary, // Keep this as primary color (blue)
+                                            .primary,
                                       ),
                                     ),
                                     TextSpan(
@@ -249,7 +247,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                               ),
                               SizedBox(
                                   height: 60 *
-                                      scaleFactor), // Extra space to prevent overlap with button
+                                      scaleFactor),
                             ],
                           ),
                         ),
@@ -258,7 +256,6 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-              // Fixed button at the bottom
               Positioned(
                 left: 16.0 * scaleFactor,
                 right: 16.0 * scaleFactor,
@@ -277,10 +274,10 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isDarkMode
                           ? Colors.white
-                          : null, // White background in dark mode
+                          : null,
                       foregroundColor: isDarkMode
                           ? Colors.black
-                          : null, // Black ripple effect in dark mode
+                          : null,
                       padding: EdgeInsets.symmetric(
                         horizontal: 40 * scaleFactor,
                         vertical: 26 * scaleFactor,
@@ -298,7 +295,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                         fontWeight: FontWeight.bold,
                         color: isDarkMode
                             ? Colors.black
-                            : null, // Black text in dark mode
+                            : null,
                       ),
                     ),
                   ),
