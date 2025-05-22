@@ -999,13 +999,13 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                           child: Container(
                                             width: double.infinity,
                                             constraints: BoxConstraints(
-                                              minHeight: 80, // Minimum height for consistency
-                                              maxHeight: 150, // Maximum height to prevent overflow
+                                              minHeight: 80,
+                                              maxHeight: 150,
                                             ),
                                             padding: const EdgeInsets.only(bottom: 30),
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.center, // Center the content vertically
+                                              mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
                                                 Text(
                                                   'Q${currentQuestionIndex + 1}',
@@ -1016,18 +1016,18 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                   ),
                                                 ),
                                                 const SizedBox(height: 8),
-                                                Flexible( // Allow text to wrap properly
+                                                Flexible(
                                                   child: Text(
                                                     question['question'],
                                                     style: TextStyle(
                                                       fontSize: 21,
                                                       fontWeight: FontWeight.bold,
-                                                      height: 1.4, // Slightly increased line height for better readability
+                                                      height: 1.4,
                                                       color: isDarkMode ? Colors.white : textColor,
                                                     ),
-                                                    maxLines: 4, // Allow up to 4 lines
-                                                    overflow: TextOverflow.visible, // Show all text
-                                                    softWrap: true, // Enable text wrapping
+                                                    maxLines: 4,
+                                                    overflow: TextOverflow.visible,
+                                                    softWrap: true,
                                                   ),
                                                 ),
                                               ],
@@ -1036,7 +1036,6 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                         ),
                                       ),
                                     ),
-                                    // Answer options section with EXPANDED to fill remaining space
                                     Expanded(
                                       child: ListView.builder(
                                         padding: EdgeInsets.zero,
