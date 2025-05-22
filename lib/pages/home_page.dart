@@ -27,9 +27,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = true;
   bool _isOffline = false;
-  List<bool> _isCardHovered = []; // For card hover states
-  List<bool> _isVideoHovered = []; // For video section hover states
-  bool _isResetButtonHovered = false; // For FAB hover state
+  List<bool> _isCardHovered = [];
+  List<bool> _isVideoHovered = [];
+  bool _isResetButtonHovered = false;
   bool _isNavigating = false;
 
   // Define consistent colors
@@ -580,9 +580,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _showVideoPopup(BuildContext context, String videoUrl) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (BuildContext context) {
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 400),
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
+        );
+      },
+      pageBuilder: (context, animation, secondaryAnimation) {
         return VideoPopup(videoUrl: videoUrl);
       },
     );
