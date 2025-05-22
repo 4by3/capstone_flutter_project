@@ -182,7 +182,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
           ),
         ),
         child: SafeArea(
-          top: false, // Don't add extra top padding since AppBar handles it
+          top: false,
           child: FadeTransition(
             opacity: _fadeAnimation,
             child: ScaleTransition(
