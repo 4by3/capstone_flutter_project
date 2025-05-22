@@ -7,11 +7,13 @@ import 'package:capstone_project/main.dart'; // Added to access ThemeProvider
 class IntroSummaryPage extends StatefulWidget {
   final int totalScore;
   final String quizMode;
+  final Map<String, int> featureScores;
 
   const IntroSummaryPage({
     super.key,
     required this.totalScore,
     required this.quizMode,
+    required this.featureScores
   });
 
   @override
@@ -66,7 +68,11 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const HomePage()),
+      MaterialPageRoute(
+        builder: (context) => HomePage(
+          initialFeatureScores: widget.featureScores,
+        ),
+      ),
     );
   }
 
@@ -98,12 +104,12 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
         decoration: isDarkMode
             ? const BoxDecoration(color: Colors.black)
             : BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [backgroundColor, secondaryBackgroundColor],
-                ),
-              ),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [backgroundColor, secondaryBackgroundColor],
+          ),
+        ),
         child: SafeArea(
           child: FadeTransition(
             opacity: _fadeAnimation,
@@ -121,7 +127,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                             height: 100,
                             decoration: BoxDecoration(
                               color:
-                                  isDarkMode ? Colors.grey[900] : Colors.white,
+                              isDarkMode ? Colors.grey[900] : Colors.white,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
@@ -205,7 +211,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                     style: TextStyle(
                                       fontSize: 14,
                                       color:
-                                          isDarkMode ? Colors.white : textColor,
+                                      isDarkMode ? Colors.white : textColor,
                                       height: 1.5,
                                     ),
                                     textAlign: TextAlign.center,
@@ -318,16 +324,16 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                           decoration: BoxDecoration(
                             color: isDarkMode
                                 ? (_isHovered
-                                    ? Colors.grey[850]
-                                    : Colors.grey[900])
+                                ? Colors.grey[850]
+                                : Colors.grey[900])
                                 : answerColor,
                             border: isDarkMode
                                 ? Border.all(
-                                    color: _isHovered
-                                        ? Colors.white.withOpacity(0.7)
-                                        : Colors.white.withOpacity(0.3),
-                                    width: 1.5,
-                                  )
+                              color: _isHovered
+                                  ? Colors.white.withOpacity(0.7)
+                                  : Colors.white.withOpacity(0.3),
+                              width: 1.5,
+                            )
                                 : null,
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
