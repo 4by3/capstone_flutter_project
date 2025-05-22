@@ -49,9 +49,9 @@ class _IntroQuizPageState extends State<IntroQuizPage>
     _questionFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _questionController, curve: Curves.easeIn),
     )..addListener(() {
-        // Debug print to confirm animation value
-        print('Question Fade Animation Value: ${_questionFadeAnimation.value}');
-      });
+      // Debug print to confirm animation value
+      print('Question Fade Animation Value: ${_questionFadeAnimation.value}');
+    });
 
     _questionScaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
       CurvedAnimation(parent: _questionController, curve: Curves.easeOutBack),
@@ -69,9 +69,9 @@ class _IntroQuizPageState extends State<IntroQuizPage>
       return Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(parent: controller, curve: Curves.easeInOut),
       )..addListener(() {
-          // Debug print to confirm animation value
-          print('Answer Fade Animation Value: ${controller.value}');
-        });
+        // Debug print to confirm animation value
+        print('Answer Fade Animation Value: ${controller.value}');
+      });
     }).toList();
 
     _answerClickControllers = List.generate(
@@ -100,7 +100,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
     try {
       // Fetch from Firestore
       final snapshot =
-          await FirebaseFirestore.instance.collection('intro_questions').get();
+      await FirebaseFirestore.instance.collection('intro_questions').get();
       final fetchedQuestions = snapshot.docs.map((doc) => doc.data()).toList();
 
       if (fetchedQuestions.isNotEmpty) {
@@ -220,10 +220,10 @@ class _IntroQuizPageState extends State<IntroQuizPage>
         currentQuestionIndex++;
         _startAnimations();
       });
-      
+
     } else {
       _submitQuiz();
-      
+
     }
   }
 
@@ -233,7 +233,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
         currentQuestionIndex--;
         _startAnimations();
       });
-      
+
     }
   }
 
@@ -251,6 +251,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
           builder: (context) => IntroSummaryPage(
             totalScore: totalScore,
             quizMode: quizMode,
+            featureScores: featureScores,
           ),
         ),
       );
@@ -315,7 +316,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
             ),
             onPressed: () {
               final themeProvider =
-                  Provider.of<ThemeProvider>(context, listen: false);
+              Provider.of<ThemeProvider>(context, listen: false);
               themeProvider.toggleTheme();
             },
             tooltip: 'Toggle Theme',
@@ -326,12 +327,12 @@ class _IntroQuizPageState extends State<IntroQuizPage>
         decoration: isDarkMode
             ? const BoxDecoration(color: Colors.black)
             : BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.blue[50]!, Colors.blue[100]!],
-                ),
-              ),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.blue[50]!, Colors.blue[100]!],
+          ),
+        ),
         child: SafeArea(
           child: Column(
             children: [
@@ -356,7 +357,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                     LinearProgressIndicator(
                       value: (currentQuestionIndex + 1) / totalQuestions,
                       backgroundColor:
-                          isDarkMode ? Colors.grey[800] : Colors.blue[100],
+                      isDarkMode ? Colors.grey[800] : Colors.blue[100],
                       valueColor: AlwaysStoppedAnimation(
                           Theme.of(context).textTheme.bodyLarge?.color),
                       minHeight: 8,
@@ -489,19 +490,19 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                           color: isSelected
                                               ? Colors.white.withOpacity(0.95)
                                               : (isDarkMode
-                                                  ? (_isHovered[index]
-                                                      ? Colors.grey[850]
-                                                      : Colors.grey[900])
-                                                  : answerColor),
+                                              ? (_isHovered[index]
+                                              ? Colors.grey[850]
+                                              : Colors.grey[900])
+                                              : answerColor),
                                           border: isDarkMode
                                               ? Border.all(
-                                                  color: _isHovered[index]
-                                                      ? Colors.white
-                                                          .withOpacity(0.7)
-                                                      : Colors.white
-                                                          .withOpacity(0.3),
-                                                  width: 1.5,
-                                                )
+                                            color: _isHovered[index]
+                                                ? Colors.white
+                                                .withOpacity(0.7)
+                                                : Colors.white
+                                                .withOpacity(0.3),
+                                            width: 1.5,
+                                          )
                                               : null,
                                           borderRadius:
                                           BorderRadius.circular(15),
@@ -523,8 +524,8 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                               color: isSelected
                                                   ? Colors.black87
                                                   : (isDarkMode
-                                                      ? Colors.white
-                                                      : Colors.white),
+                                                  ? Colors.white
+                                                  : Colors.white),
                                               fontWeight: FontWeight.bold,
                                             ),
                                             maxLines: 2,
@@ -557,18 +558,18 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                       child: OutlinedButton(
                         onPressed: currentQuestionIndex == 0
                             ? () => Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const IntroPage()),
-                                )
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const IntroPage()),
+                        )
                             : _previousQuestion,
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           side: BorderSide(
                               color: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.color ??
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.color ??
                                   Colors.black,
                               width: 2),
                           shape: RoundedRectangleBorder(
@@ -586,22 +587,22 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                       ),
                     ),
                     const SizedBox(width: 16),
-                      SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.45, 
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.45,
                       child: ElevatedButton(
                         onPressed: selectedAnswers[currentQuestionIndex] != null
                             ? _nextQuestion
                             : null,
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
+                                (Set<MaterialState> states) {
                               if (states.contains(MaterialState.disabled)) {
-                                return textColor.withOpacity(0.5); 
+                                return textColor.withOpacity(0.5);
                               }
-                              return textColor; 
+                              return textColor;
                             },
                           ),
-                          overlayColor: MaterialStateProperty.all(Colors.transparent), 
+                          overlayColor: MaterialStateProperty.all(Colors.transparent),
                           padding: MaterialStateProperty.all(
                             const EdgeInsets.symmetric(vertical: 15),
                           ),
