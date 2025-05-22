@@ -35,8 +35,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Define consistent colors
   final Color primaryBlue = const Color.fromARGB(255, 24, 53, 98);
-  final Color primaryLightBlue = Color.fromARGB(255, 40, 65, 102);
-  final Color backgroundBlue = Color.fromARGB(255, 235, 245, 255);
+  final Color primaryLightBlue = const Color.fromARGB(255, 40, 65, 102);
+  final Color backgroundBlue = const Color.fromARGB(255, 235, 245, 255);
   final Color accentRed = Colors.redAccent;
 
   @override
@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       }
     }
 
-    void _scheduleFeatureReminder(int featureIndex) async {
+    void scheduleFeatureReminder(int featureIndex) async {
       final featureName = features[featureIndex]['name'];
 
       // Different reminder periods based on importance (you can adjust these)
@@ -436,6 +436,147 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           });
         }
       }
+
+
+
+      if (mode == 'hard' && features.every((f) => f['score'] == 5)) {
+  Future.microtask(() async {
+    final AnimationController bellController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    final Animation<double> shakeAnimation = Tween(begin: -0.05, end: 0.05)
+        .chain(CurveTween(curve: Curves.elasticIn))
+        .animate(bellController);
+
+    bellController.repeat(reverse: true);
+
+    await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: AnimatedBuilder(
+            animation: shakeAnimation,
+            builder: (context, child) {
+              return Transform.rotate(
+                angle: shakeAnimation.value,
+                child: child,
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(
+                        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark ? 0.2 : 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 255, 215, 0), 
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.notifications_active_outlined,
+                      size: 40,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.amber[100],
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Text(
+                      "NOTIFICATIONS",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber[800],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Stay Updated!",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                          ? Colors.white
+                          : primaryBlue,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Great job! You’ve completed all Hard quizzes. Turn on notifications to get updates on new features and content.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                          ? Colors.white
+                          : primaryLightBlue,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        bellController.dispose();
+                        _showNotificationSettings(); 
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber[700],
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: const Text(
+                        "Enable Notifications",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  });
+}
+
+
+
     }
   } finally {
     _isNavigating = false;
@@ -451,7 +592,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) {
-          return NotificationSettingsModal();
+          return const NotificationSettingsModal();
         },
       ),
     );
@@ -601,7 +742,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
 
     if (_isLoading) {
-      return Scaffold(
+      return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -619,7 +760,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               if (_isOffline)
                 ElevatedButton(
                   onPressed: _fetchFeatures,
-                  child: Text('Retry Connection'),
+                  child: const Text('Retry Connection'),
                 ),
             ],
           ),
@@ -692,8 +833,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        SliverToBoxAdapter(
-                          child: const SizedBox(height: 5),
+                        const SliverToBoxAdapter(
+                          child: SizedBox(height: 5),
                         ),
                         SliverPersistentHeader(
                           pinned: true,
@@ -1122,7 +1263,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                                       .circular(
                                                                           8),
                                                             ),
-                                                            child: Center(
+                                                            child: const Center(
                                                               child: Icon(
                                                                 Icons
                                                                     .play_circle_fill,
@@ -1280,8 +1421,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: FloatingActionButton(
                     onPressed: _showNotificationSettings,
                     backgroundColor: primaryBlue,
-                    child: const Icon(Icons.notifications_active, color: Colors.white),
                     tooltip: 'Notification Settings',
+                    child: const Icon(Icons.notifications_active, color: Colors.white),
                   ),
                 ),
               ],
