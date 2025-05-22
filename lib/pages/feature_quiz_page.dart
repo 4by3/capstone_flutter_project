@@ -306,33 +306,65 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                 isDarkMode ? Colors.grey[900] : Colors.white.withOpacity(0.95),
             elevation: 10,
             contentPadding: const EdgeInsets.all(20),
-            title: Column(
-              children: [
-                Icon(
-                  isCorrect ? Icons.check_circle : Icons.close,
-                  color: isCorrect ? Colors.green : Colors.red,
-                  size: 80,
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 10),
-                Text(
-                  isCorrect
-                      ? (currentQuestionIndex == questions.length - 1
-                          ? 'Congratulations on finishing!'
-                          : 'On to the next one?')
-                      : 'Feedback: ${currentQuestion['feedback']}',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: isDarkMode ? Colors.white : textColor,
+            content: SizedBox(
+              width: 200,
+              height: 200,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 30), // Increased top padding
+                    child: Icon(
+                      isCorrect
+                          ? Icons.check_circle
+                          : Icons
+                              .cancel, // Changed to Icons.cancel for a bolder style
+                      color: isCorrect ? Colors.green : Colors.red,
+                      size: 80,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 10),
+                          Text(
+                            isCorrect
+                                ? (currentQuestionIndex == questions.length - 1
+                                    ? 'Congratulations on finishing!'
+                                    : 'On to the next one?')
+                                : 'Feedback: ',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: isDarkMode ? Colors.white : textColor,
+                            ),
+                          ),
+                          if (!isCorrect)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: AutoSizeText(
+                                currentQuestion['feedback'],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: isDarkMode ? Colors.white : textColor,
+                                ),
+                                maxLines: 10,
+                                minFontSize: 14,
+                                stepGranularity: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             actions: [
               Center(
@@ -442,49 +474,52 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
             isDarkMode ? Colors.grey[900] : Colors.white.withOpacity(0.95),
         elevation: 10,
         contentPadding: const EdgeInsets.all(20),
-        title: Column(
-          children: [
-            Icon(
-              score == totalQuestions ? Icons.celebration : Icons.check,
-              color: score == totalQuestions
-                  ? Colors.amber
-                  : (isDarkMode ? Colors.white : textColor),
-              size: 80,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              score == totalQuestions ? 'Perfect Score!' : 'Well Done!',
-              style: TextStyle(
-                color: isDarkMode ? Colors.white : textColor,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+        content: SizedBox(
+          width: 200,
+          height: 200,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                score == totalQuestions ? Icons.celebration : Icons.check,
+                color: score == totalQuestions
+                    ? Colors.amber
+                    : (isDarkMode ? Colors.white : textColor),
+                size: 80,
               ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '$score/$totalQuestions',
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : textColor,
+              const SizedBox(height: 20),
+              Text(
+                score == totalQuestions ? 'Perfect Score!' : 'Well Done!',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : textColor,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              score == totalQuestions
-                  ? 'You\'re a privacy expert!'
-                  : 'Nice work! Try again to improve?',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                color: isDarkMode ? Colors.white : textColor,
+              const SizedBox(height: 20),
+              Text(
+                '$score/$totalQuestions',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : textColor,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Expanded(
+                child: Text(
+                  score == totalQuestions
+                      ? 'You\'re a privacy expert!'
+                      : 'Nice work! Try again to improve?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: isDarkMode ? Colors.white : textColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           Center(
@@ -940,7 +975,6 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                         TextOverflow.ellipsis,
                                                     textAlign: TextAlign.left,
                                                     wrapWords: true,
-
                                                   ),
                                                 ],
                                               ),
