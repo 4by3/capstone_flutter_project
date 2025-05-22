@@ -436,9 +436,8 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Question section with FIXED HEIGHT for consistency
                       Container(
-                        height: 180, // Fixed height for consistency
+                        height: 180,
                         width: double.infinity,
                         padding: const EdgeInsets.only(bottom: 24),
                         child: FadeTransition(
@@ -448,35 +447,35 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                             child: Container(
                               width: double.infinity,
                               constraints: BoxConstraints(
-                                minHeight: 80, // Minimum height for consistency
-                                maxHeight: 150, // Maximum height to prevent overflow
+                                minHeight: 80,
+                                maxHeight: 150,
                               ),
                               padding: const EdgeInsets.only(bottom: 30),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center, // Center the content vertically
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
                                     'Q${currentQuestionIndex + 1}',
                                     style: TextStyle(
-                                      fontSize: 20, // Reduced from 32 to match FeatureQuizPage
+                                      fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(context).textTheme.bodyLarge?.color,
                                     ),
                                   ),
-                                  const SizedBox(height: 8), // Reduced from 16
-                                  Flexible( // Allow text to wrap properly
-                                    child: Text( // Changed from AutoSizeText to regular Text
+                                  const SizedBox(height: 8),
+                                  Flexible(
+                                    child: Text(
                                       question['question'],
                                       style: TextStyle(
-                                        fontSize: 21, // Reduced from 32 to match FeatureQuizPage
-                                        fontWeight: FontWeight.bold, // Changed from w600 to bold
+                                        fontSize: 21,
+                                        fontWeight: FontWeight.bold,
                                         height: 1.4,
                                         color: Theme.of(context).textTheme.bodyLarge?.color,
                                       ),
-                                      maxLines: 4, // Allow up to 4 lines
-                                      overflow: TextOverflow.visible, // Show all text
-                                      softWrap: true, // Enable text wrapping
+                                      maxLines: 4,
+                                      overflow: TextOverflow.visible,
+                                      softWrap: true,
                                     ),
                                   ),
                                 ],
@@ -485,10 +484,9 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                           ),
                         ),
                       ),
-                      // Answer options section with EXPANDED to fill remaining space
                       Expanded(
                         child: ListView.builder(
-                          padding: EdgeInsets.zero, // Remove padding from ListView
+                          padding: EdgeInsets.zero,
                           itemCount: options.length,
                           itemBuilder: (context, index) {
                             final option = options[index];
@@ -533,8 +531,8 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                       return Opacity(
                                         opacity: _answerClickOpacityAnimations[clickAnimationIndex].value,
                                         child: Container(
-                                          constraints: BoxConstraints(minHeight: 65), // Reduced from 77 to match FeatureQuizPage
-                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // Reduced horizontal padding from 20 to 16
+                                          constraints: BoxConstraints(minHeight: 65),
+                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                                           decoration: BoxDecoration(
                                             color: isSelected
                                                 ? Colors.white.withOpacity(0.95)
@@ -563,14 +561,14 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                             child: AutoSizeText(
                                               option,
                                               style: TextStyle(
-                                                fontSize: 16, // Reduced from 20 to match FeatureQuizPage
+                                                fontSize: 16,
                                                 color: isSelected
                                                     ? Colors.black87
                                                     : (isDarkMode ? Colors.white : Colors.white),
-                                                fontWeight: FontWeight.w500, // Changed from bold to w500 to match FeatureQuizPage
+                                                fontWeight: FontWeight.w500,
                                               ),
-                                              minFontSize: 12, // Reduced from 14
-                                              maxLines: 3, // Increased from 2 to match FeatureQuizPage
+                                              minFontSize: 12,
+                                              maxLines: 3,
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
