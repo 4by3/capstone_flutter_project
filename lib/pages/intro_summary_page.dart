@@ -73,7 +73,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
   @override
   Widget build(BuildContext context) {
     final isEasy = widget.quizMode == 'easy';
-    final totalPossibleScore = 15;
+    const totalPossibleScore = 15;
     final isDarkMode =
         Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
 
@@ -147,7 +147,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: Text(
-                              isEasy ? "EASY MODE" : "HARD MODE",
+                              isEasy ? "Beginner Level" : "Advanced Level",
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -339,10 +339,10 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                               ),
                             ],
                           ),
-                          child: Center(
+                          child: const Center(
                             child: Text(
                               "Continue",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
