@@ -303,24 +303,89 @@ class _IntroQuizPageState extends State<IntroQuizPage>
         Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: null,
-        backgroundColor: isDarkMode ? Colors.black : Colors.blue[50],
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(
-              isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: isDarkMode ? Colors.white : Colors.black,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: isDarkMode
+                ? LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.black, Colors.black],
+            )
+                : LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.blue[50]!, Colors.blue[50]!],
             ),
-            onPressed: () {
-              final themeProvider =
-                  Provider.of<ThemeProvider>(context, listen: false);
-              themeProvider.toggleTheme();
-            },
-            tooltip: 'Toggle Theme',
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            leading: null,
+            automaticallyImplyLeading: false,
+            actions: [
+              Container(
+                margin: const EdgeInsets.only(right: 16),
+                child: GestureDetector(
+                  onTap: () {
+                    Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: 50,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(13),
+                      gradient: isDarkMode
+                          ? LinearGradient(colors: [Colors.blue, Colors.blue.withOpacity(0.8)])
+                          : LinearGradient(colors: [Colors.grey[300]!, Colors.grey[400]!]),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        AnimatedPositioned(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          top: 2,
+                          left: isDarkMode ? 26 : 2,
+                          child: Container(
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.25),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              isDarkMode ? Icons.nights_stay : Icons.wb_sunny,
+                              size: 12,
+                              color: isDarkMode ? Colors.blue : Colors.orange[700],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: Container(
         decoration: isDarkMode
@@ -366,186 +431,161 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                 ),
               ),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      fit: FlexFit.loose,
-                      child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Question section with FIXED HEIGHT for consistency
+                      Container(
+                        height: 180, // Fixed height for consistency
+                        width: double.infinity,
+                        padding: const EdgeInsets.only(bottom: 24),
                         child: FadeTransition(
                           opacity: _questionFadeAnimation,
                           child: ScaleTransition(
                             scale: _questionScaleAnimation,
-                            child: Padding(
-                              padding:
-                              const EdgeInsets.symmetric(horizontal: 24),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'Q${currentQuestionIndex + 1}',
-                                      style: TextStyle(
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.color,
-                                      ),
+                            child: Container(
+                              width: double.infinity,
+                              constraints: BoxConstraints(
+                                minHeight: 80, // Minimum height for consistency
+                                maxHeight: 150, // Maximum height to prevent overflow
+                              ),
+                              padding: const EdgeInsets.only(bottom: 30),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center, // Center the content vertically
+                                children: [
+                                  Text(
+                                    'Q${currentQuestionIndex + 1}',
+                                    style: TextStyle(
+                                      fontSize: 20, // Reduced from 32 to match FeatureQuizPage
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).textTheme.bodyLarge?.color,
                                     ),
-                                    const SizedBox(height: 16),
-                                    AutoSizeText(
+                                  ),
+                                  const SizedBox(height: 8), // Reduced from 16
+                                  Flexible( // Allow text to wrap properly
+                                    child: Text( // Changed from AutoSizeText to regular Text
                                       question['question'],
                                       style: TextStyle(
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 21, // Reduced from 32 to match FeatureQuizPage
+                                        fontWeight: FontWeight.bold, // Changed from w600 to bold
                                         height: 1.4,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.color,
+                                        color: Theme.of(context).textTheme.bodyLarge?.color,
                                       ),
-                                      maxLines: 5,
-                                      minFontSize: 14,
-                                      stepGranularity: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.left,
+                                      maxLines: 4, // Allow up to 4 lines
+                                      overflow: TextOverflow.visible, // Show all text
+                                      softWrap: true, // Enable text wrapping
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 370),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 20),
-                        itemCount: options.length,
-                        itemBuilder: (context, index) {
-                          final option = options[index];
-                          final isSelected =
-                              selectedAnswers[currentQuestionIndex] == option;
-                          final animationIndex =
-                          index < _answerFadeAnimations.length
-                              ? index
-                              : _answerFadeAnimations.length - 1;
-                          final clickAnimationIndex =
-                          index < _answerClickOpacityAnimations.length
-                              ? index
-                              : _answerClickOpacityAnimations.length - 1;
+                      // Answer options section with EXPANDED to fill remaining space
+                      Expanded(
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero, // Remove padding from ListView
+                          itemCount: options.length,
+                          itemBuilder: (context, index) {
+                            final option = options[index];
+                            final isSelected = selectedAnswers[currentQuestionIndex] == option;
+                            final animationIndex = index < _answerFadeAnimations.length
+                                ? index
+                                : _answerFadeAnimations.length - 1;
+                            final clickAnimationIndex = index < _answerClickOpacityAnimations.length
+                                ? index
+                                : _answerClickOpacityAnimations.length - 1;
 
-                          return FadeTransition(
-                            opacity: _answerFadeAnimations[animationIndex],
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: GestureDetector(
-                                onTapDown: (_) {
-                                  setState(() {
-                                    _isHovered[index] = true;
-                                  });
-                                },
-                                onTapCancel: () {
-                                  setState(() {
-                                    _isHovered[index] = false;
-                                  });
-                                },
-                                onTapUp: (_) {
-                                  setState(() {
-                                    _isHovered[index] = false;
-                                  });
-                                },
-                                onTap: () {
-                                  setState(() {
-                                    selectedAnswers[currentQuestionIndex] =
-                                        option;
-                                  });
-                                  _answerClickControllers[clickAnimationIndex]
-                                      .reset();
-                                  _answerClickControllers[clickAnimationIndex]
-                                      .forward();
-                                },
-                                child: AnimatedBuilder(
-                                  animation: _answerClickOpacityAnimations[
-                                  clickAnimationIndex],
-                                  builder: (context, child) {
-                                    return Opacity(
-                                      opacity: _answerClickOpacityAnimations[
-                                      clickAnimationIndex]
-                                          .value,
-                                      child: Container(
-                                        height: 77,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 10),
-                                        decoration: BoxDecoration(
-                                          color: isSelected
-                                              ? Colors.white.withOpacity(0.95)
-                                              : (isDarkMode
-                                                  ? (_isHovered[index]
-                                                      ? Colors.grey[850]
-                                                      : Colors.grey[900])
-                                                  : answerColor),
-                                          border: isDarkMode
-                                              ? Border.all(
-                                                  color: _isHovered[index]
-                                                      ? Colors.white
-                                                          .withOpacity(0.7)
-                                                      : Colors.white
-                                                          .withOpacity(0.3),
-                                                  width: 1.5,
-                                                )
-                                              : null,
-                                          borderRadius:
-                                          BorderRadius.circular(15),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                  isDarkMode ? 0.2 : 0.1),
-                                              blurRadius: 6,
-                                              offset: const Offset(0, 2),
+                            return FadeTransition(
+                              opacity: _answerFadeAnimations[animationIndex],
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: GestureDetector(
+                                  onTapDown: (_) {
+                                    setState(() {
+                                      _isHovered[index] = true;
+                                    });
+                                  },
+                                  onTapCancel: () {
+                                    setState(() {
+                                      _isHovered[index] = false;
+                                    });
+                                  },
+                                  onTapUp: (_) {
+                                    setState(() {
+                                      _isHovered[index] = false;
+                                    });
+                                  },
+                                  onTap: () {
+                                    setState(() {
+                                      selectedAnswers[currentQuestionIndex] = option;
+                                    });
+                                    _answerClickControllers[clickAnimationIndex].reset();
+                                    _answerClickControllers[clickAnimationIndex].forward();
+                                  },
+                                  child: AnimatedBuilder(
+                                    animation: _answerClickOpacityAnimations[clickAnimationIndex],
+                                    builder: (context, child) {
+                                      return Opacity(
+                                        opacity: _answerClickOpacityAnimations[clickAnimationIndex].value,
+                                        child: Container(
+                                          constraints: BoxConstraints(minHeight: 65), // Reduced from 77 to match FeatureQuizPage
+                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // Reduced horizontal padding from 20 to 16
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? Colors.white.withOpacity(0.95)
+                                                : (isDarkMode
+                                                ? (_isHovered[index] ? Colors.grey[850] : Colors.grey[900])
+                                                : answerColor),
+                                            border: isDarkMode
+                                                ? Border.all(
+                                              color: _isHovered[index]
+                                                  ? Colors.white.withOpacity(0.7)
+                                                  : Colors.white.withOpacity(0.3),
+                                              width: 1.5,
+                                            )
+                                                : null,
+                                            borderRadius: BorderRadius.circular(15),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.1),
+                                                blurRadius: 6,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: AutoSizeText(
+                                              option,
+                                              style: TextStyle(
+                                                fontSize: 16, // Reduced from 20 to match FeatureQuizPage
+                                                color: isSelected
+                                                    ? Colors.black87
+                                                    : (isDarkMode ? Colors.white : Colors.white),
+                                                fontWeight: FontWeight.w500, // Changed from bold to w500 to match FeatureQuizPage
+                                              ),
+                                              minFontSize: 12, // Reduced from 14
+                                              maxLines: 3, // Increased from 2 to match FeatureQuizPage
+                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                          ],
-                                        ),
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: AutoSizeText(
-                                            option,
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              color: isSelected
-                                                  ? Colors.black87
-                                                  : (isDarkMode
-                                                      ? Colors.white
-                                                      : Colors.white),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            maxLines: 2,
-                                            minFontSize: 14,
-                                            stepGranularity: 1,
-                                            wrapWords: true,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.left,
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Padding(
