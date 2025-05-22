@@ -1255,37 +1255,6 @@ Future<void> initFCM() async {
   String? token = await messaging.getToken();
   print("FCM Token: $token");
 
-  // Get the current user's ID from Firebase Authentication
-  User? user = FirebaseAuth.instance.currentUser;
-
-  if (token != null && user != null) {
-    // Reference to the user's document in the 'users' collection
-    DocumentReference userDocRef =
-        FirebaseFirestore.instance.collection('users').doc(user.uid);
-
-    // Check if the user's document exists
-    DocumentSnapshot userDoc = await userDocRef.get();
-
-    if (!userDoc.exists) {
-      // Create the document if it doesn't exist
-      await userDocRef.set({
-        'fcmToken': token,
-        'createdAt': FieldValue.serverTimestamp(), // Optional: Track creation time
-        'uid': user.uid, // Optional: Store UID for reference
-        // Add other initial fields as needed, e.g., 'email': user.email
-      });
-      print("Created new user document for: ${user.uid}");
-    } else {
-      // Update the existing document with the FCM token
-      await userDocRef.set(
-        {'fcmToken': token},
-        SetOptions(merge: true), // Use merge to avoid overwriting other fields
-      );
-      print("Updated FCM token for user: ${user.uid}");
-    }
-  } else {
-    print("No user logged in or no FCM token available");
-  }
 
   // Initialize local notifications
   const AndroidInitializationSettings initializationSettingsAndroid =
@@ -1312,21 +1281,6 @@ Future<void> initFCM() async {
         message.notification!.body ?? 'No Body',
         message.data['featureIndex'] ?? '',
       );
-    }
-  });
-
-  // Handle token refresh
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .set(
-            {'fcmToken': newToken},
-            SetOptions(merge: true),
-          );
-      print("Updated FCM token on refresh for user: ${user.uid}");
     }
   });
 }
