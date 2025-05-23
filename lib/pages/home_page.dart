@@ -438,144 +438,141 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       }
 
 
-
       if (mode == 'hard' && features.every((f) => f['score'] == 5)) {
-  Future.microtask(() async {
-    final AnimationController bellController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    final Animation<double> shakeAnimation = Tween(begin: -0.05, end: 0.05)
-        .chain(CurveTween(curve: Curves.elasticIn))
-        .animate(bellController);
+        Future.microtask(() async {
+          final AnimationController bellController = AnimationController(
+            duration: const Duration(milliseconds: 600),
+            vsync: this,
+          );
+          final Animation<double> shakeAnimation = Tween(begin: -0.04, end: 0.5)
+              .chain(CurveTween(curve: Curves.elasticIn))
+              .animate(bellController);
 
-    bellController.repeat(reverse: true);
+          bellController.repeat(reverse: true);
 
-    await showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) {
-        return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          child: AnimatedBuilder(
-            animation: shakeAnimation,
-            builder: (context, child) {
-              return Transform.rotate(
-                angle: shakeAnimation.value,
-                child: child,
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                    ? Colors.grey[900]
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(
-                        Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark ? 0.2 : 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 255, 215, 0), 
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.notifications_active_outlined,
-                      size: 40,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.amber[100],
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Text(
-                      "NOTIFICATIONS",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.amber[800],
+          await showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (_) {
+              return Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                        ? Colors.grey[900]
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(
+                            Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark ? 0.2 : 0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "Stay Updated!",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                          ? Colors.white
-                          : primaryBlue,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "Great job! You’ve completed all Hard quizzes. Turn on notifications to get updates on new features and content.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                          ? Colors.white
-                          : primaryLightBlue,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        bellController.dispose();
-                        _showNotificationSettings(); 
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber[700],
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [                      
+                      AnimatedBuilder(
+                        animation: shakeAnimation,
+                        builder: (context, child) {
+                          return Transform.rotate(
+                            angle: shakeAnimation.value,
+                            child: child,
+                          );
+                        },
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 255, 215, 0), 
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.notifications_active_outlined,
+                            size: 40,
+                            color: Colors.white,
+                          ),
                         ),
-                        elevation: 4,
                       ),
-                      child: const Text(
-                        "Enable Notifications",
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.amber[100],
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Text(
+                          "NOTIFICATIONS",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber[800],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Stay Updated!",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                              ? Colors.white
+                              : primaryBlue,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Great job! You’ve completed all Hard quizzes. Turn on notifications to get updates on new features and content.",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                              ? Colors.white
+                              : primaryLightBlue,
+                          height: 1.4,
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            bellController.dispose();
+                            _showNotificationSettings();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber[700],
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 4,
+                          ),
+                          child: const Text(
+                            "Enable Notifications",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  });
-}
-
-
+                ),
+              );
+            },
+          );
+        });
+      }
 
     }
   } finally {
