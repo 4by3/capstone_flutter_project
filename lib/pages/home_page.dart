@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:capstone_project/services/privacy_notification_service.dart';
 import 'package:capstone_project/services/notification_settings_modal.dart';
+import 'package:capstone_project/services/sound_service.dart';
 import 'package:confetti/confetti.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -509,14 +510,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () async {
+              await SoundService.playClick(); // 🔊 Play click sound
+              Navigator.pop(context, false); // Cancel reset
+            },
             child: const Text(
               'Cancel',
               style: TextStyle(color: Colors.blueAccent),
             ),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () async {
+              await SoundService.playClick(); //  Play button click sound
+              Navigator.pop(context, true);
+            },
             child: Text(
               'Reset',
               style: TextStyle(color: accentRed),

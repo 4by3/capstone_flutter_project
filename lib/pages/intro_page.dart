@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:capstone_project/services/sound_service.dart';
 import 'package:provider/provider.dart';
 import 'intro_quiz_page.dart';
 import 'package:capstone_project/main.dart';
@@ -208,7 +209,8 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                 child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await SoundService.playClick(); // 🔊 Add this line
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
@@ -217,12 +219,8 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode
-                          ? Colors.white
-                          : null, // White background in dark mode
-                      foregroundColor: isDarkMode
-                          ? Colors.black
-                          : null, // Black ripple effect in dark mode
+                      backgroundColor: isDarkMode ? Colors.white : null,
+                      foregroundColor: isDarkMode ? Colors.black : null,
                       padding: EdgeInsets.symmetric(
                         horizontal: 40 * scaleFactor,
                         vertical: 26 * scaleFactor,

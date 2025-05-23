@@ -2,7 +2,7 @@ name: capstone_project
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -36,7 +36,7 @@ dependencies:
   google_fonts: ^6.2.1
   auto_size_text: ^3.0.0
   audioplayers: ^5.2.1
-  provider: ^6.1.2  # Added provider dependency
+  provider: ^6.1.2 # Added provider dependency
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -53,7 +53,6 @@ dependencies:
   firebase_auth: ^5.5.3
 
   
-
 
 dev_dependencies:
   flutter_test:
@@ -78,7 +77,6 @@ flutter_icons:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -97,6 +95,7 @@ flutter:
     - assets/audio/correct_answer.mp3
     - assets/audio/wrong_answer.mp3
     - assets/audio/background_music.mp3
+    - assets/audio/button_sound.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

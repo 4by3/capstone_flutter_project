@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:capstone_project/services/sound_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart'; // Added for ThemeProvider
 import 'home_page.dart';
@@ -219,7 +220,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                   const SizedBox(height: 20),
                                   Row(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         padding: const EdgeInsets.all(10),
@@ -228,7 +229,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                               ? Colors.grey[800]
                                               : lightBlue,
                                           borderRadius:
-                                          BorderRadius.circular(12),
+                                              BorderRadius.circular(12),
                                         ),
                                         child: Icon(
                                           Icons.lightbulb_outline,
@@ -255,7 +256,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                   const SizedBox(height: 20),
                                   Row(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         padding: const EdgeInsets.all(10),
@@ -264,7 +265,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                                               ? Colors.grey[800]
                                               : lightBlue,
                                           borderRadius:
-                                          BorderRadius.circular(12),
+                                              BorderRadius.circular(12),
                                         ),
                                         child: Icon(
                                           Icons.access_time,
@@ -315,7 +316,8 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                         setState(() {
                           _isHovered = false;
                         });
-                        _continueToHome(context);
+                        SoundService.playClick(); // 🔊 Play button sound
+                        _continueToHome(context); // ⏩ Navigate after sound
                       },
                       child: SizedBox(
                         width: double.infinity,
