@@ -493,7 +493,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
         contentPadding: const EdgeInsets.all(20),
         content: SizedBox(
           width: 200,
-          height: 200,
+          height: 250,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -942,7 +942,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                               ),
                                             ],
                                           ),
-                                          child: Icon(
+                                          child: const Icon(
                                             Icons.play_circle_fill,
                                             color: Colors.white,
                                             size: 24,
@@ -1051,7 +1051,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                           scale: _questionScaleAnimation,
                                           child: Container(
                                             width: double.infinity,
-                                            constraints: BoxConstraints(
+                                            constraints: const BoxConstraints(
                                               minHeight: 80,
                                               maxHeight: 150,
                                             ),
@@ -1168,7 +1168,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                               .value,
                                                       child: Container(
                                                         constraints:
-                                                            BoxConstraints(
+                                                            const BoxConstraints(
                                                                 minHeight: 65),
                                                         padding:
                                                             const EdgeInsets
@@ -1386,10 +1386,10 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                             ),
                                           ],
                                         ),
-                                        child: Center(
+                                        child: const Center(
                                           child: Text(
                                             'Submit',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 16,
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -1502,10 +1502,10 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                             ),
                                           ],
                                         ),
-                                        child: Center(
+                                        child: const Center(
                                           child: Text(
                                             'Close',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 16,
                                             ),

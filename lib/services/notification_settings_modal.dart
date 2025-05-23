@@ -805,24 +805,6 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
           const SizedBox(height: 16),
           Center(
             child: ElevatedButton.icon(
-              onPressed: _sendTestNotification,
-              icon: const Icon(Icons.send_rounded),
-              label: const Text('Send Scheduled Test'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isDarkMode ? Colors.grey[800] : primaryBlue,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Center(
-            child: ElevatedButton.icon(
               onPressed: _sendImmediateTestNotification,
               icon: const Icon(Icons.notifications_rounded),
               label: const Text('Send Immediate Test'),

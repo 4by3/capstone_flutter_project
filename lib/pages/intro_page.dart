@@ -258,9 +258,9 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                 ],
               ),
               Positioned(
-                left: 16.0 * scaleFactor,
-                right: 16.0 * scaleFactor,
-                bottom: 16.0 * scaleFactor,
+                left: 20.0 * scaleFactor,
+                right: 20.0 * scaleFactor,
+                bottom: 34.0 * scaleFactor,
                 child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: ElevatedButton(
@@ -281,8 +281,8 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                           ? Colors.black
                           : null,
                       padding: EdgeInsets.symmetric(
-                        horizontal: 40 * scaleFactor,
-                        vertical: 26 * scaleFactor,
+                        horizontal: 25* scaleFactor,
+                        vertical: 20 * scaleFactor,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100 * scaleFactor),
