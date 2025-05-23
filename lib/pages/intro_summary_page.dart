@@ -85,21 +85,98 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
         Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Summary'),
-        backgroundColor: isDarkMode ? Colors.black : Colors.blue[50],
-        actions: [
-          IconButton(
-            icon: Icon(
-              isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: isDarkMode ? Colors.white : Colors.black,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: isDarkMode
+                ? LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.black, Colors.black],
+            )
+                : LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [backgroundColor, backgroundColor],
             ),
-            onPressed: () {
-              Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
-            },
-            tooltip: 'Toggle Theme',
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            title: Text(
+              'Summary',
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : textColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            automaticallyImplyLeading: false,
+            actions: [
+              Container(
+                margin: const EdgeInsets.only(right: 16),
+                child: GestureDetector(
+                  onTap: () {
+                    Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: 50,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(13),
+                      gradient: isDarkMode
+                          ? LinearGradient(colors: [
+                        Colors.blue,
+                        Colors.blue.withOpacity(0.8)
+                      ])
+                          : LinearGradient(colors: [Colors.grey[300]!, Colors.grey[400]!]),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        AnimatedPositioned(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          top: 2,
+                          left: isDarkMode ? 26 : 2,
+                          child: Container(
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.25),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              isDarkMode ? Icons.nights_stay : Icons.wb_sunny,
+                              size: 12,
+                              color: isDarkMode ? Colors.blue : Colors.orange[700],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: Container(
         decoration: isDarkMode
@@ -112,6 +189,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
           ),
         ),
         child: SafeArea(
+          top: false,
           child: FadeTransition(
             opacity: _fadeAnimation,
             child: ScaleTransition(
@@ -154,7 +232,7 @@ class _IntroSummaryPageState extends State<IntroSummaryPage>
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: Text(
-                              isEasy ? "EASY MODE" : "HARD MODE",
+                              isEasy ? "Beginner Level" : "Advanced Level",
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,

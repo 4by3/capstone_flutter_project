@@ -52,27 +52,40 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
   final Color textColor = const Color.fromARGB(255, 24, 53, 98);
   final Color answerColor = const Color.fromARGB(255, 18, 40, 74);
 
+  final Color primaryBlue = const Color.fromARGB(255, 24, 53, 98);
+  final Color backgroundBlue = const Color.fromARGB(255, 173, 216, 230);
+
+  // Helper method to get mode-specific keys
+  String _getModeSpecificKey(String baseKey) {
+    return '${baseKey}_${widget.mode}';
+  }
+
   Future<void> _saveProgress() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedProgress =
-        prefs.getInt('feature_${widget.featureIndex}_progress') ?? 0;
+    final progressKey =
+        _getModeSpecificKey('feature_${widget.featureIndex}_progress');
+    final savedProgress = prefs.getInt(progressKey) ?? 0;
 
     if (currentQuestionIndex > savedProgress) {
-      await prefs.setInt(
-          'feature_${widget.featureIndex}_progress', currentQuestionIndex);
+      await prefs.setInt(progressKey, currentQuestionIndex);
     }
 
-    selectedAnswers.forEach((index, answer) {
-      prefs.setString('feature_${widget.featureIndex}_answer_$index', answer);
-      prefs.setBool('feature_${widget.featureIndex}_correct_$index',
-          previouslyCorrect[index] ?? false);
+    selectedAnswers.forEach((index, answer) async {
+      final answerKey =
+          _getModeSpecificKey('feature_${widget.featureIndex}_answer_$index');
+      final correctKey =
+          _getModeSpecificKey('feature_${widget.featureIndex}_correct_$index');
+
+      await prefs.setString(answerKey, answer);
+      await prefs.setBool(correctKey, previouslyCorrect[index] ?? false);
     });
   }
 
   Future<void> _loadSavedProgress() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedIndex =
-        prefs.getInt('feature_${widget.featureIndex}_progress') ?? 0;
+    final progressKey =
+        _getModeSpecificKey('feature_${widget.featureIndex}_progress');
+    final savedIndex = prefs.getInt(progressKey) ?? 0;
 
     final questions = await _questionsFuture;
 
@@ -83,11 +96,13 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
 
     int tempScore = 0;
     for (int i = 0; i < questions.length; i++) {
-      final key = 'feature_${widget.featureIndex}_answer_$i';
-      final correctKey = 'feature_${widget.featureIndex}_correct_$i';
+      final answerKey =
+          _getModeSpecificKey('feature_${widget.featureIndex}_answer_$i');
+      final correctKey =
+          _getModeSpecificKey('feature_${widget.featureIndex}_correct_$i');
 
-      if (prefs.containsKey(key)) {
-        selectedAnswers[i] = prefs.getString(key)!;
+      if (prefs.containsKey(answerKey)) {
+        selectedAnswers[i] = prefs.getString(answerKey)!;
       }
 
       if (prefs.getBool(correctKey) == true) {
@@ -635,26 +650,115 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Feature Quiz'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () async {
-              await _onWillPop();
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                color: isDarkMode ? Colors.white : textColor,
-              ),
-              onPressed: () {
-                Provider.of<ThemeProvider>(context, listen: false)
-                    .toggleTheme();
-              },
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: isDarkMode
+                  ? LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Colors.grey[900]!, Colors.black],
+                    )
+                  : LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Colors.white, backgroundBlue.withOpacity(0.3)],
+                    ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-          ],
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text(
+                'Feature Quiz',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : primaryBlue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: isDarkMode ? Colors.white : primaryBlue,
+                ),
+                onPressed: () async {
+                  await _onWillPop();
+                },
+              ),
+              actions: [
+                Container(
+                  margin: const EdgeInsets.only(right: 16),
+                  child: GestureDetector(
+                    onTap: () {
+                      Provider.of<ThemeProvider>(context, listen: false)
+                          .toggleTheme();
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      width: 50,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(13),
+                        gradient: isDarkMode
+                            ? LinearGradient(colors: [
+                                primaryBlue,
+                                primaryBlue.withOpacity(0.8)
+                              ])
+                            : LinearGradient(
+                                colors: [Colors.grey[300]!, Colors.grey[400]!]),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Stack(
+                        children: [
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            top: 2,
+                            left: isDarkMode ? 26 : 2,
+                            child: Container(
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.25),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                isDarkMode ? Icons.nights_stay : Icons.wb_sunny,
+                                size: 12,
+                                color: isDarkMode
+                                    ? primaryBlue
+                                    : Colors.orange[700],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
         body: FutureBuilder<List<Map<String, dynamic>>>(
           future: _questionsFuture,
@@ -746,7 +850,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                       Text(
                                         'Question ${currentQuestionIndex + 1}/$totalQuestions',
                                         style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                           color: isDarkMode
                                               ? Colors.white
@@ -756,7 +860,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                       Text(
                                         'Score: $score',
                                         style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                           color: isDarkMode
                                               ? Colors.white
@@ -928,222 +1032,231 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                               ),
                             ),
                             Expanded(
-                              child: Column(
-                                children: [
-                                  Flexible(
-                                    fit: FlexFit.loose,
-                                    child: Center(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 24),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Question section with FIXED HEIGHT
+                                    Container(
+                                      height:
+                                          180, // Fixed height for consistency
+                                      width: double.infinity,
+                                      padding:
+                                          const EdgeInsets.only(bottom: 24),
                                       child: FadeTransition(
                                         opacity: _questionFadeAnimation,
                                         child: ScaleTransition(
                                           scale: _questionScaleAnimation,
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 24),
-                                            child: SizedBox(
-                                              width: double.infinity,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text(
-                                                    'Q${currentQuestionIndex + 1}',
-                                                    style: TextStyle(
-                                                      fontSize: 30,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: isDarkMode
-                                                          ? Colors.white
-                                                          : textColor,
-                                                    ),
+                                          child: Container(
+                                            width: double.infinity,
+                                            constraints: BoxConstraints(
+                                              minHeight: 80,
+                                              maxHeight: 150,
+                                            ),
+                                            padding: const EdgeInsets.only(
+                                                bottom: 30),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  'Q${currentQuestionIndex + 1}',
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: isDarkMode
+                                                        ? Colors.white
+                                                        : textColor,
                                                   ),
-                                                  const SizedBox(height: 9),
-                                                  AutoSizeText(
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Flexible(
+                                                  child: Text(
                                                     question['question'],
                                                     style: TextStyle(
-                                                      fontSize: 30,
+                                                      fontSize: 21,
                                                       fontWeight:
-                                                          FontWeight.w600,
+                                                          FontWeight.bold,
                                                       height: 1.4,
                                                       color: isDarkMode
                                                           ? Colors.white
                                                           : textColor,
                                                     ),
-                                                    maxLines: 5,
-                                                    minFontSize: 16,
-                                                    stepGranularity: 1,
+                                                    maxLines: 4,
                                                     overflow:
-                                                        TextOverflow.ellipsis,
-                                                    textAlign: TextAlign.left,
-                                                    wrapWords: true,
+                                                        TextOverflow.visible,
+                                                    softWrap: true,
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  ConstrainedBox(
-                                    constraints: const BoxConstraints(
-                                      maxHeight: 340,
-                                    ),
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 24, vertical: 20),
-                                      itemCount: options.length,
-                                      itemBuilder: (context, index) {
-                                        final option = options[index];
-                                        final isSelected = selectedAnswers[
-                                                currentQuestionIndex] ==
-                                            option;
-                                        final animationIndex = index <
-                                                _answerFadeAnimations.length
-                                            ? index
-                                            : _answerFadeAnimations.length - 1;
-                                        final clickAnimationIndex = index <
-                                                _answerClickOpacityAnimations
-                                                    .length
-                                            ? index
-                                            : _answerClickOpacityAnimations
-                                                    .length -
-                                                1;
+                                    Expanded(
+                                      child: ListView.builder(
+                                        padding: EdgeInsets.zero,
+                                        itemCount: options.length,
+                                        itemBuilder: (context, index) {
+                                          final option = options[index];
+                                          final isSelected = selectedAnswers[
+                                                  currentQuestionIndex] ==
+                                              option;
+                                          final animationIndex = index <
+                                                  _answerFadeAnimations.length
+                                              ? index
+                                              : _answerFadeAnimations.length -
+                                                  1;
+                                          final clickAnimationIndex = index <
+                                                  _answerClickOpacityAnimations
+                                                      .length
+                                              ? index
+                                              : _answerClickOpacityAnimations
+                                                      .length -
+                                                  1;
 
-                                        return FadeTransition(
-                                          opacity: _answerFadeAnimations[
-                                              animationIndex],
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 12),
-                                            child: GestureDetector(
-                                              onTapDown: (_) {
-                                                setState(() {
-                                                  _isHovered[index] = true;
-                                                });
-                                              },
-                                              onTapCancel: () {
-                                                setState(() {
-                                                  _isHovered[index] = false;
-                                                });
-                                              },
-                                              onTapUp: (_) {
-                                                setState(() {
-                                                  _isHovered[index] = false;
-                                                });
-                                              },
-                                              onTap: () {
-                                                SoundService.playClick();
-                                                setState(() {
-                                                  selectedAnswers[
-                                                          currentQuestionIndex] =
-                                                      option;
-                                                });
-                                                _answerClickControllers[
-                                                        clickAnimationIndex]
-                                                    .reset();
-                                                _answerClickControllers[
-                                                        clickAnimationIndex]
-                                                    .forward();
-                                              },
-                                              child: AnimatedBuilder(
-                                                animation:
-                                                    _answerClickOpacityAnimations[
-                                                        clickAnimationIndex],
-                                                builder: (context, child) {
-                                                  return Opacity(
-                                                    opacity:
-                                                        _answerClickOpacityAnimations[
-                                                                clickAnimationIndex]
-                                                            .value,
-                                                    child: Container(
-                                                      height: 70,
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 20,
-                                                          vertical: 10),
-                                                      decoration: BoxDecoration(
-                                                        color: isSelected
-                                                            ? Colors.white
-                                                                .withOpacity(
-                                                                    0.95)
-                                                            : (isDarkMode
-                                                                ? (_isHovered[index]
-                                                                    ? Colors.grey[
-                                                                        850]
-                                                                    : Colors.grey[
-                                                                        900])
-                                                                : answerColor),
-                                                        border: isDarkMode
-                                                            ? Border.all(
-                                                                color: _isHovered[
-                                                                        index]
-                                                                    ? Colors
-                                                                        .white
-                                                                        .withOpacity(
-                                                                            0.7)
-                                                                    : Colors
-                                                                        .white
-                                                                        .withOpacity(
-                                                                            0.3),
-                                                                width: 1.5,
-                                                              )
-                                                            : null,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.black
-                                                                .withOpacity(
-                                                                    isDarkMode
-                                                                        ? 0.2
-                                                                        : 0.1),
-                                                            blurRadius: 6,
-                                                            offset:
-                                                                const Offset(
-                                                                    0, 2),
+                                          return FadeTransition(
+                                            opacity: _answerFadeAnimations[
+                                                animationIndex],
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 12),
+                                              child: GestureDetector(
+                                                onTapDown: (_) {
+                                                  setState(() {
+                                                    _isHovered[index] = true;
+                                                  });
+                                                },
+                                                onTapCancel: () {
+                                                  setState(() {
+                                                    _isHovered[index] = false;
+                                                  });
+                                                },
+                                                onTapUp: (_) {
+                                                  setState(() {
+                                                    _isHovered[index] = false;
+                                                  });
+                                                },
+                                                onTap: () {
+                                                  SoundService.playClick();
+                                                  setState(() {
+                                                    selectedAnswers[
+                                                            currentQuestionIndex] =
+                                                        option;
+                                                  });
+                                                  _answerClickControllers[
+                                                          clickAnimationIndex]
+                                                      .reset();
+                                                  _answerClickControllers[
+                                                          clickAnimationIndex]
+                                                      .forward();
+                                                },
+                                                child: AnimatedBuilder(
+                                                  animation:
+                                                      _answerClickOpacityAnimations[
+                                                          clickAnimationIndex],
+                                                  builder: (context, child) {
+                                                    return Opacity(
+                                                      opacity:
+                                                          _answerClickOpacityAnimations[
+                                                                  clickAnimationIndex]
+                                                              .value,
+                                                      child: Container(
+                                                        constraints:
+                                                            BoxConstraints(
+                                                                minHeight: 65),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 16,
+                                                                vertical: 10),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: isSelected
+                                                              ? Colors.white
+                                                                  .withOpacity(
+                                                                      0.95)
+                                                              : (isDarkMode
+                                                                  ? (_isHovered[
+                                                                          index]
+                                                                      ? Colors.grey[
+                                                                          850]
+                                                                      : Colors.grey[
+                                                                          900])
+                                                                  : answerColor),
+                                                          border: isDarkMode
+                                                              ? Border.all(
+                                                                  color: _isHovered[
+                                                                          index]
+                                                                      ? Colors
+                                                                          .white
+                                                                          .withOpacity(
+                                                                              0.7)
+                                                                      : Colors
+                                                                          .white
+                                                                          .withOpacity(
+                                                                              0.3),
+                                                                  width: 1.5,
+                                                                )
+                                                              : null,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(15),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors
+                                                                  .black
+                                                                  .withOpacity(
+                                                                      isDarkMode
+                                                                          ? 0.2
+                                                                          : 0.1),
+                                                              blurRadius: 6,
+                                                              offset:
+                                                                  const Offset(
+                                                                      0, 2),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: AutoSizeText(
+                                                            option,
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              color: isSelected
+                                                                  ? Colors
+                                                                      .black87
+                                                                  : Colors
+                                                                      .white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                            minFontSize: 12,
+                                                            maxLines: 3,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
                                                           ),
-                                                        ],
-                                                      ),
-                                                      child: Align(
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        child: AutoSizeText(
-                                                          option,
-                                                          style: TextStyle(
-                                                            fontSize: 20,
-                                                            color: isSelected
-                                                                ? Colors.black87
-                                                                : Colors.white,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                          maxLines: 2,
-                                                          minFontSize: 14,
-                                                          stepGranularity: 1,
-                                                          wrapWords: true,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          textAlign:
-                                                              TextAlign.left,
                                                         ),
                                                       ),
-                                                    ),
-                                                  );
-                                                },
+                                                    );
+                                                  },
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      },
+                                          );
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             Padding(
@@ -1165,6 +1278,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                       },
                                       onTapUp: (_) {
                                         setState(() {
+                                          SoundService.playClick();
                                           _isBackButtonHovered = false;
                                         });
                                         if (currentQuestionIndex == 0) {
@@ -1235,8 +1349,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                         setState(() {
                                           _isSubmitButtonHovered = false;
                                         });
-                                        SoundService
-                                            .playClick(); // ✅ This must be inside the function block
+                                        SoundService.playClick();
                                         if (selectedAnswers[
                                                 currentQuestionIndex] !=
                                             null) {
@@ -1277,7 +1390,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                           child: Text(
                                             'Submit',
                                             style: const TextStyle(
-                                              fontSize: 18,
+                                              fontSize: 16,
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -1331,8 +1444,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                     Text(
                                       question['scenario'],
                                       style: TextStyle(
-                                        fontSize: 18,
-                                        height: 1.4,
+                                        fontSize: 16,
+                                        height: 1.3,
                                         color: isDarkMode
                                             ? Colors.white
                                             : textColor,

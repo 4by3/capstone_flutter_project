@@ -27,7 +27,7 @@ class AudioService {
     try {
       // Do NOT set the source first. Instead, use `play()` directly.
       await _bgPlayer.setReleaseMode(ReleaseMode.loop);
-      await _bgPlayer.setVolume(0.2);
+      await _bgPlayer.setVolume(0.1);
       await _bgPlayer.play(AssetSource('audio/background_music.mp3'));
     } catch (e) {
       print('Error playing background music: $e');
