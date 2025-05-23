@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:provider/provider.dart';
-import 'package:capstone_project/main.dart'; // Import for ThemeProvider
+import 'package:capstone_project/main.dart'; 
 
 class NotificationSettingsModal extends StatefulWidget {
   const NotificationSettingsModal({super.key});
@@ -363,7 +363,6 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
     await prefs.setInt('notification_minute', _reminderTime.minute);
     await prefs.setBool('monthly_notifications_enabled', true);
 
-    _showSnackBar('Monthly reminders scheduled!', isSuccess: true);
   }
 
   Future<void> _scheduleQuizReminder() async {
@@ -381,9 +380,6 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('quiz_reminder_enabled', true);
 
-    _showSnackBar(
-        'Quiz reminder scheduled for $_quizReminderDays days from now',
-        isSuccess: true);
   }
 
   Future<void> _sendTestNotification() async {
@@ -399,9 +395,6 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
 
     final notificationStatus = await Permission.notification.status;
     if (!notificationStatus.isGranted) {
-      _showSnackBar(
-          'Notifications are disabled. Please enable them in settings.',
-          isError: true);
       await AppSettings.openAppSettings(type: AppSettingsType.notification);
       setState(() {
         _isLoading = false;
@@ -416,11 +409,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
         body: 'This is a test notification to verify the system is working!',
         seconds: 10,
       );
-      _showSnackBar('Test notification sent! It will appear in 10 seconds.',
-          isSuccess: true);
     } catch (e) {
       print('Error scheduling test notification: $e');
-      _showSnackBar('Failed to schedule test notification', isError: true);
     }
 
     setState(() {
@@ -446,10 +436,8 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
         body: 'This is an immediate test notification to verify the system!',
         payload: 'test_notification',
       );
-      _showSnackBar('Immediate test notification sent!', isSuccess: true);
     } catch (e) {
       print('Error sending immediate notification: $e');
-      _showSnackBar('Failed to send immediate notification', isError: true);
     }
 
     setState(() {
@@ -518,8 +506,6 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
       _monthlyRemindersEnabled = false;
       _quizRemindersEnabled = false;
     });
-
-    _showSnackBar('All reminders cancelled', isSuccess: false, isError: true);
   }
 
   void _showSnackBar(String message,
@@ -1014,8 +1000,6 @@ class _NotificationSettingsModalState extends State<NotificationSettingsModal>
       // Update state
       setState(() => _quizReminderDays = selectedDays);
 
-      // Show a message
-      _showSnackBar('Quiz reminder interval updated to $selectedDays days');
 
       // Ask user if they want to reset the reminder timer
       _showResetReminderDialog();

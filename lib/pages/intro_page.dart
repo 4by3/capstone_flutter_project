@@ -265,7 +265,7 @@ class _IntroPageState extends State<IntroPage> with TickerProviderStateMixin {
                   opacity: _fadeAnimation,
                   child: ElevatedButton(
                     onPressed: () async {
-                      await SoundService.playClick(); // 🔊 Add this line
+                      await SoundService.playClick();
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(

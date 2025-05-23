@@ -342,7 +342,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Text(
-                            "HARD MODE",
+                            "ADVANCED LEVEL",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -352,7 +352,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          "Hard Mode Unlocked!",
+                          "Advanced Level Unlocked!",
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -363,7 +363,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          "Congratulations! You've completed all Easy quizzes with perfect scores. Challenge yourself with more advanced privacy questions.",
+                          "Congratulations! You've completed all beginner quizzes with perfect scores. Challenge yourself with more advanced privacy questions.",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
@@ -392,7 +392,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                "Hard mode features more in-depth privacy scenarios and advanced options.",
+                                "Advanced level features more in-depth privacy scenarios and advanced options.",
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
