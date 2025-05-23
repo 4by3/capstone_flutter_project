@@ -466,6 +466,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                                   });
                                 },
                                 onTap: () {
+                                  SoundService.playClick();
                                   setState(() {
                                     selectedAnswers[currentQuestionIndex] =
                                         option;
@@ -558,7 +559,7 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          SoundService.playClick(); // 🔊 Add this to play sound
+                          SoundService.playClick();
 
                           if (currentQuestionIndex == 0) {
                             Navigator.pushReplacement(

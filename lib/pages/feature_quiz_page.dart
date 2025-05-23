@@ -1037,6 +1037,7 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                                 });
                                               },
                                               onTap: () {
+                                                SoundService.playClick();
                                                 setState(() {
                                                   selectedAnswers[
                                                           currentQuestionIndex] =
@@ -1166,10 +1167,8 @@ class _FeatureQuizPageState extends State<FeatureQuizPage>
                                         setState(() {
                                           _isBackButtonHovered = false;
                                         });
-                                        SoundService
-                                            .playClick(); // 🔊 Add this line
                                         if (currentQuestionIndex == 0) {
-                                          Navigator.pop(context, score);
+                                          _onWillPop();
                                         } else {
                                           setState(() {
                                             currentQuestionIndex--;
