@@ -222,15 +222,10 @@ class _IntroQuizPageState extends State<IntroQuizPage>
         currentQuestionIndex++;
         _startAnimations();
       });
-<<<<<<< HEAD
 
     } else {
       _submitQuiz();
 
-=======
-    } else {
-      _submitQuiz();
->>>>>>> origin/mostafa
     }
   }
 
@@ -240,10 +235,6 @@ class _IntroQuizPageState extends State<IntroQuizPage>
         currentQuestionIndex--;
         _startAnimations();
       });
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/mostafa
     }
   }
 
@@ -566,15 +557,6 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                   children: [
                     Expanded(
                       child: OutlinedButton(
-<<<<<<< HEAD
-                        onPressed: currentQuestionIndex == 0
-                            ? () => Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const IntroPage()),
-                        )
-                            : _previousQuestion,
-=======
                         onPressed: () {
                           SoundService.playClick(); // 🔊 Add this to play sound
 
@@ -588,7 +570,6 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                             _previousQuestion();
                           }
                         },
->>>>>>> origin/mostafa
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           side: BorderSide(
@@ -623,26 +604,16 @@ class _IntroQuizPageState extends State<IntroQuizPage>
                               }
                             : null,
                         style: ButtonStyle(
-<<<<<<< HEAD
                           backgroundColor: MaterialStateProperty.resolveWith<Color>(
                                 (Set<MaterialState> states) {
-=======
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
->>>>>>> origin/mostafa
                               if (states.contains(MaterialState.disabled)) {
                                 return textColor.withOpacity(0.5);
                               }
                               return textColor;
                             },
                           ),
-<<<<<<< HEAD
-                          overlayColor: MaterialStateProperty.all(Colors.transparent),
-=======
                           overlayColor:
                               MaterialStateProperty.all(Colors.transparent),
->>>>>>> origin/mostafa
                           padding: MaterialStateProperty.all(
                             const EdgeInsets.symmetric(vertical: 15),
                           ),
