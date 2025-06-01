@@ -1251,9 +1251,6 @@ Future<void> initFCM() async {
     sound: true,
   );
 
-  // Get the FCM token
-  String? token = await messaging.getToken();
-  print("FCM Token: $token");
 
 
   // Initialize local notifications

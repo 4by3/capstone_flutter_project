@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     try {
       final snapshot =
-      await FirebaseFirestore.instance.collection('features').get();
+          await FirebaseFirestore.instance.collection('features').get();
       final fetchedFeatures = snapshot.docs.map((doc) => doc.data()).toList();
 
       if (fetchedFeatures.isNotEmpty) {
@@ -241,10 +241,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       print('goToFeatureQuiz: Before pushing FeatureQuizPage');
       print('  Can pop: ${Navigator.of(context).canPop()}');
       final currentRoute = ModalRoute.of(context);
-      print('  Current route: ${currentRoute?.settings.name ?? 'unnamed'} (isPage: ${currentRoute is PageRoute})');
+      print(
+          '  Current route: ${currentRoute?.settings.name ?? 'unnamed'} (isPage: ${currentRoute is PageRoute})');
       int routeCount = 0;
       Navigator.of(context).popUntil((route) {
-        print('  Route $routeCount: ${route.settings.name ?? 'unnamed'} (isCurrent: ${route.isCurrent})');
+        print(
+            '  Route $routeCount: ${route.settings.name ?? 'unnamed'} (isCurrent: ${route.isCurrent})');
         routeCount++;
         return true;
       });
@@ -255,12 +257,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       final featureName = features[index]['name'];
       final originalIndex = {
-        'Block, Restrict, Report Usage': 0,
-        'Facebook Groups': 1,
-        'Audience Setting for Posts': 2,
-        'Interaction on Others\' Posts': 3,
-        'Tag Review and Settings': 4,
-      }[featureName] ?? 0;
+            'Block, Restrict, Report Usage': 0,
+            'Facebook Groups': 1,
+            'Audience Setting for Posts': 2,
+            'Interaction on Others\' Posts': 3,
+            'Tag Review and Settings': 4,
+          }[featureName] ??
+          0;
 
       final score = await Navigator.push(
         context,
@@ -275,10 +278,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       // Log stack after pop
       print('goToFeatureQuiz: After FeatureQuizPage popped');
       print('  Can pop: ${Navigator.of(context).canPop()}');
-      print('  Current route: ${currentRoute?.settings.name ?? 'unnamed'} (isPage: ${currentRoute is PageRoute})');
+      print(
+          '  Current route: ${currentRoute?.settings.name ?? 'unnamed'} (isPage: ${currentRoute is PageRoute})');
       routeCount = 0;
       Navigator.of(context).popUntil((route) {
-        print('  Route $routeCount: ${route.settings.name ?? 'unnamed'} (isCurrent: ${route.isCurrent})');
+        print(
+            '  Route $routeCount: ${route.settings.name ?? 'unnamed'} (isCurrent: ${route.isCurrent})');
         routeCount++;
         return true;
       });
@@ -296,13 +301,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 context: context,
                 barrierDismissible: true,
                 builder: (_) => Dialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
                   elevation: 0,
                   backgroundColor: Colors.transparent,
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                      color: Provider.of<ThemeProvider>(context).themeMode ==
+                              ThemeMode.dark
                           ? Colors.grey[900]
                           : Colors.white,
                       borderRadius: BorderRadius.circular(20),
@@ -336,7 +343,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 20),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
                             color: Colors.red[100],
                             borderRadius: BorderRadius.circular(30),
@@ -356,9 +364,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                                ? Colors.white
-                                : primaryBlue,
+                            color:
+                                Provider.of<ThemeProvider>(context).themeMode ==
+                                        ThemeMode.dark
+                                    ? Colors.white
+                                    : primaryBlue,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -367,9 +377,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
-                            color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                                ? Colors.white
-                                : primaryLightBlue,
+                            color:
+                                Provider.of<ThemeProvider>(context).themeMode ==
+                                        ThemeMode.dark
+                                    ? Colors.white
+                                    : primaryLightBlue,
                             height: 1.4,
                           ),
                         ),
@@ -395,7 +407,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 "Advanced level features more in-depth privacy scenarios and advanced options.",
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                                  color: Provider.of<ThemeProvider>(context)
+                                              .themeMode ==
+                                          ThemeMode.dark
                                       ? Colors.white
                                       : primaryLightBlue,
                                   height: 1.4,
@@ -410,9 +424,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           child: ElevatedButton(
                             onPressed: () => Navigator.pop(context),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
-                                  ? Colors.grey[900]
-                                  : primaryBlue,
+                              backgroundColor:
+                                  Provider.of<ThemeProvider>(context)
+                                              .themeMode ==
+                                          ThemeMode.dark
+                                      ? Colors.grey[900]
+                                      : primaryBlue,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -448,7 +465,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 for (var feature in features) {
                   String featureName = feature['name'];
                   // Clear hard mode question index and other quiz state
-                  await prefs.remove('${featureName}_hard_currentQuestionIndex');
+                  await prefs
+                      .remove('${featureName}_hard_currentQuestionIndex');
                   await prefs.remove('${featureName}_hard_answeredQuestions');
                   await prefs.remove('${featureName}_hard_correctAnswers');
                   await prefs.remove('${featureName}_hard_totalQuestions');
@@ -462,7 +480,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 setState(() {
                   _sortFeatures();
                   _isCardHovered = List.generate(features.length, (_) => false);
-                  _isVideoHovered = List.generate(features.length, (_) => false);
+                  _isVideoHovered =
+                      List.generate(features.length, (_) => false);
                 });
 
                 // Ensure scores are saved with hard mode prefix
@@ -470,6 +489,153 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               }
             });
           }
+        }
+
+        if (mode == 'hard' && features.every((f) => f['score'] == 5)) {
+          Future.microtask(() async {
+            final AnimationController bellController = AnimationController(
+              duration: const Duration(milliseconds: 600),
+              vsync: this,
+            );
+            final Animation<double> shakeAnimation =
+                Tween(begin: -0.04, end: 0.5)
+                    .chain(CurveTween(curve: Curves.elasticIn))
+                    .animate(bellController);
+
+            bellController.repeat(reverse: true);
+
+            await showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (_) {
+                return Dialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  elevation: 0,
+                  backgroundColor: Colors.transparent,
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Provider.of<ThemeProvider>(context).themeMode ==
+                              ThemeMode.dark
+                          ? Colors.grey[900]
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(
+                              Provider.of<ThemeProvider>(context).themeMode ==
+                                      ThemeMode.dark
+                                  ? 0.2
+                                  : 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedBuilder(
+                          animation: shakeAnimation,
+                          builder: (context, child) {
+                            return Transform.rotate(
+                              angle: shakeAnimation.value,
+                              child: child,
+                            );
+                          },
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: const BoxDecoration(
+                              color: Color.fromARGB(255, 255, 215, 0),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.notifications_active_outlined,
+                              size: 40,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.amber[100],
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Text(
+                            "NOTIFICATIONS",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.amber[800],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Stay Updated!",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Provider.of<ThemeProvider>(context).themeMode ==
+                                        ThemeMode.dark
+                                    ? Colors.white
+                                    : primaryBlue,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Great job! You’ve completed all Hard quizzes. Turn on notifications to get updates on new features and content.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color:
+                                Provider.of<ThemeProvider>(context).themeMode ==
+                                        ThemeMode.dark
+                                    ? Colors.white
+                                    : primaryLightBlue,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              bellController.dispose();
+                              _showNotificationSettings();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber[700],
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 4,
+                            ),
+                            child: const Text(
+                              "Enable Notifications",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          });
         }
       }
     } finally {
@@ -506,7 +672,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor:
-        isDarkMode ? Colors.grey[900] : Colors.white.withOpacity(0.95),
+            isDarkMode ? Colors.grey[900] : Colors.white.withOpacity(0.95),
         title: Text(
           'Reset Progress?',
           style: TextStyle(
@@ -687,15 +853,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           decoration: BoxDecoration(
             gradient: isDarkMode
                 ? LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.black, Colors.black],
-            )
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.black, Colors.black],
+                  )
                 : LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [backgroundBlue, backgroundBlue],
-            ),
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [backgroundBlue, backgroundBlue],
+                  ),
           ),
           child: AppBar(
             backgroundColor: Colors.transparent,
@@ -707,7 +873,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 margin: const EdgeInsets.only(right: 16),
                 child: GestureDetector(
                   onTap: () {
-                    Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+                    Provider.of<ThemeProvider>(context, listen: false)
+                        .toggleTheme();
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
@@ -716,8 +883,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(13),
                       gradient: isDarkMode
-                          ? LinearGradient(colors: [primaryBlue, primaryBlue.withOpacity(0.8)])
-                          : LinearGradient(colors: [Colors.grey[300]!, Colors.grey[400]!]),
+                          ? LinearGradient(colors: [
+                              primaryBlue,
+                              primaryBlue.withOpacity(0.8)
+                            ])
+                          : LinearGradient(
+                              colors: [Colors.grey[300]!, Colors.grey[400]!]),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.15),
@@ -750,7 +921,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             child: Icon(
                               isDarkMode ? Icons.nights_stay : Icons.wb_sunny,
                               size: 12,
-                              color: isDarkMode ? primaryBlue : Colors.orange[700],
+                              color:
+                                  isDarkMode ? primaryBlue : Colors.orange[700],
                             ),
                           ),
                         ),
@@ -766,640 +938,641 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Stack(
-        children: [
-          Container(
-            decoration: isDarkMode
-                ? const BoxDecoration(color: Colors.black)
-                : BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [backgroundBlue, Colors.blue[100]!],
-              ),
-            ),
-            child: SafeArea(
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 15),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Your Privacy Journey',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color:
-                              isDarkMode ? Colors.white : primaryBlue,
-                              height: 1.1,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: const SizedBox(height: 5),
-                  ),
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _StickyHeaderDelegate(
-                      child: Padding(
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 20),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? Colors.grey[900]
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isDarkMode
-                                    ? Colors.black.withOpacity(0.2)
-                                    : primaryBlue.withOpacity(0.2),
-                                blurRadius: 15,
-                                offset: const Offset(0, 5),
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            children: [
-                              Text(
-                                'Progress Overview',
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDarkMode
-                                      ? Colors.white
-                                      : primaryBlue,
-                                  height: 1.1,
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceAround,
-                                children: [
-                                  _buildProgressStat(
-                                    'Completed',
-                                    features
-                                        .where((f) => f['score'] == 5)
-                                        .length
-                                        .toString(),
-                                    Icons.check_circle,
-                                    Colors.green,
-                                  ),
-                                  _buildProgressStat(
-                                    'In Progress',
-                                    features
-                                        .where((f) =>
-                                    (f['started'] as int) == 1 &&
-                                        f['score'] < 5)
-                                        .length
-                                        .toString(),
-                                    Icons.trending_up,
-                                    Colors.orange,
-                                  ),
-                                  _buildProgressStat(
-                                    'Not Started',
-                                    features
-                                        .where((f) =>
-                                    (f['started'] as int) == 0)
-                                        .length
-                                        .toString(),
-                                    Icons.schedule,
-                                    Colors.grey,
-                                  ),
-                                ],
-                              ),
-                            ],
+              children: [
+                Container(
+                  decoration: isDarkMode
+                      ? const BoxDecoration(color: Colors.black)
+                      : BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [backgroundBlue, Colors.blue[100]!],
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 30),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: features.length,
-                            itemBuilder: (context, index) {
-                              bool isCompleted =
-                                  features[index]['score'] == 5;
-                              bool hasStarted =
-                                  (features[index]['started'] as int) ==
-                                      1;
-                              Color statusColor = isDarkMode
-                                  ? Colors.grey[400]!
-                                  : Colors.grey;
-                              if (hasStarted) {
-                                statusColor = isCompleted
-                                    ? Colors.green
-                                    : Colors.orange;
-                              }
-
-                              return Padding(
-                                padding:
-                                const EdgeInsets.only(bottom: 20),
-                                child: ScaleTransition(
-                                  scale: _scaleControllers[index].drive(
-                                    Tween(begin: 1.0, end: 0.95),
+                  child: SafeArea(
+                    child: CustomScrollView(
+                      controller: _scrollController,
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(20, 30, 20, 15),
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Your Privacy Journey',
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        isDarkMode ? Colors.white : primaryBlue,
+                                    height: 1.1,
                                   ),
-                                  child: GestureDetector(
-                                    onTapDown: (_) {
-                                      setState(() {
-                                        _isCardHovered[index] = true;
-                                      });
-                                    },
-                                    onTapCancel: () {
-                                      setState(() {
-                                        _isCardHovered[index] = false;
-                                      });
-                                    },
-                                    onTapUp: (_) {
-                                      setState(() {
-                                        _isCardHovered[index] = false;
-                                      });
-                                      _goToFeatureQuiz(index);
-                                    },
-                                    onTap: () => _goToFeatureQuiz(index),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: _isCardHovered[index]
-                                            ? (isDarkMode
-                                            ? Colors.grey[850]
-                                            : primaryBlue
-                                            .withOpacity(0.05))
-                                            : _getCardBackgroundColor(
-                                          features[index]['score'],
-                                          features[index]['started']
-                                          as int,
-                                          isDarkMode,
-                                        ),
-                                        borderRadius:
-                                        BorderRadius.circular(16),
-                                        border: isDarkMode
-                                            ? Border.all(
-                                          color: _isCardHovered[
-                                          index]
-                                              ? Colors.white
-                                              .withOpacity(0.7)
-                                              : Colors.white
-                                              .withOpacity(0.3),
-                                          width: 1.5,
-                                        )
-                                            : Border.all(
-                                          width: 2,
-                                          color: statusColor
-                                              .withOpacity(0.5),
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black
-                                                .withOpacity(isDarkMode
-                                                ? 0.2
-                                                : 0.1),
-                                            blurRadius: 12,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: const SizedBox(height: 5),
+                        ),
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: _StickyHeaderDelegate(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? Colors.grey[900]
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: isDarkMode
+                                          ? Colors.black.withOpacity(0.2)
+                                          : primaryBlue.withOpacity(0.2),
+                                      blurRadius: 15,
+                                      offset: const Offset(0, 5),
+                                      spreadRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.all(24),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Progress Overview',
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : primaryBlue,
+                                        height: 1.1,
                                       ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            padding:
-                                            const EdgeInsets.fromLTRB(
-                                                20, 20, 20, 12),
-                                            child: Row(
+                                    ),
+                                    const SizedBox(height: 24),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        _buildProgressStat(
+                                          'Completed',
+                                          features
+                                              .where((f) => f['score'] == 5)
+                                              .length
+                                              .toString(),
+                                          Icons.check_circle,
+                                          Colors.green,
+                                        ),
+                                        _buildProgressStat(
+                                          'In Progress',
+                                          features
+                                              .where((f) =>
+                                                  (f['started'] as int) == 1 &&
+                                                  f['score'] < 5)
+                                              .length
+                                              .toString(),
+                                          Icons.trending_up,
+                                          Colors.orange,
+                                        ),
+                                        _buildProgressStat(
+                                          'Not Started',
+                                          features
+                                              .where((f) =>
+                                                  (f['started'] as int) == 0)
+                                              .length
+                                              .toString(),
+                                          Icons.schedule,
+                                          Colors.grey,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 30),
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: features.length,
+                                  itemBuilder: (context, index) {
+                                    bool isCompleted =
+                                        features[index]['score'] == 5;
+                                    bool hasStarted =
+                                        (features[index]['started'] as int) ==
+                                            1;
+                                    Color statusColor = isDarkMode
+                                        ? Colors.grey[400]!
+                                        : Colors.grey;
+                                    if (hasStarted) {
+                                      statusColor = isCompleted
+                                          ? Colors.green
+                                          : Colors.orange;
+                                    }
+
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 20),
+                                      child: ScaleTransition(
+                                        scale: _scaleControllers[index].drive(
+                                          Tween(begin: 1.0, end: 0.95),
+                                        ),
+                                        child: GestureDetector(
+                                          onTapDown: (_) {
+                                            setState(() {
+                                              _isCardHovered[index] = true;
+                                            });
+                                          },
+                                          onTapCancel: () {
+                                            setState(() {
+                                              _isCardHovered[index] = false;
+                                            });
+                                          },
+                                          onTapUp: (_) {
+                                            setState(() {
+                                              _isCardHovered[index] = false;
+                                            });
+                                            _goToFeatureQuiz(index);
+                                          },
+                                          onTap: () => _goToFeatureQuiz(index),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: _isCardHovered[index]
+                                                  ? (isDarkMode
+                                                      ? Colors.grey[850]
+                                                      : primaryBlue
+                                                          .withOpacity(0.05))
+                                                  : _getCardBackgroundColor(
+                                                      features[index]['score'],
+                                                      features[index]['started']
+                                                          as int,
+                                                      isDarkMode,
+                                                    ),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              border: isDarkMode
+                                                  ? Border.all(
+                                                      color: _isCardHovered[
+                                                              index]
+                                                          ? Colors.white
+                                                              .withOpacity(0.7)
+                                                          : Colors.white
+                                                              .withOpacity(0.3),
+                                                      width: 1.5,
+                                                    )
+                                                  : Border.all(
+                                                      width: 2,
+                                                      color: statusColor
+                                                          .withOpacity(0.5),
+                                                    ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(isDarkMode
+                                                          ? 0.2
+                                                          : 0.1),
+                                                  blurRadius: 12,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Container(
                                                   padding:
-                                                  const EdgeInsets
-                                                      .all(8),
-                                                  decoration:
-                                                  BoxDecoration(
-                                                    color: statusColor
-                                                        .withOpacity(
-                                                        0.12),
-                                                    borderRadius:
-                                                    BorderRadius
-                                                        .circular(10),
-                                                  ),
-                                                  child: Icon(
-                                                    isCompleted
-                                                        ? Icons
-                                                        .check_circle
-                                                        : hasStarted
-                                                        ? Icons
-                                                        .trending_up
-                                                        : Icons
-                                                        .schedule,
-                                                    color: statusColor,
-                                                    size: 24,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 14),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start,
+                                                      const EdgeInsets.fromLTRB(
+                                                          20, 20, 20, 12),
+                                                  child: Row(
                                                     children: [
-                                                      Text(
-                                                        features[index]
-                                                        ['name'],
-                                                        style: TextStyle(
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                          FontWeight
-                                                              .w600,
-                                                          color: isDarkMode
-                                                              ? Colors
-                                                              .white
-                                                              : primaryBlue,
-                                                          height: 1.2,
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: statusColor
+                                                              .withOpacity(
+                                                                  0.12),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                        child: Icon(
+                                                          isCompleted
+                                                              ? Icons
+                                                                  .check_circle
+                                                              : hasStarted
+                                                                  ? Icons
+                                                                      .trending_up
+                                                                  : Icons
+                                                                      .schedule,
+                                                          color: statusColor,
+                                                          size: 24,
                                                         ),
                                                       ),
-                                                      if (features[index]
-                                                      ['score'] <
-                                                          2)
-                                                        Padding(
-                                                          padding:
-                                                          const EdgeInsets
-                                                              .only(
-                                                              top: 6),
-                                                          child:
-                                                          Container(
-                                                            padding: const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal:
-                                                                10,
-                                                                vertical:
-                                                                4),
-                                                            decoration:
-                                                            BoxDecoration(
-                                                              color: isDarkMode
-                                                                  ? Colors
-                                                                  .blue
-                                                                  .withOpacity(
-                                                                  0.3)
-                                                                  : Colors
-                                                                  .blue
-                                                                  .withOpacity(0.12),
-                                                              borderRadius:
-                                                              BorderRadius.circular(
-                                                                  12),
-                                                            ),
-                                                            child: Text(
-                                                              "Recommended",
-                                                              style:
-                                                              TextStyle(
-                                                                color: isDarkMode
-                                                                    ? Colors.blueAccent[
-                                                                100]
-                                                                    : Colors
-                                                                    .blueAccent,
-                                                                fontSize:
-                                                                13,
+                                                      const SizedBox(width: 14),
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              features[index]
+                                                                  ['name'],
+                                                              style: TextStyle(
+                                                                fontSize: 18,
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: isDarkMode
+                                                                    ? Colors
+                                                                        .white
+                                                                    : primaryBlue,
+                                                                height: 1.2,
+                                                              ),
+                                                            ),
+                                                            if (features[index]
+                                                                    ['score'] <
+                                                                2)
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        top: 6),
+                                                                child:
+                                                                    Container(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          10,
+                                                                      vertical:
+                                                                          4),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: isDarkMode
+                                                                        ? Colors
+                                                                            .blue
+                                                                            .withOpacity(
+                                                                                0.3)
+                                                                        : Colors
+                                                                            .blue
+                                                                            .withOpacity(0.12),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            12),
+                                                                  ),
+                                                                  child: Text(
+                                                                    "Recommended",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: isDarkMode
+                                                                          ? Colors.blueAccent[
+                                                                              100]
+                                                                          : Colors
+                                                                              .blueAccent,
+                                                                      fontSize:
+                                                                          13,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          20, 0, 20, 16),
+                                                  child: Text(
+                                                    features[index]
+                                                        ['description'],
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      height: 1.5,
+                                                      color: isDarkMode
+                                                          ? Colors.grey[400]
+                                                          : Colors.grey[700],
+                                                    ),
+                                                  ),
+                                                ),
+                                                if (hasStarted || isCompleted)
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(
+                                                        20, 0, 20, 16),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                              isCompleted
+                                                                  ? 'Completed'
+                                                                  : 'In Progress',
+                                                              style: TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color:
+                                                                    statusColor,
+                                                                height: 1.2,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              '${features[index]['score']}/5',
+                                                              style: TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color:
+                                                                    statusColor,
+                                                                height: 1.2,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 8),
+                                                        LinearProgressIndicator(
+                                                          value: features[index]
+                                                                  ['score'] /
+                                                              5,
+                                                          backgroundColor:
+                                                              isDarkMode
+                                                                  ? Colors
+                                                                      .grey[800]
+                                                                  : Colors.grey[
+                                                                      200],
+                                                          valueColor:
+                                                              AlwaysStoppedAnimation(
+                                                                  statusColor),
+                                                          minHeight: 8,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(4),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                GestureDetector(
+                                                  onTapDown: (_) {
+                                                    setState(() {
+                                                      _isVideoHovered[index] =
+                                                          true;
+                                                    });
+                                                  },
+                                                  onTapCancel: () {
+                                                    setState(() {
+                                                      _isVideoHovered[index] =
+                                                          false;
+                                                    });
+                                                  },
+                                                  onTapUp: (_) {
+                                                    setState(() {
+                                                      _isVideoHovered[index] =
+                                                          false;
+                                                    });
+                                                    _showVideoPopup(
+                                                        context,
+                                                        features[index]
+                                                            ['video']);
+                                                  },
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: isDarkMode
+                                                          ? (_isVideoHovered[
+                                                                  index]
+                                                              ? Colors.grey[850]
+                                                              : Colors
+                                                                  .grey[900])
+                                                          : backgroundBlue
+                                                              .withOpacity(0.5),
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .only(
+                                                        bottomLeft:
+                                                            Radius.circular(16),
+                                                        bottomRight:
+                                                            Radius.circular(16),
+                                                      ),
+                                                    ),
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 20,
+                                                          vertical: 14),
+                                                      child: Row(
+                                                        children: [
+                                                          Container(
+                                                            width: 80,
+                                                            height: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: isDarkMode
+                                                                  ? Colors.white
+                                                                      .withOpacity(
+                                                                          0.1)
+                                                                  : Colors.black
+                                                                      .withOpacity(
+                                                                          0.1),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8),
+                                                            ),
+                                                            child: Center(
+                                                              child: Icon(
+                                                                Icons
+                                                                    .play_circle_fill,
+                                                                color: Colors
+                                                                    .white,
+                                                                size: 30,
                                                               ),
                                                             ),
                                                           ),
-                                                        ),
-                                                    ],
+                                                          const SizedBox(
+                                                              width: 16),
+                                                          Expanded(
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  'Video Tutorial',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    color: isDarkMode
+                                                                        ? Colors
+                                                                            .white
+                                                                        : primaryBlue,
+                                                                    height: 1.2,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  'Learn how to use ${features[index]['name']}',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        13,
+                                                                    color: isDarkMode
+                                                                        ? Colors
+                                                                            .grey[400]
+                                                                        : primaryLightBlue,
+                                                                    height: 1.3,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Icon(
+                                                            Icons.chevron_right,
+                                                            color: isDarkMode
+                                                                ? Colors.white
+                                                                : primaryBlue,
+                                                            size: 24,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
-                                          Padding(
-                                            padding:
-                                            const EdgeInsets.fromLTRB(
-                                                20, 0, 20, 16),
-                                            child: Text(
-                                              features[index]
-                                              ['description'],
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                height: 1.5,
-                                                color: isDarkMode
-                                                    ? Colors.grey[400]
-                                                    : Colors.grey[700],
-                                              ),
-                                            ),
-                                          ),
-                                          if (hasStarted || isCompleted)
-                                            Padding(
-                                              padding: const EdgeInsets
-                                                  .fromLTRB(
-                                                  20, 0, 20, 16),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment
-                                                    .start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        isCompleted
-                                                            ? 'Completed'
-                                                            : 'In Progress',
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                          FontWeight
-                                                              .w500,
-                                                          color:
-                                                          statusColor,
-                                                          height: 1.2,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        '${features[index]['score']}/5',
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                          FontWeight
-                                                              .bold,
-                                                          color:
-                                                          statusColor,
-                                                          height: 1.2,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(
-                                                      height: 8),
-                                                  LinearProgressIndicator(
-                                                    value: features[index]
-                                                    ['score'] /
-                                                        5,
-                                                    backgroundColor:
-                                                    isDarkMode
-                                                        ? Colors
-                                                        .grey[800]
-                                                        : Colors.grey[
-                                                    200],
-                                                    valueColor:
-                                                    AlwaysStoppedAnimation(
-                                                        statusColor),
-                                                    minHeight: 8,
-                                                    borderRadius:
-                                                    BorderRadius
-                                                        .circular(4),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          GestureDetector(
-                                            onTapDown: (_) {
-                                              setState(() {
-                                                _isVideoHovered[index] =
-                                                true;
-                                              });
-                                            },
-                                            onTapCancel: () {
-                                              setState(() {
-                                                _isVideoHovered[index] =
-                                                false;
-                                              });
-                                            },
-                                            onTapUp: (_) {
-                                              setState(() {
-                                                _isVideoHovered[index] =
-                                                false;
-                                              });
-                                              _showVideoPopup(
-                                                  context,
-                                                  features[index]
-                                                  ['video']);
-                                            },
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: isDarkMode
-                                                    ? (_isVideoHovered[
-                                                index]
-                                                    ? Colors.grey[850]
-                                                    : Colors
-                                                    .grey[900])
-                                                    : backgroundBlue
-                                                    .withOpacity(0.5),
-                                                borderRadius:
-                                                const BorderRadius
-                                                    .only(
-                                                  bottomLeft:
-                                                  Radius.circular(16),
-                                                  bottomRight:
-                                                  Radius.circular(16),
-                                                ),
-                                              ),
-                                              child: Container(
-                                                padding: const EdgeInsets
-                                                    .symmetric(
-                                                    horizontal: 20,
-                                                    vertical: 14),
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 80,
-                                                      height: 50,
-                                                      decoration:
-                                                      BoxDecoration(
-                                                        color: isDarkMode
-                                                            ? Colors.white
-                                                            .withOpacity(
-                                                            0.1)
-                                                            : Colors.black
-                                                            .withOpacity(
-                                                            0.1),
-                                                        borderRadius:
-                                                        BorderRadius
-                                                            .circular(
-                                                            8),
-                                                      ),
-                                                      child: Center(
-                                                        child: Icon(
-                                                          Icons
-                                                              .play_circle_fill,
-                                                          color: Colors
-                                                              .white,
-                                                          size: 30,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                        width: 16),
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                        children: [
-                                                          Text(
-                                                            'Video Tutorial',
-                                                            style:
-                                                            TextStyle(
-                                                              fontSize:
-                                                              16,
-                                                              fontWeight:
-                                                              FontWeight
-                                                                  .w600,
-                                                              color: isDarkMode
-                                                                  ? Colors
-                                                                  .white
-                                                                  : primaryBlue,
-                                                              height: 1.2,
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            'Learn how to use ${features[index]['name']}',
-                                                            style:
-                                                            TextStyle(
-                                                              fontSize:
-                                                              13,
-                                                              color: isDarkMode
-                                                                  ? Colors
-                                                                  .grey[400]
-                                                                  : primaryLightBlue,
-                                                              height: 1.3,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Icon(
-                                                      Icons.chevron_right,
-                                                      color: isDarkMode
-                                                          ? Colors.white
-                                                          : primaryBlue,
-                                                      size: 24,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
+                                const SizedBox(height: 80),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 80),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: ConfettiWidget(
+                    confettiController: _confettiController,
+                    blastDirectionality: BlastDirectionality.explosive,
+                    shouldLoop: false,
+                    colors: const [
+                      Colors.green,
+                      Colors.blue,
+                      Colors.yellow,
+                      Colors.purple,
+                      Colors.orange,
+                    ],
+                    emissionFrequency: 0.05,
+                    numberOfParticles: 20,
+                    maxBlastForce: 5,
+                    minBlastForce: 2,
+                    gravity: 0.1,
+                  ),
+                ),
+                Positioned(
+                  bottom: 20,
+                  right: 20,
+                  child: GestureDetector(
+                    onTapDown: (_) {
+                      setState(() {
+                        _isResetButtonHovered = true;
+                      });
+                    },
+                    onTapCancel: () {
+                      setState(() {
+                        _isResetButtonHovered = false;
+                      });
+                    },
+                    onTapUp: (_) {
+                      setState(() {
+                        _isResetButtonHovered = false;
+                      });
+                      _resetQuiz();
+                    },
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: isDarkMode
+                            ? (_isResetButtonHovered
+                                ? Colors.grey[850]
+                                : Colors.grey[900])
+                            : primaryBlue,
+                        border: isDarkMode
+                            ? Border.all(
+                                color: _isResetButtonHovered
+                                    ? Colors.white.withOpacity(0.7)
+                                    : Colors.white.withOpacity(0.3),
+                                width: 1.5,
+                              )
+                            : null,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black
+                                .withOpacity(isDarkMode ? 0.2 : 0.1),
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          ),
                         ],
+                      ),
+                      child: const Icon(
+                        Icons.refresh,
+                        color: Colors.white,
+                        size: 24,
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirectionality: BlastDirectionality.explosive,
-              shouldLoop: false,
-              colors: const [
-                Colors.green,
-                Colors.blue,
-                Colors.yellow,
-                Colors.purple,
-                Colors.orange,
+                ),
+                Positioned(
+                  bottom: 20,
+                  left: 20,
+                  child: FloatingActionButton(
+                    onPressed: _showNotificationSettings,
+                    backgroundColor: primaryBlue,
+                    child: const Icon(Icons.notifications_active,
+                        color: Colors.white),
+                    tooltip: 'Notification Settings',
+                  ),
+                ),
               ],
-              emissionFrequency: 0.05,
-              numberOfParticles: 20,
-              maxBlastForce: 5,
-              minBlastForce: 2,
-              gravity: 0.1,
             ),
-          ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: GestureDetector(
-              onTapDown: (_) {
-                setState(() {
-                  _isResetButtonHovered = true;
-                });
-              },
-              onTapCancel: () {
-                setState(() {
-                  _isResetButtonHovered = false;
-                });
-              },
-              onTapUp: (_) {
-                setState(() {
-                  _isResetButtonHovered = false;
-                });
-                _resetQuiz();
-              },
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? (_isResetButtonHovered
-                      ? Colors.grey[850]
-                      : Colors.grey[900])
-                      : primaryBlue,
-                  border: isDarkMode
-                      ? Border.all(
-                    color: _isResetButtonHovered
-                        ? Colors.white.withOpacity(0.7)
-                        : Colors.white.withOpacity(0.3),
-                    width: 1.5,
-                  )
-                      : null,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black
-                          .withOpacity(isDarkMode ? 0.2 : 0.1),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.refresh,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            left: 20,
-            child: FloatingActionButton(
-              onPressed: _showNotificationSettings,
-              backgroundColor: primaryBlue,
-              child: const Icon(Icons.notifications_active, color: Colors.white),
-              tooltip: 'Notification Settings',
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
